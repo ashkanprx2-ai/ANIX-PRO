@@ -4,6 +4,7 @@ String stationGameIcon(String id) => switch (id) {
       'basketball_battle' => 'g_basketball',
       'mini_golf' => 'golf',
       'kart_racing' => 'g_kart',
+      'crash_racing' => 'assets/games/icons/crash_racing.webp',
       'traffic_racer' => 'g_traffic',
       'billiards' => 'g_8ball',
       'pool8' => 'r1c1',

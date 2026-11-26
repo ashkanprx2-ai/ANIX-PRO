@@ -14,6 +14,7 @@ class ArcadeIconSpec {
 }
 
 const Map<String, ArcadeIconSpec> kArcadeIcons = <String, ArcadeIconSpec>{
+  'crash_racing': ArcadeIconSpec(Icons.local_fire_department_rounded, Color(0xFFFF8A1E), Color(0xFFFFD34E)),
   'kart_racing': ArcadeIconSpec(Icons.sports_motorsports_rounded, Color(0xFFFF7A1A), Color(0xFFFFD34E)),
   'obstacle_race': ArcadeIconSpec(Icons.directions_run_rounded, Color(0xFFFF4FA3), Color(0xFF8C5BFF)),
   'bomb_arena': ArcadeIconSpec(Icons.local_fire_department_rounded, Color(0xFFFF4D3D), Color(0xFFFFB13D)),

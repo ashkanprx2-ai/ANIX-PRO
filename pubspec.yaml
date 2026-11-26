@@ -120,6 +120,8 @@ flutter:
     - assets/games/shared/discs/
     - assets/games/shared/pieces/
     - assets/games/kart_racing/
+    - assets/games/crash_racing/
+    - assets/games/icons/
     - assets/games/obstacle_race/
     - assets/games/bomb_arena/
     - assets/games/pool8/

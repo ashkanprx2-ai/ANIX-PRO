@@ -54,6 +54,7 @@ class ArcadeDef {
 /// medal table and an icon, so they advertised "16 games" while shipping 16 playable
 /// ones only by accident. They are gone: the arcade is exactly the games in `kGames`.
 const List<String> kArcadeMultiIds = <String>[
+  'crash_racing',
   'kart_racing',
   'obstacle_race',
   'bomb_arena',
@@ -98,6 +99,7 @@ const Map<String, ArcadeDef> kArcadeDefs = <String, ArcadeDef>{
   'gate_shooter': ArcadeDef(id: 'gate_shooter', unitFa: 'امتیاز', unitEn: 'pts', bronze: 1500, silver: 5000, gold: 15000, daily: 3000),
   'water_sort': ArcadeDef(id: 'water_sort', unitFa: 'امتیاز', unitEn: 'pts', bronze: 800, silver: 3000, gold: 8000, daily: 1500),
   // multiplayer — "score" is the game's own match score; medals count wins in a row vs Hard bots
+  'crash_racing': ArcadeDef(id: 'crash_racing', unitFa: 'امتیاز', unitEn: 'pts', bronze: 1, silver: 3, gold: 5, daily: 1, multiplayer: true),
   'kart_racing': ArcadeDef(id: 'kart_racing', unitFa: 'امتیاز', unitEn: 'pts', bronze: 1, silver: 3, gold: 5, daily: 1, multiplayer: true),
   'obstacle_race': ArcadeDef(id: 'obstacle_race', unitFa: 'امتیاز', unitEn: 'pts', bronze: 1, silver: 3, gold: 5, daily: 1, multiplayer: true),
   'bomb_arena': ArcadeDef(id: 'bomb_arena', unitFa: 'امتیاز', unitEn: 'pts', bronze: 1, silver: 3, gold: 5, daily: 1, multiplayer: true),

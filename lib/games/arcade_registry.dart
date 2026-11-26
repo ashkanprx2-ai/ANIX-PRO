@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'core/game_contract.dart';
 import 'bomb_arena/bomb_arena_entry.dart';
+import 'crash_racing/crash_racing_entry.dart';
 import 'kart_racing/kart_racing_entry.dart';
 import 'obstacle_race/obstacle_race_entry.dart';
 import 'pool8/pool8_entry.dart';
@@ -13,6 +14,31 @@ import 'spy_mafia/spy_mafia_entry.dart';
 /// Multiplayer games: bots offline + online rooms / quick match / invites / tournaments on the games project.
 /// Solo games: quick start, daily challenge, server-validated global boards.
 final List<GameInfo> kArcadeGames = <GameInfo>[
+  GameInfo(
+    id: 'crash_racing',
+    nameFa: 'کرش ریسینگ',
+    nameEn: 'Crash Racing',
+    taglineFa: 'پاورسلاید، توربوی سه‌مرحله‌ای و آیتم‌های جنگلی',
+    taglineEn: 'Power-slides, triple turbos and jungle power-ups',
+    rulesFa: 'ماشین خودش گاز می‌دهد؛ با دکمه‌های چپ و راست فرمان بده. در پیچ دکمه‌ی دریفت را نگه دار تا بپری و سُر بخوری. '
+        'وقتی دود اگزوز سیاه شد و دکمه‌ی دریفت قرمز شد، توربو را بزن (یا دریفت را سریع دوباره بزن): سه بار پشت سر هم '
+        'جرقه‌ی آبی، نارنجی و قرمز. زود یا دیر زدن گرما را می‌سوزاند. از سکوها بپر؛ پرش طولانی توربو می‌دهد. '
+        'از جعبه‌های ؟ آیتم بگیر: موشک هدایت‌شونده، بمب غلتان، جعبه‌ی تله، نیترو، سپر و ماسک نگهبان (شکست‌ناپذیری). '
+        'با ۱۰ انبه‌ستاره سرعتت بیشتر می‌شود. ۳ دور مقابل ۵ راننده؛ بهترین زمان‌ها در جدول جهانی ثبت می‌شوند.',
+    rulesEn: 'Your kart accelerates by itself; steer with left/right. Hold DRIFT in a corner to hop into a power-slide. '
+        'When the exhaust smoke turns black and the DRIFT button glows red, hit TURBO (or re-tap DRIFT): up to three '
+        'boosts per slide — blue, orange, red. Too early or too late loses the heat. Jump the ramps; long hang time '
+        'boosts you. ? crates give a homing rocket, a bowling bomb, a hazard crate, nitro, a shield or the guardian '
+        'mask (invincible). 10 star-mangos raise your top speed. 3 laps vs 5 drivers; best times go on the world board.',
+    minPlayers: 6,
+    maxPlayers: 6,
+    defaultPlayers: 6,
+    supportsLocal: false,
+    accent: const Color(0xFFFF8A1E),
+    builder: buildCrashRacingGame,
+    group: 4,
+    isNew: true,
+  ),
   GameInfo(
     id: 'kart_racing',
     nameFa: 'مسابقه‌ی کارت',
