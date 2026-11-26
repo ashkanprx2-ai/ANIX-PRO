@@ -76,7 +76,7 @@ class GameLaunch {
   /// Total seats (2..6 depending on the game). Seat 0 is always the local player.
   final int playerCount;
 
-  /// Equipped cosmetic items, e.g. {'puck': 'puck_nx_green', 'striker': 'striker_soccer', 'cue': 'cue_classic'}.
+  /// Equipped cosmetic items, e.g. {'striker': 'striker_soccer', 'cue': 'cue_classic'}.
   final Map<String, String> skins;
   final int? seed;
 

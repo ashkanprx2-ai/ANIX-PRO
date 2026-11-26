@@ -167,15 +167,11 @@ class _MiniDisc extends StatelessWidget {
   const _MiniDisc({required this.asset});
   final String asset;
   @override
-  Widget build(BuildContext context) => Container(
-        width: 12,
-        height: 12,
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-          color: Color(0xFFE23B2E),
-          boxShadow: <BoxShadow>[BoxShadow(color: Color(0x99000000), blurRadius: 1.5, offset: Offset(0, 1.2))],
-        ),
-        child: ClipOval(child: Image.asset(asset, fit: BoxFit.cover, cacheWidth: 48, errorBuilder: (_, __, ___) => const SizedBox())),
+  Widget build(BuildContext context) => SizedBox(
+        width: 14,
+        height: 14,
+        // the team's NX puck as cut (no disc, clip or tint added)
+        child: Image.asset(asset, fit: BoxFit.contain, cacheWidth: 48, errorBuilder: (_, __, ___) => const SizedBox()),
       );
 }
 

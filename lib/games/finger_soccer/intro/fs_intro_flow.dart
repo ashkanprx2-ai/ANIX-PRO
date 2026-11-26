@@ -41,7 +41,7 @@ class _FsIntroFlowState extends State<FsIntroFlow> {
   GameLaunch get launch => widget.launch;
   bool get _bot => launch.vsBot;
 
-  /// A bot opponent: a club or a nation (never an NX coin, an elite coin or a boss — those stay the player's reward),
+  /// A bot opponent: one of the club or national NX pucks (brands, cars and fantasy stay the player's reward),
   /// and never the team the player fields.
   String _randomTeam(String not) {
     final List<BmTeam> pool = kBmTeams

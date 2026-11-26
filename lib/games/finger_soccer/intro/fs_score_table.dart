@@ -121,10 +121,8 @@ class FsScoreTable extends StatelessWidget {
                 decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF1C2038)),
                 child: r.avatar != null
                     ? NxUserAvatar(avatar: r.avatar, name: r.name, size: 36)
-                    : ClipOval(
-                        child: Image.asset(r.crest, fit: BoxFit.contain, cacheWidth: 96,
-                            errorBuilder: (_, __, ___) => const SizedBox()),
-                      ),
+                    : Image.asset(r.crest, fit: BoxFit.contain, cacheWidth: 96,
+                        errorBuilder: (_, __, ___) => const SizedBox()),
               ),
               const SizedBox(width: 8),
               Expanded(

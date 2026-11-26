@@ -86,20 +86,20 @@ class FsShop extends StatefulWidget {
   State<FsShop> createState() => _FsShopState();
 }
 
-/// [label, isNew]
-const List<String> kFsTeamShopCategories = <String>[
-  'clubs', 'nations', 'nx', 'cars', 'sport', 'elite', 'legends',
-];
+/// Team tabs of the shop, in kBmCats order (the owner's NX puck categories).
+const List<String> kFsTeamShopCategories = <String>['clubs', 'nations', 'brands', 'cars', 'fantasy'];
 
+/// Shop tab indices after the team categories.
+const int kFsShopTabCustom = 5, kFsShopTabPlayer = 6, kFsShopTabField = 7, kFsShopTabBall = 8;
+
+/// [label, isNew]
 const List<(String, bool)> kFsShopTabs = <(String, bool)>[
-  ('باشگاهی', false),
-  ('ملی', false),
-  ('نیکسورا', false),
-  ('خودرو', false),
-  ('ورزشی', false),
-  ('ویژه', false),
-  ('افسانه', false),
-  ('اختصاصی', true),
+  ('باشگاه‌ها', true),
+  ('ملی', true),
+  ('برندها', true),
+  ('ماشین‌ها', true),
+  ('فانتزی', true),
+  ('اختصاصی', false),
   ('بازیکن', false),
   ('زمین', false),
   ('توپ', false),
@@ -192,15 +192,15 @@ class _FsShopState extends State<FsShop> {
       return <Widget>[for (final BmTeam t in kBmTeams.where((BmTeam t) => t.cat == cat)) _teamCard(t)];
     }
     switch (_tab) {
-      case 7:
+      case kFsShopTabCustom:
         // the create card until the player made a team, then every shared custom team (power 10, 250 gems)
         return <Widget>[
           if (GemShop.instance.myCustomTeam == null) _customCard(),
           for (final BmTeam t in kBmTeams.where((BmTeam t) => bmIsCustomTeamId(t.id))) _teamCard(t),
         ];
-      case 8:
+      case kFsShopTabPlayer:
         return <Widget>[_emptyCard('بازیکن ها به‌زودی')];
-      case 9:
+      case kFsShopTabField:
         return <Widget>[
           for (int i = 0; i < kBmFieldsRaw.length; i++)
             _artCard(bmFieldName(i, widget.fa), 'assets/games/bermuda/thumbs/${kBmFieldsRaw[i].id}.webp', i == _field, () {
@@ -208,7 +208,7 @@ class _FsShopState extends State<FsShop> {
               _savePref(kBmFieldPref, i);
             }, square: true),
         ];
-      case 10:
+      case kFsShopTabBall:
         return <Widget>[
           for (int i = 0; i < NB; i++)
             _artCard(widget.fa ? kBmBallFa[i] : kBmBallN[i], bmBallThumb(i), i == _ball, () {

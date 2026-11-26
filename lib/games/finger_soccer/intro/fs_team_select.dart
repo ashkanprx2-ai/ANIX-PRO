@@ -1,6 +1,7 @@
-// Team select (reference 6-17 s): coach / team-table corner buttons, team name pill, 3D disc with bouncing yellow
-// arrows, cream stat card (power / time / aim), select-or-buy + shop buttons, team one / team two toggle, the side's
-// captain, and the ready button with its countdown.
+// Team select: the owner's NX pucks by category (tabs), a uniform grid of pucks with their names (each puck exactly as
+// cut — selection and lock state live on the tile, never on the art), the picked team's stat card (power / time / aim)
+// with select-or-buy + shop buttons, team one / team two toggle, the side's captain, and the ready button with its
+// countdown.
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -130,66 +131,26 @@ class _FsTeamSelectState extends State<FsTeamSelect> {
 
   BmTeam get _t => kBmTeams[_browse[_side]];
   String get _category => _categories[_side];
-  List<BmTeam> get _categoryTeams => kBmTeams.where((BmTeam t) => t.cat == _category).toList(growable: false);
 
-  /// Browse only the active category. A category change can no longer silently skip national / club catalogs.
-  /// Browsing picks an owned team for the player, or any team for the opponent; locked teams remain purchasable.
-  void _step(int d) => setState(() {
-        final List<BmTeam> group = _categoryTeams;
-        if (group.isEmpty) return;
-        int at = group.indexWhere((BmTeam t) => t.id == _t.id);
-        if (at < 0) at = d > 0 ? -1 : 0;
-        at = (at + d + group.length) % group.length;
-        final BmTeam t = group[at];
+  /// Tiles of the active category: the NX pucks, or in the custom tab every shared custom team (the "create" tile
+  /// is not a team and lives in the shop).
+  List<BmTeam> get _categoryTeams => kBmTeams
+      .where((BmTeam t) => t.cat == _category && t.id != kCustomTeamId)
+      .toList(growable: false);
+
+  /// Tapping a puck shows it in the stat card; an owned puck (any puck for the opponent side) is also picked.
+  void _browseTeam(BmTeam t) => setState(() {
         _browse[_side] = kBmTeams.indexOf(t);
         if (!_needsOwn || GemShop.instance.ownsTeam(t.id)) widget.teams[_side] = t.id;
       });
 
-  Future<void> _showCategories() async {
-    final String? category = await showDialog<String>(
-      context: context,
-      builder: (BuildContext c) => Directionality(
-        textDirection: widget.fa ? TextDirection.rtl : TextDirection.ltr,
-        child: AlertDialog(
-          backgroundColor: kFsNavy,
-          title: Text(widget.fa ? 'دسته‌بندی تیم‌ها' : 'Team categories', style: fsText(18, weight: FontWeight.w900)),
-          contentPadding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-          content: SizedBox(
-            width: 340,
-            child: ListView(
-              shrinkWrap: true,
-              children: <Widget>[
-                for (final List<Object> row in kBmCats)
-                  ListTile(
-                    dense: true,
-                    selected: row[0] == _category,
-                    selectedTileColor: const Color(0x3322C3A2),
-                    leading: Icon(row[0] == _category ? Icons.radio_button_checked : Icons.radio_button_off,
-                        color: row[0] == _category ? kFsLime : const Color(0xFF9EA3C7)),
-                    title: Text(fsTeamCategoryName(row[0] as String, widget.fa), style: fsText(14, weight: FontWeight.w800)),
-                    trailing: Text(
-                      fsFa(kBmTeams.where((BmTeam t) => t.cat == row[0]).length),
-                      style: fsText(12, color: const Color(0xFF9EA3C7)),
-                    ),
-                    onTap: () => Navigator.pop(c, row[0] as String),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-    if (category == null || !mounted) return;
-    setState(() {
-      _categories[_side] = category;
-      final List<BmTeam> group = _categoryTeams;
-      if (group.isEmpty) return;
-      final int currentIndex = group.indexWhere((BmTeam t) => t.id == widget.teams[_side]);
-      final BmTeam selected = currentIndex < 0 ? group.first : group[currentIndex];
-      _browse[_side] = kBmTeams.indexOf(selected);
-      if (!_needsOwn || GemShop.instance.ownsTeam(selected.id)) widget.teams[_side] = selected.id;
-    });
-  }
+  void _pickCategory(String category) => setState(() {
+        _categories[_side] = category;
+        final List<BmTeam> group = _categoryTeams;
+        if (group.isEmpty) return;
+        final int at = group.indexWhere((BmTeam t) => t.id == widget.teams[_side]);
+        _browse[_side] = kBmTeams.indexOf(at < 0 ? group.first : group[at]);
+      });
 
   bool get _needsOwn => _side == 0 && widget.ownedOnlySide0;
 
@@ -243,7 +204,7 @@ class _FsTeamSelectState extends State<FsTeamSelect> {
                     decoration: BoxDecoration(color: kFsNavyTile, borderRadius: BorderRadius.circular(8)),
                     child: Row(children: <Widget>[
                       SizedBox(width: 28, child: Text(fsFa(i + 1), style: fsText(12))),
-                      SizedBox(width: 26, height: 26, child: Image.asset(t.asset, cacheWidth: 64, errorBuilder: (_, __, ___) => const SizedBox())),
+                      SizedBox(width: 26, height: 26, child: Image.asset(bmTeamThumb(t), cacheWidth: 64, errorBuilder: (_, __, ___) => const SizedBox())),
                       const SizedBox(width: 6),
                       Expanded(child: Text(fsTeamName(t, widget.fa), overflow: TextOverflow.ellipsis, style: fsText(12))),
                       for (final int v in <int>[t.power, fsTimeStat(t), t.accuracy])
@@ -259,61 +220,113 @@ class _FsTeamSelectState extends State<FsTeamSelect> {
     );
   }
 
-  Widget _corner(IconData icon, String label, VoidCallback onTap) => FsPress(
-        onTap: onTap,
+  Widget _tab(String category, String label) {
+    final bool on = _category == category;
+    return Expanded(
+      child: FsPress(
+        key: ValueKey<String>('fs_tab_$category'),
+        onTap: () => _pickCategory(category),
         child: Container(
-          width: 76,
-          height: 76,
+          height: 34,
+          margin: const EdgeInsets.symmetric(horizontal: 2),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(9),
-            gradient: const LinearGradient(
-                begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: <Color>[Color(0xFF22C3A2), kFsTeal, kFsTealDark]),
-            border: Border.all(color: const Color(0xFF0A6553), width: 1.2),
-            boxShadow: const <BoxShadow>[BoxShadow(color: Color(0x66000000), blurRadius: 4, offset: Offset(0, 2))],
+            borderRadius: BorderRadius.circular(8),
+            gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: on ? const <Color>[Color(0xFFC8F53A), Color(0xFF7DCB12)] : const <Color>[Color(0xFF22C3A2), kFsTealDark]),
+            border: Border.all(color: on ? const Color(0xFF3F8F0A) : const Color(0xFF0A5E4D)),
           ),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-            Icon(icon, color: Colors.white, size: 36),
-            const SizedBox(height: 2),
-            Text(label, style: fsText(10, weight: FontWeight.w900, height: 1.1)),
-          ]),
+          alignment: Alignment.center,
+          child: Text(label,
+              maxLines: 1,
+              overflow: TextOverflow.visible,
+              softWrap: false,
+              style: fsText(10.5, color: on ? const Color(0xFF173A05) : Colors.white, weight: FontWeight.w900, height: 1.4)),
         ),
-      );
+      ),
+    );
+  }
 
-  Widget _statRow(String label, int v, double top) => Positioned(
-        left: 104,
-        top: top,
-        width: 150,
-        height: 18,
-        child: Row(textDirection: TextDirection.ltr, children: <Widget>[
-          Container(
-            width: 100,
-            height: 15,
-            decoration: BoxDecoration(
-                color: const Color(0xFF151515), borderRadius: BorderRadius.circular(3), border: Border.all(color: const Color(0xFF2C2C2C))),
-            child: Stack(children: <Widget>[
-              FractionallySizedBox(
-                widthFactor: (v / 10).clamp(0.0, 1.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(2),
-                    gradient: const LinearGradient(
-                        begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: <Color>[Color(0xFF8BEA3A), kFsBarGreen, Color(0xFF3F9A10)]),
-                  ),
-                ),
-              ),
-              Positioned(
-                  left: 8,
-                  top: 0,
-                  bottom: 0,
-                  child: Center(child: Text(fsFa(v), style: fsText(11, weight: FontWeight.w900, height: 1)))),
-            ]),
+  /// One grid tile: the puck exactly as cut, its name, and under the name its price (locked) or a tick (picked).
+  Widget _tile(BmTeam t, bool fa) {
+    final GemShop shop = GemShop.instance;
+    final bool browsed = _t.id == t.id;
+    final bool picked = widget.teams[_side] == t.id;
+    final bool locked = _needsOwn && !shop.ownsTeam(t.id);
+    final String? url = t.crestUrl;
+    return GestureDetector(
+      key: ValueKey<String>('fs_team_${t.id}'),
+      behavior: HitTestBehavior.opaque,
+      onTap: () => _browseTeam(t),
+      child: Container(
+        decoration: BoxDecoration(
+          color: browsed ? const Color(0xFF2E3460) : const Color(0xCC1C2038),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: picked ? kFsLime : (browsed ? kFsYellow : kFsNavyEdge), width: picked || browsed ? 2 : 1),
+        ),
+        padding: const EdgeInsets.fromLTRB(3, 5, 3, 3),
+        child: Column(children: <Widget>[
+          SizedBox(
+            width: 60,
+            height: 60,
+            child: url != null && url.isNotEmpty
+                ? FsDisc3D(asset: t.asset, r: 26, depth: 4, networkUrl: url)
+                : Image.asset(bmTeamThumb(t),
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.contain,
+                    cacheWidth: 128,
+                    filterQuality: FilterQuality.medium,
+                    errorBuilder: (_, __, ___) => const SizedBox()),
           ),
+          const SizedBox(height: 3),
           Expanded(
-            child: Text(label,
-                textAlign: TextAlign.center, style: fsText(13, color: const Color(0xFF3B2A12), weight: FontWeight.w900, height: 1)),
+            child: Text(fsTeamName(t, fa),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: fsText(9.5, weight: FontWeight.w800, height: 1.15)),
+          ),
+          SizedBox(
+            height: 14,
+            child: locked
+                ? Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+                    Text(fsFa(shop.teamPrice(t.id)), style: fsText(9.5, color: kFsYellow, weight: FontWeight.w900, height: 1)),
+                    const SizedBox(width: 2),
+                    const FsGem(size: 10),
+                  ])
+                : picked
+                    ? const Icon(Icons.check_circle_rounded, size: 13, color: kFsLime)
+                    : const SizedBox(),
           ),
         ]),
-      );
+      ),
+    );
+  }
+
+  Widget _bar(String label, int v) => Row(textDirection: TextDirection.rtl, children: <Widget>[
+        SizedBox(width: 34, child: Text(label, style: fsText(11, color: const Color(0xFF3B2A12), weight: FontWeight.w900, height: 1))),
+        Expanded(
+          child: Container(
+            height: 12,
+            decoration: BoxDecoration(
+                color: const Color(0xFF151515), borderRadius: BorderRadius.circular(3), border: Border.all(color: const Color(0xFF2C2C2C))),
+            alignment: Alignment.centerRight,
+            child: FractionallySizedBox(
+              widthFactor: (v / 10).clamp(0.0, 1.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(2),
+                  gradient: const LinearGradient(
+                      begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: <Color>[Color(0xFF8BEA3A), kFsBarGreen, Color(0xFF3F9A10)]),
+                ),
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: 18, child: Text(fsFa(v), textAlign: TextAlign.center, style: fsText(11, color: const Color(0xFF3B2A12), weight: FontWeight.w900, height: 1))),
+      ]);
 
   Widget _toggle(int side, double left) {
     final bool on = _side == side;
@@ -406,97 +419,100 @@ class _FsTeamSelectState extends State<FsTeamSelect> {
     final bool owned = !_needsOwn || GemShop.instance.ownsTeam(t.id);
     final bool picked = widget.teams[_side] == t.id;
     final Widget action = !owned
-        ? fsBuyButton('خرید', GemShop.instance.teamPrice(t.id), 130, 30)
+        ? fsBuyButton('خرید', GemShop.instance.teamPrice(t.id), 130, 28, size: 12)
         : picked
-            ? fsGreyButton('انتخاب شده', 130, 30)
-            : fsLimeButton('انتخاب', 130, 30);
+            ? fsGreyButton('انتخاب شده', 130, 28, size: 12)
+            : fsLimeButton('انتخاب', 130, 28, size: 12);
+    final List<BmTeam> group = _categoryTeams;
     return FsCanvas(topLane: widget.topLane, children: <Widget>[
-      Positioned(left: 22, top: 44, child: _corner(Icons.sports_rounded, 'انتخاب مربی', () => _say('انتخاب مربی به‌زودی'))),
-      Positioned(left: 262, top: 44, child: _corner(Icons.leaderboard_rounded, 'جدول تیم ها', _showTable)),
       Positioned(
-        left: 112,
-        top: 45,
-        width: 136,
-        height: 38,
-        child: FsPress(
-          onTap: _showCategories,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              gradient: const LinearGradient(
-                  begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: <Color>[Color(0xFF1FAE8F), Color(0xFF0E7B64)]),
-              border: Border.all(color: const Color(0xFF0A5E4D)),
-            ),
-            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-              Text('${fsTeamCategoryName(_category, widget.fa)}  ▾',
-                  maxLines: 1, overflow: TextOverflow.ellipsis, style: fsText(9.5, weight: FontWeight.w800, height: 1)),
-              const SizedBox(height: 2),
-              Text(fsTeamName(t, widget.fa),
-                  maxLines: 1, overflow: TextOverflow.ellipsis, style: fsText(12.5, weight: FontWeight.w900, height: 1)),
-            ]),
-          ),
-        ),
-      ),
-      Positioned(left: 28, top: 134, child: FsArrow(left: true, onTap: () => _step(-1))),
-      Positioned(left: 280, top: 134, child: FsArrow(left: false, onTap: () => _step(1))),
-      Positioned(
-        left: 0,
-        right: 0,
-        top: 104,
-        child: Center(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 180),
-            transitionBuilder: (Widget c, Animation<double> a) => ScaleTransition(scale: a, child: c),
-            child: GestureDetector(
-              key: ValueKey<String>(t.id),
-              behavior: HitTestBehavior.opaque,
-              onTap: _selectOrBuy,
-              child: DecoratedBox(
-                decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: <BoxShadow>[
-                  if (bmTeamAccent(t.id) != null)
-                    BoxShadow(color: bmTeamAccent(t.id)!.withValues(alpha: 0.55), blurRadius: 26, spreadRadius: 2),
-                ]),
-                child: FsDisc3D(asset: t.asset, r: 56, networkUrl: t.crestUrl),
+        left: 8,
+        right: 8,
+        top: 40,
+        height: 34,
+        child: Row(children: <Widget>[
+          for (final List<Object> row in kBmCats) _tab(row[0] as String, fsTeamCategoryName(row[0] as String, widget.fa)),
+          FsPress(
+            onTap: _showTable,
+            child: Container(
+              width: 34,
+              height: 34,
+              margin: const EdgeInsets.only(right: 2),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                gradient: const LinearGradient(
+                    begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: <Color>[Color(0xFF22C3A2), kFsTealDark]),
+                border: Border.all(color: const Color(0xFF0A5E4D)),
               ),
+              child: const Icon(Icons.leaderboard_rounded, color: Colors.white, size: 20),
             ),
           ),
-        ),
+        ]),
       ),
       Positioned(
-        left: 98,
-        top: 242,
-        width: 164,
-        height: 116,
-        child: DecoratedBox(
+        left: 8,
+        right: 8,
+        top: 80,
+        height: 318,
+        child: group.isEmpty
+            ? Center(
+                child: Text(widget.fa ? 'هنوز تیم اختصاصی‌ای نیست؛ در فروشگاه بساز' : 'No custom teams yet — create one in the shop',
+                    textAlign: TextAlign.center, style: fsText(12)))
+            : RepaintBoundary(
+                child: GridView.builder(
+                  key: ValueKey<String>('fs_grid_$_category'),
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4, mainAxisSpacing: 6, crossAxisSpacing: 6, childAspectRatio: 80 / 108),
+                  itemCount: group.length,
+                  itemBuilder: (BuildContext c, int i) => _tile(group[i], widget.fa),
+                ),
+              ),
+      ),
+      Positioned(
+        left: 8,
+        top: 404,
+        width: 206,
+        height: 70,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
           decoration: BoxDecoration(
             color: kFsCream,
-            borderRadius: BorderRadius.circular(5),
+            borderRadius: BorderRadius.circular(6),
             border: Border.all(color: kFsCreamEdge, width: 2),
             boxShadow: const <BoxShadow>[BoxShadow(color: Color(0x66000000), blurRadius: 5, offset: Offset(0, 2))],
           ),
+          child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
+            _bar('قدرت', t.power),
+            _bar('زمان', fsTimeStat(t)),
+            _bar('هدف', t.accuracy),
+          ]),
         ),
       ),
-      _statRow('قدرت', t.power, 256),
-      _statRow('زمان', fsTimeStat(t), 291),
-      _statRow('هدف', t.accuracy, 326),
-      Positioned(left: 115, top: 374, child: FsPress(onTap: picked && owned ? null : _selectOrBuy, child: action)),
       Positioned(
-        left: 115,
-        top: 424,
-        child: FsPress(
-          onTap: widget.onShop,
-          child: FsBevel(
-            w: 130,
-            h: 36,
-            radius: 5,
-            lipH: 4,
-            top: const Color(0xFFFFFFFF),
-            bottom: const Color(0xFFDADADA),
-            lip: const Color(0xFF7B7B7B),
-            child: Text('فروشگاه', style: fsText(14, color: const Color(0xFF333333), weight: FontWeight.w900)),
+        left: 220,
+        top: 402,
+        width: 132,
+        child: Column(children: <Widget>[
+          Text(fsTeamName(t, widget.fa),
+              maxLines: 1, overflow: TextOverflow.ellipsis, style: fsText(12.5, weight: FontWeight.w900, height: 1.2)),
+          const SizedBox(height: 3),
+          FsPress(onTap: picked && owned ? null : _selectOrBuy, child: action),
+          const SizedBox(height: 4),
+          FsPress(
+            onTap: widget.onShop,
+            child: FsBevel(
+              w: 130,
+              h: 24,
+              radius: 5,
+              lipH: 3,
+              top: const Color(0xFFFFFFFF),
+              bottom: const Color(0xFFDADADA),
+              lip: const Color(0xFF7B7B7B),
+              child: Text('فروشگاه', style: fsText(12, color: const Color(0xFF333333), weight: FontWeight.w900)),
+            ),
           ),
-        ),
+        ]),
       ),
       _toggle(0, 193),
       _toggle(1, 81),

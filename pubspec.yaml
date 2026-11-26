@@ -103,9 +103,6 @@ flutter:
     - assets/ui/nx_kit/ornate/
     - assets/games/shared/
     - assets/games/bermuda/balls/v9/
-    - assets/games/bermuda/discs/v9/
-    - assets/games/bermuda/discs/v10/
-    - assets/games/bermuda/discs/v11/
     - assets/basketball/
     - assets/games/bermuda/fields/
     - assets/games/bermuda/goals/

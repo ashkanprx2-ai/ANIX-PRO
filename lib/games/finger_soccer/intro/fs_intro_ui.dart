@@ -468,14 +468,37 @@ class FsOutlined extends StatelessWidget {
       ]);
 }
 
-/// A team disc as the reference shows it on the team picker: the crest art on a thick silver cylinder.
+/// A team on the pickers: an NX puck exactly as cut, or a custom team's uploaded crest on a silver cylinder.
 class FsDisc3D extends StatelessWidget {
   const FsDisc3D({super.key, required this.asset, required this.r, this.depth = 9, this.networkUrl});
   final String asset;
   final double r, depth;
   final String? networkUrl;
   @override
-  Widget build(BuildContext context) => SizedBox(
+  Widget build(BuildContext context) {
+    if (networkUrl == null || networkUrl!.isEmpty) {
+      // The owner's NX puck: shown exactly as cut (it already is a 3D puck), never clipped, framed or tinted.
+      final int px = (r * 2 * MediaQuery.devicePixelRatioOf(context)).ceil().clamp(64, 512);
+      return SizedBox(
+        width: r * 2 + 6,
+        height: r * 2 + depth + 8,
+        child: Center(
+          child: Image.asset(asset,
+              width: r * 2 + 6,
+              height: r * 2 + 6,
+              fit: BoxFit.contain,
+              cacheWidth: px,
+              gaplessPlayback: true,
+              filterQuality: FilterQuality.medium,
+              errorBuilder: (_, __, ___) => const SizedBox()),
+        ),
+      );
+    }
+    return _crestDisc();
+  }
+
+  /// A player's uploaded round crest on a silver cylinder (custom teams only).
+  Widget _crestDisc() => SizedBox(
         width: r * 2 + 6,
         height: r * 2 + depth + 8,
         child: Stack(alignment: Alignment.topCenter, children: <Widget>[

@@ -226,17 +226,17 @@ class BmTeam {
 const String kBmCustomTeamPrefix = 'cx_';
 
 /// Fallback disc art of a custom team whose crest is not loaded.
-const String kBmCustomTeamFallbackAsset = 'assets/games/bermuda/discs/v10/nx_core_green.webp';
+const String kBmCustomTeamFallbackAsset = 'assets/games/finger_soccer/pucks/iso/fx_crown.webp';
 
 /// Every custom team plays at this power / accuracy (owner spec 2026-11-24).
 const int kBmCustomTeamStat = 10;
 
 bool bmIsCustomTeamId(String id) => id.startsWith(kBmCustomTeamPrefix) && id.length > kBmCustomTeamPrefix.length;
 
-/// Every piece set, in picker order (see kBmTeamDefs: Club, National, Luxury). Growable: the shared custom teams
+/// Every piece set, in picker order (see kBmTeamDefs: clubs, nations, brands, cars, fantasy). Growable: the shared custom teams
 /// (FsCustomTeams) are appended at runtime in the 'custom' category, so every picker / lookup sees them.
 final List<BmTeam> kBmTeams = kBmTeamDefs
-    .map((BmTeamDef d) => BmTeam(d.id, d.cat, d.name, d.faName, 'assets/games/bermuda/${d.art}.webp', d.power, d.accuracy))
+    .map((BmTeamDef d) => BmTeam(d.id, d.cat, d.name, d.faName, d.art, d.power, d.accuracy))
     .toList();
 
 /// The team [id]. An unknown custom id (e.g. the opponent's team created after this phone loaded the list) plays as
@@ -245,7 +245,10 @@ BmTeam bmTeam(String id) => kBmTeams.firstWhere((BmTeam t) => t.id == id,
     orElse: () => bmIsCustomTeamId(id)
         ? BmTeam(id, 'custom', 'Custom Team', 'تیم اختصاصی', kBmCustomTeamFallbackAsset, kBmCustomTeamStat,
             kBmCustomTeamStat)
-        : kBmTeams.first);
+        : kBmTeams.firstWhere((BmTeam t) => t.id == kBmDefaultTeamId, orElse: () => kBmTeams.first));
+
+/// 128 px grid / list thumbnail of [t]'s puck (`pucks/thumb/<id>.webp`); a custom team keeps its fallback asset.
+String bmTeamThumb(BmTeam t) => t.asset.replaceFirst('/finger_soccer/pucks/iso/', '/finger_soccer/pucks/thumb/');
 
 /// A team shape: five discs (the keeper first) as [x, d] in the team's own frame. x is the fraction of the playing
 /// width, left to right as the team sees it from its own goal; d is the depth from its own goal line as a fraction of

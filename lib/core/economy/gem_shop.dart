@@ -9,18 +9,13 @@ import '../../games/finger_soccer/core/fs_custom_teams.dart';
 import '../online/online_service.dart';
 import '../profile/profile_service.dart';
 
-/// Finger-soccer teams that are always unlocked (no purchase). v10 (owner art 2026-11-22): the three starter NX
-/// faction coins — NX Core, NX Cyan and NX Mercury. The v9 starter ids (`club32`, `club33`, `nat26`) were the old
-/// house badges; their art is gone, so a saved setup that still names one resolves to [kDefaultTeam] (see
-/// GemShop.usableTeam) and the server seed keeps those three catalog rows priced 0 but inactive.
-const Set<String> kFreeTeams = <String>{'nx_core', 'nx_cyan', 'nx_frost_blue'};
+/// Finger-soccer teams that are always unlocked (no purchase): the owner's three free NX pucks — wolf, shark and
+/// eagle (bm_data.dart kBmFreeTeamIds). Every other id a saved setup may still name (the retired v9..v14 crest teams)
+/// is not in kBmTeamDefs any more, so [GemShop.usableTeam] resolves it to [kDefaultTeam].
+const Set<String> kFreeTeams = kBmFreeTeamIds;
 
-/// Default team for a new player / when a saved team is not owned.
-const String kDefaultTeam = 'nx_core';
-
-/// v9 starter ids that no longer exist as art. A saved setup naming one is migrated to [kDefaultTeam].
-const Set<String> kRetiredTeams = <String>{'club32', 'club33', 'club34', 'club35', 'club36', 'club37', 'club38', 'club39',
-  'nat24', 'nat25', 'nat26', 'nat27'};
+/// Default team for a new player / when a saved team is not owned or no longer exists.
+const String kDefaultTeam = kBmDefaultTeamId;
 
 /// Inventory / catalog id of a finger-soccer team (`fs_team:club0`).
 String teamItemId(String teamId) => 'fs_team:$teamId';
@@ -127,13 +122,13 @@ class GemShop extends ChangeNotifier {
     return _p?.owns(teamItemId(teamId)) ?? false;
   }
 
-  /// A team the player may field: [teamId] when owned, otherwise the default free team. A retired v9 id (its art no
+  /// A team the player may field: [teamId] when owned, otherwise the default free team. A retired id (its art no
   /// longer ships) is never fielded, even if the server inventory still lists it. The "create" tile id resolves to
   /// the player's own custom team; a custom team someone else made needs its 250-gem purchase.
   String usableTeam(String teamId) {
     if (teamId == kCustomTeamId) return myCustomTeam?.teamId ?? kDefaultTeam;
     if (bmIsCustomTeamId(teamId)) return ownsTeam(teamId) ? teamId : kDefaultTeam;
-    if (kRetiredTeams.contains(teamId) || !kBmTeamDefs.any((BmTeamDef t) => t.id == teamId)) return kDefaultTeam;
+    if (!kBmTeamDefs.any((BmTeamDef t) => t.id == teamId && t.cat != 'custom')) return kDefaultTeam;
     return ownsTeam(teamId) ? teamId : kDefaultTeam;
   }
 

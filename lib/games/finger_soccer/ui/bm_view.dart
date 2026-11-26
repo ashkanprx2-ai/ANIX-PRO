@@ -640,6 +640,8 @@ class _BermudaViewState extends State<BermudaView>
     }
 
     final List<String?> crests = await Future.wait(<Future<String?>>[crest(0), crest(1)]);
+    // true = the side draws a player's uploaded round crest (3D disc); false = an NX puck drawn exactly as cut
+    final List<bool> crestDisc = <bool>[false, false];
     if (!mounted || _disposed) return;
     final String? team0Custom = crests[0], team1Custom = crests[1];
     final List<ui.Image?> r = await Future.wait(<Future<ui.Image?>>[
@@ -647,8 +649,14 @@ class _BermudaViewState extends State<BermudaView>
       f.builtInGoals ? Future<ui.Image?>.value(null) : _img('${_a}goals/${f.gs}.webp'),
       // v9: every ball is a flat art the 3D roller rolls with the ball's motion (no sprite sheet)
       _img(bmBallArt(c.ball)),
-      _imgNetwork(team0Custom, w: 192).then((ui.Image? x) => x ?? _img(bmTeam(c.teams[e.ct(0)]).asset, w: 192)),
-      _imgNetwork(team1Custom, w: 192).then((ui.Image? x) => x ?? _img(bmTeam(c.teams[e.ct(1)]).asset, w: 192)),
+      _imgNetwork(team0Custom, w: 192).then((ui.Image? x) {
+        crestDisc[0] = x != null;
+        return x ?? _img(bmTeam(c.teams[e.ct(0)]).asset, w: 192);
+      }),
+      _imgNetwork(team1Custom, w: 192).then((ui.Image? x) {
+        crestDisc[1] = x != null;
+        return x ?? _img(bmTeam(c.teams[e.ct(1)]).asset, w: 192);
+      }),
     ]);
     if (!mounted || _disposed) {
       for (final ui.Image? i in r) {
@@ -678,6 +686,8 @@ class _BermudaViewState extends State<BermudaView>
     }
     im.team[0] = r[3];
     im.team[1] = r[4];
+    im.crestDisc[0] = crestDisc[0];
+    im.crestDisc[1] = crestDisc[1];
     _refreshHudCrests();
   }
 

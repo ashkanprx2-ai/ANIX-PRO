@@ -1365,7 +1365,7 @@ class _TalkRoomPageState extends ConsumerState<TalkRoomPage> {
             child: ListView(
               scrollDirection: Axis.horizontal,
               children: <Widget>[
-                for (final BmTeam t in kBmTeams.where((BmTeam t) => t.cat == cat[0]))
+                for (final BmTeam t in kBmTeams.where((BmTeam t) => t.cat == cat[0] && t.id != kCustomTeamId))
                   GestureDetector(
                     // Locked teams (not bought with gems) can't be picked here; buy them in the game / shop.
                     onTap: () {

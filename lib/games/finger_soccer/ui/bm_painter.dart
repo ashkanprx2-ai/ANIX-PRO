@@ -13,6 +13,7 @@ import 'bm_trails.dart';
 /// Every sprite is drawn so its measured rim lands exactly on the physics radius (see kBmDiscArtFill /
 /// kBmBallArtFill and tool/build_fs_v9_assets.py): what the player sees is what collides.
 double bmDiscSpriteHalf(BmBody b) => b.r / kBmDiscArtFill;
+double bmPuckSpriteHalf(BmBody b) => b.r / kBmPuckArtFill;
 double bmBallSpriteHalf(BmBody b) => b.r / kBmBallArtFill;
 
 /// v7 GIF ball playback: the animation runs while the ball moves (speed above [kBmGifBallMinSpeed], world units/s).
@@ -33,6 +34,9 @@ class BmImages {
   double animMs = 0;
   double animPhase = 0, animX = double.nan, animY = double.nan, animT = 0;
   final List<ui.Image?> team = <ui.Image?>[null, null];
+  /// Per side: true when [team] is a player's uploaded round crest (drawn as a 3D disc); false for the owner's NX
+  /// pucks, which are drawn exactly as cut (no rotation, rim, bevel or notch).
+  final List<bool> crestDisc = <bool>[false, false];
   BmBallRenderer? ballR;
   // cached background (blurred cover + faded field), keyed by size/field
   ui.Image? bg;
@@ -55,6 +59,7 @@ class BmImages {
     animMs = 0;
     field = goal = ball = bg = null;
     team[0] = team[1] = null;
+    crestDisc[0] = crestDisc[1] = false;
     ballR = null;
   }
 }
@@ -330,6 +335,7 @@ void bmPaintSevenSeg(Canvas canvas, Rect r, int digit, Color c) {
 }
 
 class BmPainter extends CustomPainter {
+  static final Paint _puckPaint = Paint()..filterQuality = FilterQuality.medium;
   BmPainter(this.e, this.im, this.view, this.now, this.dpr, this.fancy, {required Listenable repaint, this.debugColliders = false})
       : super(repaint: repaint);
 
@@ -613,6 +619,13 @@ class BmPainter extends CustomPainter {
       return;
     }
     // No idle bobbing: the sprite stays exactly on its collider.
+    if (!im.crestDisc[b.team == 0 ? 0 : 1]) {
+      // The owner's NX puck: drawn exactly as cut, centred on its collider, its width the collider's diameter.
+      final double h = bmPuckSpriteHalf(b);
+      canvas.drawImageRect(sp, src, Rect.fromLTWH(bx - h, drawY - h, h * 2, h * 2), _puckPaint);
+      canvas.restore();
+      return;
+    }
     // v5 (owner request 2026-11-20): the disc turns with its spin (b.ang, picked up from glancing hits and rails), so
     // a struck disc visibly rotates; a small rim notch keeps the turn visible on a crest that looks the same rotated.
     canvas.translate(bx, drawY);

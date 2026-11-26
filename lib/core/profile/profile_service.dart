@@ -124,8 +124,7 @@ class ProfileService extends ChangeNotifier {
     if (j == null) {
       explorerId = _newExplorerId();
       coins = 500; // starter credits, earned/spent only through real actions afterwards
-      inventory.addAll(const ['puck_nx_green', 'puck_tech_nx', 'theme_aurora', 'striker_soccer', 'cue_classic']);
-      equipped['puck'] = 'puck_nx_green';
+      inventory.addAll(const ['theme_aurora', 'striker_soccer', 'cue_classic']);
       equipped['striker'] = 'striker_soccer';
       equipped['cue'] = 'cue_classic';
       _save();

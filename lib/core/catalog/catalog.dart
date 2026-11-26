@@ -36,9 +36,6 @@ CatalogItem _gear(String id, String slot, String fa, String en, int price, {int 
 CatalogItem _decor(String id, String fa, String en, int price, {int lvl = 1, String r = 'common'}) =>
     CatalogItem(id: 'decor_$id', category: ItemCategory.decor, nameFa: fa, nameEn: en, price: price,
         asset: AppAssets.decor(id), minLevel: lvl, rarity: r);
-CatalogItem _puck(String id, String fa, String en, int price, {int lvl = 1, String r = 'common'}) =>
-    CatalogItem(id: 'puck_$id', category: ItemCategory.puck, nameFa: fa, nameEn: en, price: price,
-        asset: AppAssets.puckIso(id), slot: 'puck', minLevel: lvl, rarity: r);
 CatalogItem _striker(String id, String fa, String en, int price, {int lvl = 1, String r = 'common'}) =>
     CatalogItem(id: 'striker_$id', category: ItemCategory.striker, nameFa: fa, nameEn: en, price: price,
         asset: AppAssets.disc('striker_$id'), slot: 'striker', minLevel: lvl, rarity: r);
@@ -78,18 +75,7 @@ final kCatalog = <CatalogItem>[
   _decor('spire_tower', 'برج نوک‌تیز', 'Spire Tower', 420, lvl: 7, r: 'epic'),
   _decor('tablet_stand', 'پایه‌ی تبلت', 'Tablet Stand', 90),
   _decor('banner', 'پرچم نیکسورا', 'NEXORA Banner', 60),
-  // Finger Soccer pucks
-  _puck('nx_green', 'NX سبز', 'NX Green', 0),
-  _puck('tech_nx', 'تک NX', 'Tech NX', 0),
-  _puck('frost', 'یخی', 'Frost', 150),
-  _puck('frost_b', 'یخی آبی', 'Frost Blue', 150),
-  _puck('eagle_marble', 'عقاب مرمری', 'Marble Eagle', 220),
-  _puck('eagle_gold', 'عقاب طلایی', 'Golden Eagle', 350, r: 'rare'),
-  _puck('noble_lion', 'شیر نجیب', 'Noble Lion', 300, r: 'rare'),
-  _puck('royal_lion', 'شیر سلطنتی', 'Royal Lion', 450, lvl: 5, r: 'epic'),
-  _puck('phoenix_purple', 'ققنوس بنفش', 'Purple Phoenix', 500, lvl: 6, r: 'epic'),
-  _puck('dragon_fire', 'اژدهای آتش', 'Fire Dragon', 650, lvl: 8, r: 'legendary'),
-  _puck('cosmic_crown', 'تاج کیهانی', 'Cosmic Crown', 800, lvl: 10, r: 'legendary'),
+  // (Finger Soccer pucks are the NX teams of the finger-soccer gem shop, not coin items.)
   // Carrom strikers
   _striker('soccer', 'استرایکر توپ', 'Soccer Striker', 0),
   _striker('compass', 'قطب‌نما', 'Compass', 140),

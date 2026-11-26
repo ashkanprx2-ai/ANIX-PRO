@@ -1416,7 +1416,7 @@ class _PlayerSheetState extends ConsumerState<_PlayerSheet> {
   }
 
   Future<void> _addItem() async {
-    final String? it = await _ask(context, context.tx('شناسه‌ی آیتم یا تیم (مثل fs_team:club0)', 'Item / team id (e.g. fs_team:club0)'));
+    final String? it = await _ask(context, context.tx('شناسه‌ی آیتم یا تیم (مثل fs_team:realmadrid)', 'Item / team id (e.g. fs_team:realmadrid)'));
     if (it == null || it.trim().isEmpty) return;
     await _done(await _api(ref).grantItem(widget.userId, it.trim(), true, 'admin panel'));
   }

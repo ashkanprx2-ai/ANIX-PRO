@@ -531,12 +531,12 @@ class _StationForecastScreenState extends ConsumerState<StationForecastScreen> {
         StationCard(
           child: Column(children: <Widget>[
             Row(children: <Widget>[
-              Image.asset(m[0].asset, width: 46, height: 46),
+              Image.asset(m[0].asset, width: 46, height: 46, cacheWidth: 138),
               const SizedBox(width: 8),
               Expanded(child: Text(fa ? m[0].faName : m[0].name, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500))),
               Expanded(child: Text(fa ? m[1].faName : m[1].name, textAlign: TextAlign.end, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500))),
               const SizedBox(width: 8),
-              Image.asset(m[1].asset, width: 46, height: 46),
+              Image.asset(m[1].asset, width: 46, height: 46, cacheWidth: 138),
             ]),
             StationBar(pa / 100, height: 14),
             const SizedBox(height: 8),

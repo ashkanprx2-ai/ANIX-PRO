@@ -14,7 +14,7 @@ void main() {
     final p = ProfileService(LocalStore.instance);
     expect(p.explorerId, matches(RegExp(r'^NX-[A-Z0-9]{4}-[A-Z0-9]{4}$')));
     expect(p.coins, 500);
-    expect(p.owns('puck_nx_green'), isTrue);
+    expect(p.owns('striker_soccer'), isTrue);
     expect(p.level, 1);
   });
 

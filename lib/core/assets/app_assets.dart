@@ -91,72 +91,6 @@ class AppAssets {
   static const gamesCarromBoardNxBlackGold =
       'assets/games/carrom/board_nx_black_gold.webp';
   static const gamesFingerSoccerPitch = 'assets/games/finger_soccer/pitch.webp';
-  static const gamesFingerSoccerPucksIsoPuckCosmicCrownIso =
-      'assets/games/finger_soccer/pucks/iso/puck_cosmic_crown_iso.webp';
-  static const gamesFingerSoccerPucksIsoPuckDragonFireIso =
-      'assets/games/finger_soccer/pucks/iso/puck_dragon_fire_iso.webp';
-  static const gamesFingerSoccerPucksIsoPuckEagleGoldIso =
-      'assets/games/finger_soccer/pucks/iso/puck_eagle_gold_iso.webp';
-  static const gamesFingerSoccerPucksIsoPuckEagleMarbleIso =
-      'assets/games/finger_soccer/pucks/iso/puck_eagle_marble_iso.webp';
-  static const gamesFingerSoccerPucksIsoPuckFrostBIso =
-      'assets/games/finger_soccer/pucks/iso/puck_frost_b_iso.webp';
-  static const gamesFingerSoccerPucksIsoPuckFrostIso =
-      'assets/games/finger_soccer/pucks/iso/puck_frost_iso.webp';
-  static const gamesFingerSoccerPucksIsoPuckNobleLionIso =
-      'assets/games/finger_soccer/pucks/iso/puck_noble_lion_iso.webp';
-  static const gamesFingerSoccerPucksIsoPuckNxGreenIso =
-      'assets/games/finger_soccer/pucks/iso/puck_nx_green_iso.webp';
-  static const gamesFingerSoccerPucksIsoPuckPhoenixPurpleIso =
-      'assets/games/finger_soccer/pucks/iso/puck_phoenix_purple_iso.webp';
-  static const gamesFingerSoccerPucksIsoPuckRoyalLionIso =
-      'assets/games/finger_soccer/pucks/iso/puck_royal_lion_iso.webp';
-  static const gamesFingerSoccerPucksIsoPuckTechNxIso =
-      'assets/games/finger_soccer/pucks/iso/puck_tech_nx_iso.webp';
-  static const gamesFingerSoccerPucksThumbPuckCosmicCrownThumb =
-      'assets/games/finger_soccer/pucks/thumb/puck_cosmic_crown_thumb.webp';
-  static const gamesFingerSoccerPucksThumbPuckDragonFireThumb =
-      'assets/games/finger_soccer/pucks/thumb/puck_dragon_fire_thumb.webp';
-  static const gamesFingerSoccerPucksThumbPuckEagleGoldThumb =
-      'assets/games/finger_soccer/pucks/thumb/puck_eagle_gold_thumb.webp';
-  static const gamesFingerSoccerPucksThumbPuckEagleMarbleThumb =
-      'assets/games/finger_soccer/pucks/thumb/puck_eagle_marble_thumb.webp';
-  static const gamesFingerSoccerPucksThumbPuckFrostBThumb =
-      'assets/games/finger_soccer/pucks/thumb/puck_frost_b_thumb.webp';
-  static const gamesFingerSoccerPucksThumbPuckFrostThumb =
-      'assets/games/finger_soccer/pucks/thumb/puck_frost_thumb.webp';
-  static const gamesFingerSoccerPucksThumbPuckNobleLionThumb =
-      'assets/games/finger_soccer/pucks/thumb/puck_noble_lion_thumb.webp';
-  static const gamesFingerSoccerPucksThumbPuckNxGreenThumb =
-      'assets/games/finger_soccer/pucks/thumb/puck_nx_green_thumb.webp';
-  static const gamesFingerSoccerPucksThumbPuckPhoenixPurpleThumb =
-      'assets/games/finger_soccer/pucks/thumb/puck_phoenix_purple_thumb.webp';
-  static const gamesFingerSoccerPucksThumbPuckRoyalLionThumb =
-      'assets/games/finger_soccer/pucks/thumb/puck_royal_lion_thumb.webp';
-  static const gamesFingerSoccerPucksThumbPuckTechNxThumb =
-      'assets/games/finger_soccer/pucks/thumb/puck_tech_nx_thumb.webp';
-  static const gamesFingerSoccerPucksTopPuckCosmicCrownTop =
-      'assets/games/finger_soccer/pucks/top/puck_cosmic_crown_top.webp';
-  static const gamesFingerSoccerPucksTopPuckDragonFireTop =
-      'assets/games/finger_soccer/pucks/top/puck_dragon_fire_top.webp';
-  static const gamesFingerSoccerPucksTopPuckEagleGoldTop =
-      'assets/games/finger_soccer/pucks/top/puck_eagle_gold_top.webp';
-  static const gamesFingerSoccerPucksTopPuckEagleMarbleTop =
-      'assets/games/finger_soccer/pucks/top/puck_eagle_marble_top.webp';
-  static const gamesFingerSoccerPucksTopPuckFrostBTop =
-      'assets/games/finger_soccer/pucks/top/puck_frost_b_top.webp';
-  static const gamesFingerSoccerPucksTopPuckFrostTop =
-      'assets/games/finger_soccer/pucks/top/puck_frost_top.webp';
-  static const gamesFingerSoccerPucksTopPuckNobleLionTop =
-      'assets/games/finger_soccer/pucks/top/puck_noble_lion_top.webp';
-  static const gamesFingerSoccerPucksTopPuckNxGreenTop =
-      'assets/games/finger_soccer/pucks/top/puck_nx_green_top.webp';
-  static const gamesFingerSoccerPucksTopPuckPhoenixPurpleTop =
-      'assets/games/finger_soccer/pucks/top/puck_phoenix_purple_top.webp';
-  static const gamesFingerSoccerPucksTopPuckRoyalLionTop =
-      'assets/games/finger_soccer/pucks/top/puck_royal_lion_top.webp';
-  static const gamesFingerSoccerPucksTopPuckTechNxTop =
-      'assets/games/finger_soccer/pucks/top/puck_tech_nx_top.webp';
   static const gamesSharedDiscsDiscBlack =
       'assets/games/shared/discs/disc_black.webp';
   static const gamesSharedDiscsDiscBlackCrown =
@@ -308,10 +242,11 @@ class AppAssets {
       'assets/progression/club_badges/$id.webp';
 
   static String disc(String id) => 'assets/games/shared/discs/$id.webp';
-  static String puckTop(String skin) =>
-      'assets/games/finger_soccer/pucks/top/puck_${skin}_top.webp';
-  static String puckIso(String skin) =>
-      'assets/games/finger_soccer/pucks/iso/puck_${skin}_iso.webp';
-  static String puckThumb(String skin) =>
-      'assets/games/finger_soccer/pucks/thumb/puck_${skin}_thumb.webp';
+  /// The owner's NX finger-soccer pucks by team id (bm_data.dart kBmTeamDefs): 512 iso, 256 top, 128 thumb.
+  static String puckTop(String teamId) =>
+      'assets/games/finger_soccer/pucks/top/$teamId.webp';
+  static String puckIso(String teamId) =>
+      'assets/games/finger_soccer/pucks/iso/$teamId.webp';
+  static String puckThumb(String teamId) =>
+      'assets/games/finger_soccer/pucks/thumb/$teamId.webp';
 }
