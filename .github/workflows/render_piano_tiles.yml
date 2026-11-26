@@ -1,0 +1,39 @@
+name: Piano Tiles render shots
+# Renders test_render/piano_tiles_render_test.dart and uploads the PNGs (artifact: piano-tiles-shots).
+on:
+  push:
+    branches: ['arena/game-piano_tiles']
+    paths: ['lib/games/piano_tiles/**', 'test_render/piano_tiles_render_test.dart', 'assets/games/piano_tiles/**', '.github/workflows/render_piano_tiles.yml']
+  workflow_dispatch:
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.50.0'
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Render
+        run: |
+          set +e
+          mkdir -p shots
+          sudo mkdir -p /workspace/work && sudo ln -sfn $FLUTTER_ROOT /workspace/work/flutter_sdk && sudo ln -sfn $PWD /workspace/work/anix
+          sudo apt-get install -y -qq fonts-dejavu-core >/dev/null 2>&1
+          flutter test test/games/piano_tiles/ --reporter expanded 2>&1 | tail -15
+          flutter test test_render/piano_tiles_render_test.dart --dart-define=SHOTS=$PWD/shots > render.txt 2>&1
+          echo "=====RENDER====="
+          grep -vE "^  (dart:|package:flutter_tools)" render.txt | head -150
+          grep -E "All tests passed|Some tests failed|EXCEPTION|overflowed|Expected:|Actual:|Error" render.txt | head -10 | while IFS= read -r line; do
+            echo "::warning title=pt-render::$line"
+          done
+          find shots -type f | sort
+          exit 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: piano-tiles-shots
+          path: shots
+          if-no-files-found: ignore

@@ -1,0 +1,456 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../../../core/catalog/catalog.dart';
+import '../../../core/online/cloud_profile_sync.dart';
+import '../../../core/online/online_service.dart';
+import '../../../core/profile/profile_service.dart';
+import '../../../core/settings/app_settings.dart';
+import '../../../core/theme/nx_theme.dart';
+import '../../../core/widgets/nx_widgets.dart';
+import 'avatar_view.dart';
+import 'po_common.dart';
+
+import '../../../core/ui2/anix_kit.dart';
+import '../../../core/ui2/luxe.dart';
+
+/// Identity: avatar, name, Explorer ID, bio, rank, XP, join date.
+class IdentityTab extends ConsumerWidget {
+  const IdentityTab({super.key});
+
+  Future<void> _editProfile(BuildContext context, ProfileService p) async {
+    final TextEditingController name = TextEditingController(text: p.username);
+    final TextEditingController bio = TextEditingController(text: p.bio);
+    String? err;
+    bool saving = false;
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext ctx) => StatefulBuilder(
+        builder: (BuildContext ctx, StateSetter setModal) => AnixDialog(
+          title: Text(ctx.tx('ویرایش پروفایل و نام کاربری', 'Edit profile & username')),
+          content: SizedBox(
+            width: 360,
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
+              TextField(
+                controller: name,
+                maxLength: 20,
+                textDirection: TextDirection.ltr,
+                decoration: InputDecoration(
+                  labelText: ctx.tx('نام کاربری (انگلیسی ۳ تا ۲۰ حرف)', 'Username (3–20 letters, digits, _ or .)'),
+                  prefixText: '@',
+                  errorText: err,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: bio,
+                maxLength: 160,
+                maxLines: 3,
+                decoration: InputDecoration(labelText: ctx.tx('درباره‌ی من', 'Bio')),
+              ),
+            ]),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: saving ? null : () => Navigator.pop(ctx),
+              child: Text(ctx.tx('انصراف', 'Cancel')),
+            ),
+            FilledButton(
+              onPressed: saving
+                  ? null
+                  : () async {
+                      final String candidate = name.text.trim().replaceFirst(RegExp(r'^@+'), '');
+                      setModal(() {
+                        saving = true;
+                        err = null;
+                      });
+                      if (candidate != p.username) {
+                        final CloudProfileSync? sync = CloudProfileSync.current;
+                        final String status = sync != null
+                            ? await sync.setUsername(candidate)
+                            : (ProfileService.isValidRealUsername(candidate) ? 'ok' : 'bad_chars');
+                        if (status != 'ok') {
+                          setModal(() {
+                            saving = false;
+                            err = switch (status) {
+                              'taken' => ctx.tx('این نام کاربری قبلاً انتخاب شده است.', 'This username is already taken.'),
+                              'bad_length' => ctx.tx('نام کاربری باید بین ۳ تا ۲۰ کاراکتر باشد.', 'Username must be 3–20 characters.'),
+                              'bad_chars' => ctx.tx('فقط حروف انگلیسی، عدد، نقطه (.) و زیرخط (_) مجاز است.',
+                                  'Use only English letters, numbers, . and _.'),
+                              _ => ctx.tx('ذخیره روی سرور ممکن نشد؛ اینترنتت را بررسی کن.', 'Could not save to server; check connection.'),
+                            };
+                          });
+                          return;
+                        }
+                        if (sync == null) {
+                          await p.setConfirmedUsername(candidate);
+                        }
+                      }
+                      await p.updateProfile(newBio: bio.text.trim());
+                      if (ctx.mounted) Navigator.pop(ctx);
+                      if (context.mounted) {
+                        luxeToast(context, context.tx('پروفایل ذخیره شد ✓', 'Profile saved ✓'));
+                      }
+                    },
+              child: saving
+                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                  : Text(ctx.tx('ذخیره', 'Save')),
+            ),
+          ],
+        ),
+      ),
+    );
+    name.dispose();
+    bio.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ProfileService p = ref.watch(profileProvider);
+    final NxThemeColors visual = NxThemeColors.of(context);
+    final String? frameId = p.equipped['frame'];
+    final CatalogItem? frame = frameId == null ? null : catalogItem(frameId);
+    final int gearCount =
+        kAvatarSlots.where((String s) => p.equipped.containsKey(s)).length;
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+          NxSpace.md, NxSpace.sm, NxSpace.md, NxSpace.xl),
+      children: <Widget>[
+        PoCard(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: <Color>[visual.surfaceRaised, visual.surface],
+          ),
+          child: Column(children: <Widget>[
+            const SizedBox(height: 8),
+            _ProfileAvatarPicker(profile: p),
+            const SizedBox(height: 12),
+            Text(
+              p.username.isEmpty
+                  ? context.tx('کاوشگر بی‌نام', 'Unnamed explorer')
+                  : p.username,
+              style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  color: PoColors.ink(context)),
+            ),
+            const SizedBox(height: 4),
+            Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
+              AnixRankEmblem(tier: anixTierForLevel(p.level), size: 34),
+              const SizedBox(width: 6),
+              Text(
+                  '${context.tx(p.rankTitleFa, p.rankTitleEn)} · ${anixTierName(anixTierForLevel(p.level), context.isFa)}',
+                  style: TextStyle(
+                      color: PoColors.lilac(context),
+                      fontWeight: FontWeight.w800)),
+            ]),
+            const SizedBox(height: 10),
+            _ExplorerIdChip(id: p.explorerId),
+            const SizedBox(height: 12),
+            Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
+                children: <Widget>[
+                  NxPill(
+                      label: poDigits(
+                          context, '${context.tx('سطح', 'Level')} ${p.level}'),
+                      icon: Icons.bolt_rounded,
+                      color: PoColors.mint(context)),
+                  NxPill(
+                      label: poDigits(context, '${p.coins}'),
+                      icon: Icons.toll_rounded,
+                      color: const Color(0xFFD69A00)),
+                  NxPill(
+                      label: poDigits(context,
+                          '${p.achievements.length} ${context.tx('دستاورد', 'badges')}'),
+                      icon: Icons.emoji_events_rounded,
+                      color: PoColors.lilac(context)),
+                  if (frame != null)
+                    NxPill(
+                        label: context.tx(frame.nameFa, frame.nameEn),
+                        icon: Icons.crop_square_rounded,
+                        color: const Color(0xFF2F8CFF)),
+                ]),
+            const SizedBox(height: 8),
+          ]),
+        ),
+        const SizedBox(height: NxSpace.md),
+        // XP on a dark card so the shared XpBar keeps its intended contrast.
+        Container(
+          padding: const EdgeInsets.all(NxSpace.md),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(NxRadius.lg),
+            gradient: LinearGradient(
+                colors: <Color>[visual.backgroundMid, visual.surfaceRaised]),
+            boxShadow: const <BoxShadow>[
+              BoxShadow(
+                  color: Color(0x332A1E6E),
+                  blurRadius: 18,
+                  offset: Offset(0, 6))
+            ],
+          ),
+          child: DefaultTextStyle.merge(
+            style: const TextStyle(color: NxColors.ink),
+            child: Theme(
+              data: ThemeData.dark(useMaterial3: true),
+              child: DefaultTextStyle.merge(
+                style: const TextStyle(color: NxColors.ink),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      const XpBar(height: 12),
+                      const SizedBox(height: 10),
+                      Text(
+                        poDigits(
+                            context,
+                            context.tx('کل امتیاز تجربه: ${p.xp} XP',
+                                'Total experience: ${p.xp} XP')),
+                        style: TextStyle(color: visual.muted, fontSize: 12),
+                      ),
+                    ]),
+              ),
+            ),
+          ),
+        ),
+        PoSectionTitle(context.tx('درباره‌ی من', 'About me'),
+            icon: Icons.person_rounded,
+            trailing: TextButton.icon(
+              onPressed: () => _editProfile(context, p),
+              icon: const Icon(Icons.edit_rounded, size: 16),
+              label: Text(context.tx('ویرایش', 'Edit')),
+            )),
+        PoCard(
+          onTap: () => _editProfile(context, p),
+          child: Text(
+            p.bio.isEmpty
+                ? context.tx('هنوز چیزی ننوشته‌ای. برای نوشتن بیوگرافی بزن.',
+                    'No bio yet. Tap to write one.')
+                : p.bio,
+            style: TextStyle(
+                color: p.bio.isEmpty
+                    ? PoColors.inkDim(context)
+                    : PoColors.ink(context),
+                height: 1.5),
+          ),
+        ),
+        PoSectionTitle(context.tx('اطلاعات حساب', 'Account'),
+            icon: Icons.info_outline_rounded),
+        PoCard(
+          child: Column(children: <Widget>[
+            _InfoRow(
+                icon: Icons.event_rounded,
+                label: context.tx('تاریخ پیوستن', 'Joined'),
+                value: poDate(context, p.createdAt)),
+            _InfoRow(
+                icon: Icons.local_fire_department_rounded,
+                label: context.tx('رکورد روزانه', 'Daily streak'),
+                value: poDigits(context,
+                    context.tx('${p.streak} روز', '${p.streak} days'))),
+            _InfoRow(
+                icon: Icons.sports_esports_rounded,
+                label: context.tx('مسابقه‌ها', 'Matches'),
+                value: poDigits(context, '${p.totalGamesPlayed}')),
+            _InfoRow(
+                icon: Icons.checkroom_rounded,
+                label: context.tx('تجهیزات پوشیده', 'Gear equipped'),
+                value: poDigits(context, '$gearCount/${kAvatarSlots.length}')),
+            _InfoRow(
+                icon: Icons.inventory_2_rounded,
+                label: context.tx('آیتم‌های مالکیت', 'Items owned'),
+                value: poDigits(context, '${p.inventory.length}')),
+          ]),
+        ),
+        PoSectionTitle(context.tx('میانبرها', 'Quick links'),
+            icon: Icons.bolt_rounded),
+        Wrap(spacing: 8, runSpacing: 8, children: <Widget>[
+          ActionChip(
+            avatar: const Icon(Icons.storefront_rounded, size: 18),
+            label: Text(context.tx('NEXORA Exchange', 'NEXORA Exchange')),
+            onPressed: () => context.push('/world/nexora_exchange'),
+          ),
+          ActionChip(
+            avatar: const Icon(Icons.sports_esports_rounded, size: 18),
+            label: Text(context.tx('آرکید', 'Arcade')),
+            onPressed: () => context.push('/world/nexora_arcade'),
+          ),
+          ActionChip(
+            avatar: const Icon(Icons.settings_rounded, size: 18),
+            label: Text(context.tx('تنظیمات', 'Settings')),
+            onPressed: () => context.push('/settings'),
+          ),
+        ]),
+        PoSectionTitle(context.tx('دوستان', 'Friends'),
+            icon: Icons.group_rounded),
+        Theme(
+          data: ThemeData.dark(useMaterial3: true),
+          child: Container(
+            decoration: BoxDecoration(
+                color: NxColors.panel,
+                borderRadius: BorderRadius.circular(NxRadius.lg)),
+            child: ref.watch(onlineProvider).isOnline
+                ? ListTile(
+                    leading: Icon(Icons.group_rounded, color: visual.accent),
+                    title: Text(context.tx('دوستان، درخواست‌ها و جستجو',
+                        'Friends, requests and search')),
+                    subtitle: Text(context.tx('در ORBIT NETWORK › مخاطبان',
+                        'In ORBIT NETWORK › Contacts')),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/world/orbit_network'),
+                  )
+                : const OnlineOnlyNotice(
+                    featureFa: 'فهرست دوستان', featureEn: 'The friends list'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ProfileAvatarPicker extends ConsumerStatefulWidget {
+  const _ProfileAvatarPicker({required this.profile});
+  final ProfileService profile;
+
+  @override
+  ConsumerState<_ProfileAvatarPicker> createState() => _ProfileAvatarPickerState();
+}
+
+class _ProfileAvatarPickerState extends ConsumerState<_ProfileAvatarPicker> {
+  bool _busy = false;
+
+  Future<void> _pick() async {
+    final online = ref.read(onlineProvider);
+    if (!online.isOnline || online.isGuest) {
+      luxeToast(context, context.tx('برای عکس پروفایل وارد حساب شو.', 'Sign in to set a profile photo.'));
+      return;
+    }
+    final XFile? file = await ImagePicker().pickImage(
+        source: ImageSource.gallery, maxWidth: 720, maxHeight: 720, imageQuality: 85);
+    if (file == null) return;
+    setState(() => _busy = true);
+    try {
+      final String name = file.name.toLowerCase();
+      final String ext = name.contains('.') ? name.split('.').last : 'jpg';
+      await ref.read(cloudSyncProvider).uploadAvatar(await file.readAsBytes(), extension: ext);
+      if (mounted) {
+        luxeToast(context, context.tx('عکس پروفایل ذخیره شد.', 'Profile photo saved.'));
+      }
+    } catch (e) {
+      if (mounted) {
+        luxeToast(context, context.tx('آپلود عکس ناموفق بود.', 'Profile photo upload failed.'));
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _choosePortrait() async {
+    final ProfileService p = widget.profile;
+    final String? id = await showAnixAvatarPicker(context,
+        current: p.portrait, tier: anixTierForLevel(p.level), fa: context.isFa);
+    if (id != null) await p.setPortrait(id);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ProfileService p = widget.profile;
+    final String? url = p.avatarUrl;
+    final AnixTier tier = anixTierForLevel(p.level);
+    return Column(children: <Widget>[
+      Stack(alignment: Alignment.bottomRight, children: <Widget>[
+        GestureDetector(
+          onTap: _choosePortrait,
+          child: AnixFramedAvatar(avatarId: p.portrait, photoUrl: url, tier: tier, size: 176, active: true),
+        ),
+        FloatingActionButton.small(
+          heroTag: 'profile-photo-picker',
+          tooltip: context.tx('عکس پروفایل', 'Profile photo'),
+          onPressed: _busy ? null : _pick,
+          child: _busy
+              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+              : const Icon(Icons.camera_alt_rounded),
+        ),
+      ]),
+      const SizedBox(height: 10),
+      AnixButton(
+        label: context.tx('انتخاب آواتار', 'Choose avatar'),
+        icon: Icons.face_retouching_natural_rounded,
+        style: AnixButtonStyle.secondary,
+        height: 40,
+        fontSize: 13,
+        onTap: _choosePortrait,
+      ),
+    ]);
+  }
+}
+
+class _ExplorerIdChip extends StatelessWidget {
+  const _ExplorerIdChip({required this.id});
+  final String id;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: const Color(0x147B5CE6),
+      borderRadius: BorderRadius.circular(40),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(40),
+        onTap: () async {
+          await Clipboard.setData(ClipboardData(text: id));
+          if (!context.mounted) return;
+          luxeToast(context, context.tx('Explorer ID کپی شد', 'Explorer ID copied'));
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: Directionality(
+            textDirection: TextDirection.ltr,
+            child: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
+              Icon(Icons.fingerprint_rounded,
+                  size: 18, color: PoColors.lilac(context)),
+              const SizedBox(width: 6),
+              Text(id,
+                  style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.6,
+                      color: PoColors.ink(context),
+                      fontFamily: 'monospace')),
+              const SizedBox(width: 8),
+              Icon(Icons.copy_rounded,
+                  size: 16, color: PoColors.inkDim(context)),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  const _InfoRow(
+      {required this.icon, required this.label, required this.value});
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(children: <Widget>[
+        Icon(icon, size: 18, color: PoColors.lilac(context)),
+        const SizedBox(width: 10),
+        Expanded(
+            child:
+                Text(label, style: TextStyle(color: PoColors.inkDim(context)))),
+        Text(value,
+            style: TextStyle(
+                fontWeight: FontWeight.w800, color: PoColors.ink(context))),
+      ]),
+    );
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "game": "basketball_battle",
+  "palette": {},
+  "fx": {},
+  "sprites": {
+    "court": "court_nx.webp",
+    "ball": "ball.webp",
+    "ball_fire": "ball_fire.webp",
+    "ball_fast": "ball_fast.webp",
+    "hoop": "hoop_board.webp",
+    "stand": "hoop_stand.webp",
+    "fx_explosion": "fx_explosion.webp",
+    "fx_swish": "fx_swish.webp"
+  },
+  "hud": {
+    "scoreboard": "scoreboard_blank.webp",
+    "player_home": "player_blue.webp",
+    "player_guest": "player_red.webp",
+    "trophy": "trophy.webp",
+    "medal": "medal.webp",
+    "shield": "shield.webp"
+  },
+  "expected_sprites": {
+    "ball": "basketball (round)",
+    "hoop": "hoop + backboard (front view)",
+    "court": "court background (portrait)"
+  },
+  "source": "owner art 2026-11-25 (uploads 139206 arena, 139207 sprites), cut by tool/nx_kit_slice.py; court_nx.webp is the arena with its painted hoop removed, placed so its backboard sits on the physics board at hoopX = 0 (360 x 640 canvas at 2x)"
+}

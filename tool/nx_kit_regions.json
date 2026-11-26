@@ -1,0 +1,16 @@
+{
+  "arena": {
+    "mirror": [[195, 430, 290, 735], [430, 500, 420, 605], [495, 600, 465, 560], [595, 662, 412, 612]],
+    "tile": [[662, 800, 412, 612, 330, 410]],
+    "rowfill": [[0, 170, 215, 810]],
+    "board_px": [304, 720, 196]
+  },
+  "snl_kit": {"0": "grid_empty", "1": "snake_blue_s", "2": "snake_pink_s", "3": "snake_green_s", "4": "snake_purple_long",
+              "5": "board_numbers", "6": "snake_orange", "7": "snake_cyan", "8": "snake_small", "9": "ladder_short",
+              "10": "ladder_mid", "11": "ladder_long", "12": "pawn_blue", "14": "pawn_yellow", "15": "pawn_green"},
+  "snl_sprites": {"0": "ladder_a", "1": "snake_pink", "2": "ladder_b", "4": "snake_blue", "5": "snake_purple",
+                  "6": "ladder_c", "7": "ladder_d", "8": "snake_pink_b"},
+  "timer_text": [[172, 305, 62, 108], [203, 252, 112, 148], [430, 595, 52, 82], [425, 600, 85, 145],
+                 [715, 850, 62, 108], [805, 850, 112, 148]],
+  "glyph1_shift": 12
+}

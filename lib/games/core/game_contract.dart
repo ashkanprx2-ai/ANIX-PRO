@@ -1,0 +1,225 @@
+import 'package:flutter/widgets.dart';
+
+import 'net_link.dart';
+
+export 'net_link.dart';
+
+/// ===================== ANIX GAME CONTRACT (STEP_16) =====================
+/// Every Arcade game is an independent module under `lib/games/<id>/`.
+///  * Pure-Dart rules engine in `lib/games/<id>/core/` (no Flutter/Flame imports,
+///    deterministic, unit-tested; the same logic will run server-side online).
+///  * Rendering (Flame or Flutter CustomPainter) + UI in `lib/games/<id>/ui/`.
+///  * One entry function `Widget build<Name>Game(GameLaunch launch)` in
+///    `lib/games/<id>/<id>_entry.dart` registered in game_registry.dart.
+///  * When a match ends the game calls `launch.onFinish(GameResult(...))` exactly
+///    once. The host shows the result screen, awards XP/coins and offers rematch.
+///  * The host draws the exit button (top-start corner, 56x56 safe area): keep
+///    that corner free of important UI.
+/// ==========================================================================
+
+enum GameMode {
+  /// Against offline AI.
+  vsBot,
+
+  /// Pass-and-play / same-device multiplayer.
+  local,
+
+  /// Online match: [GameLaunch.net] carries the move link, seats are global.
+  online,
+}
+
+enum BotDifficulty { easy, normal, hard }
+
+enum GameOutcome { win, loss, draw }
+
+class GameLaunch {
+  const GameLaunch({
+    required this.gameId,
+    required this.mode,
+    required this.difficulty,
+    required this.playerName,
+    required this.isFa,
+    required this.fancyEffects,
+    required this.reducedMotion,
+    required this.soundOn,
+    required this.onFinish,
+    this.playerCount = 2,
+    this.skins = const {},
+    this.seed,
+    this.net,
+    this.tournamentMatchId,
+    this.daily = false,
+    this.immersive,
+  });
+
+  /// Set to true by a game whose match screen draws its own complete chrome (its own menu with an exit, its own
+  /// clock) while the match runs, so the host page hides its corner buttons, tutorial banner and presence dots and
+  /// nothing covers the playfield. The host owns the notifier; null when the host does not support it.
+  final ValueNotifier<bool>? immersive;
+
+  /// Daily challenge run: [seed] is today's shared seed (solo: score target, multiplayer: win vs Hard bots).
+  final bool daily;
+
+  final String gameId;
+  final GameMode mode;
+  final BotDifficulty difficulty;
+
+  /// Display name of the local player (from Personal Orbit identity).
+  final String playerName;
+  final bool isFa;
+
+  /// false on Low quality or Reduced Motion: drop particles/trails/shake.
+  final bool fancyEffects;
+  final bool reducedMotion;
+  final bool soundOn;
+
+  /// Total seats (2..6 depending on the game). Seat 0 is always the local player.
+  final int playerCount;
+
+  /// Equipped cosmetic items, e.g. {'puck': 'puck_nx_green', 'striker': 'striker_soccer', 'cue': 'cue_classic'}.
+  final Map<String, String> skins;
+  final int? seed;
+
+  /// Call exactly once at the end of the match.
+  final void Function(GameResult result) onFinish;
+
+  /// Online link (null offline). Seats are global: [mySeat] is this phone.
+  final NetLink? net;
+
+  /// Optional tournament match this game is played for (null for normal matches).
+  /// Games pass it back in [GameResult.tournamentMatchId].
+  final String? tournamentMatchId;
+
+  bool get vsBot => mode == GameMode.vsBot;
+  bool get online => net != null;
+  int get mySeat => net?.mySeat ?? 0;
+
+  /// True when this phone controls [seat] by touch (local pass-and-play: every seat).
+  bool controlsSeat(int seat) => net == null ? true : seat == net!.mySeat;
+
+  /// True when [seat] is played by another phone.
+  bool isRemoteSeat(int seat) => net != null && seat != net!.mySeat;
+
+  /// Online name for a seat, or null offline.
+  String? netName(int seat) {
+    final NetLink? n = net;
+    if (n == null || seat < 0 || seat >= n.names.length) return null;
+    return n.names[seat];
+  }
+  String tx(String fa, String en) => isFa ? fa : en;
+}
+
+class GameResult {
+  const GameResult({
+    required this.outcome,
+    this.score = 0,
+    this.opponentScore = 0,
+    this.summaryFa = '',
+    this.summaryEn = '',
+    this.winnerSeats,
+    this.scores,
+    this.tournamentMatchId,
+    this.durationMs,
+    this.endsMatch = true,
+    this.holdMs,
+    this.holdUntil,
+  });
+
+  /// Online only: the host shows its result overlay once [holdMs] has passed AND this future has completed, so a game
+  /// can keep its own end screen up while something there is still in progress (finger soccer: a rematch request
+  /// being answered). Null: [holdMs] alone. The game must complete it (it does at the latest when it is disposed).
+  final Future<void>? holdUntil;
+
+  /// How long (ms) the game keeps its own end screen up before the host shows its result overlay (null: the host's
+  /// default short pause). The result is reported / recorded at once either way. v6 finger soccer: its 20 s score
+  /// table.
+  final int? holdMs;
+
+  /// False when only this player left a match that goes on for the others (team games): the result is shown on this
+  /// phone but not reported as the match's end (the server books this seat's loss when the match ends).
+  final bool endsMatch;
+
+  /// Length of the run (solo arcade games; used by the server-side score sanity check).
+  final int? durationMs;
+
+  /// Tournament match id from [GameLaunch.tournamentMatchId] (null for normal matches).
+  final String? tournamentMatchId;
+
+  /// Goals / points of the local player and of the opponent (aliases of [score] / [opponentScore]).
+  int get goalsFor => score;
+  int get goalsAgainst => opponentScore;
+
+  /// Online: winning global seats (empty = draw) and per-seat scores, reported to the server.
+  final List<int>? winnerSeats;
+  final List<int>? scores;
+
+  /// Outcome from the local player's (seat 0) perspective. In local
+  /// pass-and-play report win if seat 0 won.
+  final GameOutcome outcome;
+  final int score;
+  final int opponentScore;
+  final String summaryFa;
+  final String summaryEn;
+}
+
+/// Metadata shown in the Arcade lobby.
+class GameInfo {
+  const GameInfo({
+    required this.id,
+    required this.nameFa,
+    required this.nameEn,
+    required this.taglineFa,
+    required this.taglineEn,
+    required this.rulesFa,
+    required this.rulesEn,
+    required this.minPlayers,
+    required this.maxPlayers,
+    this.onlineMin,
+    this.onlineMax,
+    required this.builder,
+    required this.accent,
+    this.supportsLocal = true,
+    this.defaultPlayers = 2,
+    this.supportsOnline = false,
+    this.solo = false,
+    this.group = 0,
+    this.isNew = false,
+  });
+
+  /// Single-player arcade game (quick start, daily challenge, global score board; no bots / rooms).
+  final bool solo;
+
+  /// Arcade lobby filter group: 1 sports, 2 board, 3 party, 4 action/racing, 5 solo arcade.
+  final int group;
+
+  /// Shown with a NEW ribbon in the lobby.
+  final bool isNew;
+
+  /// Online multiplayer (lobby, rooms, matchmaking) is wired for this game.
+  final bool supportsOnline;
+
+  final String id;
+  final String nameFa;
+  final String nameEn;
+  final String taglineFa;
+  final String taglineEn;
+  final String rulesFa;
+  final String rulesEn;
+  final int minPlayers;
+  final int maxPlayers;
+
+  /// Online seat bounds, when the networked format differs from the offline one.
+  /// Finger soccer is 1v1 on one phone but plays 1v1, 2v2 and 3v3 online, so its
+  /// online range is 2..6 while [maxPlayers] (offline pass-and-play) stays 2.
+  /// These are the numbers the online lobby, the room manager and `nx_game_bounds`
+  /// on the games project must agree on.
+  final int? onlineMin;
+  final int? onlineMax;
+
+  int get onlineMinPlayers => onlineMin ?? minPlayers;
+  int get onlineMaxPlayers => onlineMax ?? maxPlayers;
+  final int defaultPlayers;
+  final bool supportsLocal;
+  final Color accent;
+  final Widget Function(GameLaunch launch) builder;
+}
