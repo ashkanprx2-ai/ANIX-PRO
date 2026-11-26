@@ -207,13 +207,11 @@ class OnlineService extends ChangeNotifier {
 
   bool? _googleEnabled;
 
-  /// Whether the auth project actually has the Google provider switched on (public GET /auth/v1/settings →
-  /// external.google). The integration's working sign-in paths are username / e-mail + password (nx-login) and the
-  /// e-mail code; Google is offered only when the server can complete it, so the button never leads to
-  /// "provider is not enabled". Cached for the session; false when offline / not configured.
-  Future<bool> googleSignInAvailable() async {
-    if (_googleEnabled != null) return _googleEnabled!;
-    if (!configured || kIsWeb) return false;
+  /// Whether the auth project has the Google provider switched on (public GET /auth/v1/settings → external.google):
+  /// true / false from the server, null when it could not be read (offline) — then the caller just tries.
+  Future<bool?> googleProviderState() async {
+    if (_googleEnabled != null) return _googleEnabled;
+    if (!configured || kIsWeb) return null;
     try {
       final HttpClient h = HttpClient()..connectionTimeout = const Duration(seconds: 6);
       final HttpClientRequest rq = await h.getUrl(Uri.parse('${OnlineConfig.supabaseUrl}/auth/v1/settings'));
@@ -222,12 +220,15 @@ class OnlineService extends ChangeNotifier {
       final String body = await rs.transform(utf8.decoder).join();
       h.close();
       final dynamic j = jsonDecode(body);
-      _googleEnabled = j is Map && j['external'] is Map && (j['external'] as Map)['google'] == true;
+      if (j is Map && j['external'] is Map) {
+        final bool on = (j['external'] as Map)['google'] == true;
+        if (on) _googleEnabled = true; // only cache "on", so enabling it in the dashboard works without a restart
+        return on;
+      }
     } catch (e) {
       debugPrint('auth settings: $e');
-      return false;
     }
-    return _googleEnabled!;
+    return null;
   }
 
   /// "Sign in with Google": Supabase OAuth (Google provider) in the system browser; Google returns to

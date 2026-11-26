@@ -103,17 +103,6 @@ class _StationAuthPageState extends ConsumerState<StationAuthPage> {
   bool _accepted = false;
   bool _prefilled = false;
 
-  /// Google button only when the auth project has the Google provider enabled (see OnlineService.googleSignInAvailable).
-  bool _google0 = false;
-
-  @override
-  void initState() {
-    super.initState();
-    unawaited(ref.read(onlineProvider).googleSignInAvailable().then((bool v) {
-      if (mounted && v != _google0) setState(() => _google0 = v);
-    }));
-  }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -198,6 +187,17 @@ class _StationAuthPageState extends ConsumerState<StationAuthPage> {
       _busy = true;
       _error = null;
     });
+    // The button is always shown; when the auth project reports the Google provider switched off we say so plainly
+    // instead of opening a browser page that can only fail.
+    if (await online.googleProviderState() == false) {
+      if (!mounted) return;
+      setState(() {
+        _busy = false;
+        _error = stx(context, 'ورود با گوگل هنوز روی سرور فعال نشده؛ فعلاً با نام کاربری/ایمیل وارد شو.',
+            'Google sign-in is not enabled on the server yet; please use username / e-mail for now.');
+      });
+      return;
+    }
     final bool opened = await online.signInWithGoogle();
     if (!mounted) return;
     setState(() {
@@ -359,7 +359,6 @@ class _StationAuthPageState extends ConsumerState<StationAuthPage> {
                           busy: _busy,
                           onTap: _busy ? null : _submit,
                         ),
-                        if (_google0)
                         StationButton(
                           key: const ValueKey<String>('auth-google'),
                           label: stx(context, 'ورود با گوگل', 'Sign in with Google'),
