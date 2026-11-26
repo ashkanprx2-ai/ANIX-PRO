@@ -977,7 +977,7 @@ class RemoteOracleEngine implements OracleEngine {
       <String, dynamic>{'role': 'user', 'content': input},
     ];
     final Map<String, dynamic> ctx = <String, dynamic>{
-      'app': 'NEXORA hub (Flutter): 7 worlds (Hub, Arcade with 26 games, Orbit Network messenger, Nova Gallery, '
+      'app': 'NEXORA hub (Flutter): 7 worlds (Hub, Arcade with 27 games, Orbit Network messenger, Nova Gallery, '
           'Social Station, Personal Orbit, ORACLE Core). NOT the finger-football app: app tools are unavailable here, '
           'answer in plain text only, short, in the user\'s language.',
       'mode': 'chat',

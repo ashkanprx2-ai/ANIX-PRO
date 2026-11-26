@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/game_contract.dart';
+import '../piano_tiles/piano_tiles.dart';
 import 'solo_kit.dart';
 import 'ui/action_boards.dart';
 import 'ui/puzzle_boards.dart';
@@ -112,6 +113,7 @@ final List<SoloDef> kSoloDefs = <SoloDef>[
     accent: const Color(0xFFFF8FD1),
     board: (BuildContext c, SoloRun r) => World2048Board(run: r),
   ),
+  kPianoTilesDef,
 ];
 
 SoloDef? soloDef(String id) {

@@ -120,6 +120,8 @@ flutter:
     - assets/games/bubble_shooter/
     - assets/games/knife_hit/
     - assets/games/game_2048/
+    - assets/games/piano_tiles/
+    - assets/games/piano_tiles/notes/
     - assets/progression/achievements/
     - assets/progression/club_badges/
     - assets/ui/holo_frames/

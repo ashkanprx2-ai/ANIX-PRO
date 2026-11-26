@@ -92,7 +92,7 @@ const kAchievements = <AchievementDef>[
   AchievementDef(id: 'arcade_rookie', asset: 'badge_gamer', nameFa: 'تازه‌نفس آرکید', nameEn: 'Arcade Rookie',
       descFa: '۵ بازی جدید آرکید را امتحان کن', descEn: 'Try 5 of the new arcade games', check: _arcadeRookie, coinReward: 120),
   AchievementDef(id: 'arcade_all', asset: 'trophy_wings', nameFa: 'استاد آرکید', nameEn: 'Arcade Master',
-      descFa: 'هر ۱۷ بازی جدید آرکید را بازی کن', descEn: 'Play all 17 new arcade games', check: _arcadeAll, coinReward: 400),
+      descFa: 'هر ۱۸ بازی جدید آرکید را بازی کن', descEn: 'Play all 18 new arcade games', check: _arcadeAll, coinReward: 400),
   AchievementDef(id: 'arcade_gold', asset: 'trophy_crown', nameFa: 'مدال طلا', nameEn: 'Gold Medal',
       descFa: 'در یک بازی تک‌نفره مدال طلا بگیر', descEn: 'Earn a gold medal in a solo game', check: _arcadeGold, coinReward: 200),
   AchievementDef(id: 'arcade_daily', asset: 'badge_daily', nameFa: 'چالش‌باز', nameEn: 'Challenger',
