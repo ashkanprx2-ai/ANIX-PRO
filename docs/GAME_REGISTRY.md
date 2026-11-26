@@ -45,6 +45,7 @@ The README's **26 games** is correct. The static audit found **16 `*_entry.dart`
 | 24 | `stack_tower` | Stack Tower | tap | ✅ |
 | 25 | `tetris_rush` | Tetris Rush | dpad | ✅ |
 | 26 | `game_2048` | NX 2048 | dpad | ✅ |
+| 27 | `water_sort` | Water Sort (مرتب‌سازی آب) — endless saved levels, `lib/games/water_sort/` | tap | ✅ (server limit row pending) |
 
 Solo games: `minPlayers/maxPlayers = 1`, `supportsOnline = false` for live play; they share medals, daily challenge and the server-validated global score board like every other arcade game.
 

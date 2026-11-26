@@ -77,6 +77,7 @@ const List<String> kArcadeSoloIds = <String>[
   'game_2048',
   'piano_tiles',
   'gate_shooter',
+  'water_sort',
 ];
 
 const List<String> kArcadeIds = <String>[...kArcadeMultiIds, ...kArcadeSoloIds];
@@ -95,6 +96,7 @@ const Map<String, ArcadeDef> kArcadeDefs = <String, ArcadeDef>{
   'game_2048': ArcadeDef(id: 'game_2048', unitFa: 'امتیاز', unitEn: 'pts', bronze: 2000, silver: 8000, gold: 20000, daily: 5000),
   'piano_tiles': ArcadeDef(id: 'piano_tiles', unitFa: 'نت', unitEn: 'notes', bronze: 60, silver: 150, gold: 300, daily: 110),
   'gate_shooter': ArcadeDef(id: 'gate_shooter', unitFa: 'امتیاز', unitEn: 'pts', bronze: 1500, silver: 5000, gold: 15000, daily: 3000),
+  'water_sort': ArcadeDef(id: 'water_sort', unitFa: 'امتیاز', unitEn: 'pts', bronze: 800, silver: 3000, gold: 8000, daily: 1500),
   // multiplayer — "score" is the game's own match score; medals count wins in a row vs Hard bots
   'kart_racing': ArcadeDef(id: 'kart_racing', unitFa: 'امتیاز', unitEn: 'pts', bronze: 1, silver: 3, gold: 5, daily: 1, multiplayer: true),
   'obstacle_race': ArcadeDef(id: 'obstacle_race', unitFa: 'امتیاز', unitEn: 'pts', bronze: 1, silver: 3, gold: 5, daily: 1, multiplayer: true),

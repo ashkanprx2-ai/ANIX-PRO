@@ -110,6 +110,7 @@ flutter:
     - assets/games/stickman_arena/
     - assets/games/ludo_battle/
     - assets/games/chess_blitz/
+    - assets/games/water_sort/
     - assets/games/endless_runner/
     - assets/games/tetris_rush/
     - assets/games/helix_jump/

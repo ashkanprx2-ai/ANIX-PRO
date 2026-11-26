@@ -25,11 +25,11 @@ String core(String name) => name.split(' (').first.trim();
 
 void main() {
   group('catalogue size', () {
-    test('the arcade is the nine originals plus eighteen expansion games', () {
+    test('the arcade is the nine originals plus twenty expansion games', () {
       expect(kArcadeMultiIds.length, 7, reason: 'multiplayer arcade games');
-      expect(kArcadeSoloIds.length, 11, reason: 'solo arcade games');
-      expect(kArcadeIds.length, 18);
-      expect(kGames.length, 27);
+      expect(kArcadeSoloIds.length, 13, reason: 'solo arcade games');
+      expect(kArcadeIds.length, 20);
+      expect(kGames.length, 29);
     });
 
     test('every expansion id resolves to a playable registry entry', () {
