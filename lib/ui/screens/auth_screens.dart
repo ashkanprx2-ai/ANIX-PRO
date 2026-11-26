@@ -103,6 +103,17 @@ class _StationAuthPageState extends ConsumerState<StationAuthPage> {
   bool _accepted = false;
   bool _prefilled = false;
 
+  /// Google button only when the auth project has the Google provider enabled (see OnlineService.googleSignInAvailable).
+  bool _google0 = false;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(ref.read(onlineProvider).googleSignInAvailable().then((bool v) {
+      if (mounted && v != _google0) setState(() => _google0 = v);
+    }));
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -348,6 +359,7 @@ class _StationAuthPageState extends ConsumerState<StationAuthPage> {
                           busy: _busy,
                           onTap: _busy ? null : _submit,
                         ),
+                        if (_google0)
                         StationButton(
                           key: const ValueKey<String>('auth-google'),
                           label: stx(context, 'ورود با گوگل', 'Sign in with Google'),

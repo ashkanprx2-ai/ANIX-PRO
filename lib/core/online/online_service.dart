@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -201,6 +203,31 @@ class OnlineService extends ChangeNotifier {
     });
     if (ok == true) _otpSentAt[e.toLowerCase()] = DateTime.now();
     return ok ?? false;
+  }
+
+  bool? _googleEnabled;
+
+  /// Whether the auth project actually has the Google provider switched on (public GET /auth/v1/settings →
+  /// external.google). The integration's working sign-in paths are username / e-mail + password (nx-login) and the
+  /// e-mail code; Google is offered only when the server can complete it, so the button never leads to
+  /// "provider is not enabled". Cached for the session; false when offline / not configured.
+  Future<bool> googleSignInAvailable() async {
+    if (_googleEnabled != null) return _googleEnabled!;
+    if (!configured || kIsWeb) return false;
+    try {
+      final HttpClient h = HttpClient()..connectionTimeout = const Duration(seconds: 6);
+      final HttpClientRequest rq = await h.getUrl(Uri.parse('${OnlineConfig.supabaseUrl}/auth/v1/settings'));
+      rq.headers.set('apikey', OnlineConfig.supabaseAnonKey);
+      final HttpClientResponse rs = await rq.close().timeout(const Duration(seconds: 8));
+      final String body = await rs.transform(utf8.decoder).join();
+      h.close();
+      final dynamic j = jsonDecode(body);
+      _googleEnabled = j is Map && j['external'] is Map && (j['external'] as Map)['google'] == true;
+    } catch (e) {
+      debugPrint('auth settings: $e');
+      return false;
+    }
+    return _googleEnabled!;
   }
 
   /// "Sign in with Google": Supabase OAuth (Google provider) in the system browser; Google returns to
