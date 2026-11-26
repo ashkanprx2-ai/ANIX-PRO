@@ -52,17 +52,27 @@
 
 Every push to `main` is analysed, tested and built by CI; release builds are tagged `anix-v1.0.<build>` and marked **Latest**.
 
+## 🛰️ NEXORA Station UI (ANIX PRO build)
+
+This branch ships the **NEXORA Station Luxe** interface on top of the full integration (rematch, spectator, social safety, ban guard, economy ledger, Bazaar IAP, victory effects, 29 games):
+
+* Every screen is built from `lib/ui/` (Station kit, shell, screens); the old `core/ui2`, `core/widgets`, `core/theme` and `worlds/hub` UI is gone. Surviving feature pages (tournaments, admin, NOVA, ORBIT, social station, talk room, online lobby/match, game host) are re-skinned through `lib/ui/kit/station_compat.dart`.
+* Games grid, records and game detail are generated from `kGames` (which includes `kSoloDefs`), so a newly registered game appears automatically with its icon (`lib/ui/screens/game_icons.dart`, pedestal-art fallback).
+* Sign-in: username / e-mail + password (usernames through the `nx-login` Edge Function), e-mail code, and a **Sign in with Google** button (Supabase OAuth → `nexora://login-callback`). The button tells the player when the server's Google provider is switched off (see `docs/DECISIONS.md` D17).
+* Releases of this build: [ashkanprx2-ai/ANIX-PRO releases](https://github.com/ashkanprx2-ai/ANIX-PRO/releases/latest). The in-app updater still reads `Ashkani25/NEW-ANIX-` releases (`lib/core/update/app_updater.dart`).
+
 ## ✨ What's inside
 
 | | |
 |---|---|
 | 🎙️ **Rooms** | Voice stage + text chat + members. Unlimited speakers and listeners. The room manager picks a game, ticks the players, and everyone comes back to the room after the match. |
-| 🎮 **26 games** | 9 classics, 7 multiplayer arcade games and 10 solo arcade games — offline vs. smart bots or online against real people, with reconnect & resync. |
+| 🎮 **29 games** | 9 classics, 7 multiplayer arcade games and 13 solo arcade games (incl. Piano Tiles, Gate Shooter, Water Sort) — offline vs. smart bots or online against real people, with reconnect & resync. |
 | ⚡ **Quick match** | One tap to find an opponent: fair first-come pairing, no ghost seats, safe re-queue and reconnect. |
 | 🏆 **Ranked & tournaments** | Per-game ELO ladders and global XP ranks, trophies, brackets up to 64 players with check-in, auto rounds and server-side prizes. |
 | 👤 **Accounts** | Username + password (email optional), stay signed in, profile photo from your gallery, follow / unfollow with follower counts. |
 | 💬 **Social** | 1:1 chats, groups and channels, voice & video calls, posts, 24 h stories, likes, comments. |
-| 🤖 **ORACLE** | A cheeky robot buddy reacting to your real wins and losses — famous for its «جاااااان!». |
+| 🤖 **ORACLE & LUNA** | Two AI companions — «دو ذهن، یک دنیا». Pick one on the AI page; the active one replaces ORACLE everywhere (buddy, chat, in-game sheet, result lines). ORACLE is the cheeky robot with «جاااااان!», LUNA the warm moon-girl. |
+| 💎 **Wallet** | Coins & gems on one append-only server ledger (wallet history in the Gems screen), Cafe Bazaar coin/gem packs, victory effects for every online game, server-enforced daily wheel. |
 | 🔊 **Sound** | Music, in-game sounds and UI effects with separate switches and volume sliders. |
 | 🌐 **Bilingual** | Full Persian (RTL) and English UI. |
 
