@@ -67,7 +67,7 @@ WalletReasonKind walletReasonKind(String reason) {
   if (r.startsWith('iap_refund')) return WalletReasonKind.iapRefund;
   if (r.startsWith('iap:')) return WalletReasonKind.iap;
   if (r.startsWith('shop:')) return WalletReasonKind.purchase;
-  if (r.startsWith('award:') || r == 'daily_gems' || r == 'welcome_gems') return WalletReasonKind.reward;
+  if (r.startsWith('award:') || r == 'daily_gems' || r == 'welcome_gems' || r == 'wheel_daily') return WalletReasonKind.reward;
   if (r.startsWith('admin') || r.startsWith('owner_grant')) return WalletReasonKind.admin;
   if (r.startsWith('games:cosmetic')) return WalletReasonKind.cosmetic;
   if (r.startsWith('games:tournament')) return WalletReasonKind.tournament;

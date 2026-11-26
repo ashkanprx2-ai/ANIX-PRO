@@ -5,7 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/catalog/catalog.dart';
 import '../../core/economy/carrom_shop_view.dart';
+import '../../core/economy/bazaar_store.dart';
 import '../../core/economy/gem_shop.dart';
+import '../../core/economy/victory_fx.dart';
+import '../../core/economy/wallet_ledger.dart';
 import '../../core/profile/profile_service.dart';
 import '../../core/settings/app_settings.dart';
 import '../../games/finger_soccer/core/bm_data.dart';
@@ -146,18 +149,41 @@ class StationGemsScreen extends ConsumerStatefulWidget {
 
 class _StationGemsScreenState extends ConsumerState<StationGemsScreen> {
   final GemShop shop = GemShop.instance;
+  final BazaarStore store = BazaarStore.instance;
   int _cat = 0;
+
+  String _toman(BuildContext context, int v) {
+    final String s = v.toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+$)'), (Match m) => '${m[1]},');
+    return stationFa(context) ? '${nxNum(context, v)} تومان' : '$s toman';
+  }
+
+  Future<void> _buyPack(IapPack pack) async {
+    final bool fa = stationFa(context);
+    final IapResult r = await store.buy(pack);
+    if (!mounted) return;
+    if (r.ok) {
+      final String what = r.grantedGems > 0
+          ? (fa ? '${nxNum(context, r.grantedGems)} جم' : '${r.grantedGems} gems')
+          : (fa ? '${nxNum(context, r.grantedCoins)} سکه' : '${r.grantedCoins} coins');
+      await showStationModal(context, big: r.grantedGems > 0 ? '💎' : '🪙', title: stx(context, 'خرید موفق', 'Purchase complete'), text: fa ? '$what به حسابت اضافه شد ✓' : '$what added ✓');
+    } else if (r.error != 'cancelled') {
+      stationToast(context, iapErrorText(r.error, fa), error: true);
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     shop.addListener(_on);
+    store.addListener(_on);
     if (!shop.loaded) unawaited(shop.refresh());
+    if (!store.loaded) unawaited(store.load());
   }
 
   @override
   void dispose() {
     shop.removeListener(_on);
+    store.removeListener(_on);
     super.dispose();
   }
 
@@ -211,6 +237,46 @@ class _StationGemsScreenState extends ConsumerState<StationGemsScreen> {
             ),
           ]),
         ),
+        // Coin & gem packs paid in rials through Cafe Bazaar (contents + prices from nx_iap_products; the server verifies
+        // the purchase token and credits through the wallet ledger).
+        StationTitle(stx(context, 'بسته‌های سکه و جم · کافه‌بازار', 'Coin & gem packs · Cafe Bazaar')),
+        if (!store.configured)
+          StationEmpty(text: iapErrorText('not_configured', fa), icon: 'r3c6')
+        else if (store.packs.isEmpty && !store.loaded)
+          const StationEmpty(text: '…', loading: true)
+        else
+          StationRows(children: <Widget>[
+            for (int i = 0; i < store.packs.length; i++)
+              StationRow(
+                first: i == 0,
+                leading: store.packs[i].gems > 0 ? const StationGem(size: 26) : const StationCoin(size: 26),
+                title: fa ? store.packs[i].titleFa : store.packs[i].titleEn,
+                subtitle: fa ? store.packs[i].badgeFa : null,
+                trailing: StationButton(
+                  small: true,
+                  expand: false,
+                  label: _toman(context, store.packs[i].priceToman),
+                  onTap: store.busy ? null : () => _buyPack(store.packs[i]),
+                ),
+              ),
+          ]),
+        // Victory effects: the gem item for every online game (bought through nx_buy_with_gems, equipped in slot win_fx).
+        StationTitle(stx(context, 'افکت پیروزی · همه بازی‌ها', 'Victory effects · every game')),
+        StationTile(
+          icon: 'r5c6',
+          title: equippedVictoryFx(ref.read(profileProvider)) == null
+              ? stx(context, 'افکت پیروزی', 'Victory effects')
+              : (fa ? equippedVictoryFx(ref.read(profileProvider))!.nameFa : equippedVictoryFx(ref.read(profileProvider))!.nameEn),
+          subtitle: stx(context, 'بعد از هر برد آنلاین', 'After every online win'),
+          onTap: () => showVictoryFxShop(context, fa: fa),
+        ),
+        StationTile(
+          icon: 'r2c6',
+          title: stx(context, 'تاریخچه‌ی کیف پول', 'Wallet history'),
+          subtitle: stx(context, 'همه‌ی تراکنش‌های سکه و جم', 'Every coin & gem change'),
+          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const StationWalletHistoryScreen())),
+        ),
+        StationTitle(stx(context, 'تیم‌های فوتبال انگشتی', 'Finger-soccer teams')),
         StationSeg(labels: <String>[for (final List<Object> c in cats) fa ? '${c[2]}' : '${c[1]}'], index: _cat, onChanged: (int i) => setState(() => _cat = i)),
         StationGrid(columns: 3, gap: 10, children: <Widget>[
           for (final BmTeam t in teams)
@@ -230,6 +296,56 @@ class _StationGemsScreenState extends ConsumerState<StationGemsScreen> {
               );
             }),
         ]),
+      ],
+    );
+  }
+}
+
+/// Wallet history: the signed-in player's append-only coin / gem ledger (nx_wallet_history), newest first.
+class StationWalletHistoryScreen extends StatefulWidget {
+  const StationWalletHistoryScreen({super.key});
+
+  @override
+  State<StationWalletHistoryScreen> createState() => _StationWalletHistoryScreenState();
+}
+
+class _StationWalletHistoryScreenState extends State<StationWalletHistoryScreen> {
+  List<WalletLedgerEntry>? _rows;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(WalletLedger.fetch(limit: 100).then((List<WalletLedgerEntry> r) {
+      if (mounted) setState(() => _rows = r);
+    }));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool fa = stationFa(context);
+    final List<WalletLedgerEntry>? rows = _rows;
+    return StationScreen(
+      title: stx(context, 'تاریخچه‌ی کیف پول', 'Wallet history'),
+      latin: 'LEDGER',
+      children: <Widget>[
+        if (rows == null)
+          const StationEmpty(text: '…', loading: true)
+        else if (rows.isEmpty)
+          StationEmpty(text: stx(context, 'هنوز تراکنشی نیست (یا آفلاینی)', 'No transactions yet (or offline)'))
+        else
+          StationRows(children: <Widget>[
+            for (int i = 0; i < rows.length; i++)
+              StationRow(
+                first: i == 0,
+                leading: rows[i].currency == WalletCurrency.gems ? const StationGem(size: 26) : const StationCoin(size: 26),
+                title: walletReasonText(rows[i].reason, fa),
+                subtitle: rows[i].createdAt == null
+                    ? null
+                    : '${nxNum(context, rows[i].createdAt!.toLocal().month, group: false)}/${nxNum(context, rows[i].createdAt!.toLocal().day, group: false)} · ${stx(context, 'مانده', 'balance')} ${nxNum(context, rows[i].balanceAfter)}',
+                trailing: Text('${rows[i].delta > 0 ? '+' : '−'}${nxNum(context, rows[i].delta.abs())}',
+                    style: TextStyle(fontWeight: FontWeight.w700, color: rows[i].delta > 0 ? const Color(0xFF4DFF88) : const Color(0xFFFF6B6B))),
+              ),
+          ]),
       ],
     );
   }
