@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../storage/local_store.dart';
-import '../theme/nx_theme.dart';
+import '../../ui/theme/station_palette.dart';
 
 enum GraphicsQuality { low, medium, high, ultra }
 
@@ -14,19 +14,10 @@ class AppSettings extends ChangeNotifier {
         .firstWhere((e) => e.name == q, orElse: () => GraphicsQuality.high);
     _reducedMotion = _store.getBool(_kReduced) ?? false;
     _languageCode = _store.getString(_kLang) ?? 'fa';
-    _visualTheme = NxVisualTheme.values.firstWhere(
-      (e) => e.name == _store.getString(_kVisualTheme),
-      orElse: () => NxVisualTheme.neon,
-    );
-    // NX2 redesign: the cosmic neon skin is the only app skin now.
-    _visualTheme = NxVisualTheme.neon;
-    _appearanceMode = NxAppearanceMode.values.firstWhere(
-      (e) => e.name == _store.getString(_kAppearance),
-      orElse: () => NxAppearanceMode.dark,
-    );
-    if (_appearanceMode == NxAppearanceMode.light) {
-      _visualTheme = NxVisualTheme.gold;
-    }
+    // Station UI skin (neon = orange/navy, white = ice crystal). A device that had picked the old light appearance
+    // starts in the white skin.
+    final String? skin = _store.getString(_kSkin);
+    _skin = skin == 'white' || (skin == null && _store.getString(_kAppearance) == 'light') ? StationSkin.white : StationSkin.neon;
     _music = false;
     _musicVolume = 0.0;
     _sfxVolume = (_store.getInt(_kSfxVol) ?? 80).clamp(0, 100) / 100.0;
@@ -78,7 +69,6 @@ class AppSettings extends ChangeNotifier {
   static const _kQuality = 'settings.quality';
   static const _kReduced = 'settings.reduced_motion';
   static const _kLang = 'settings.lang';
-  static const _kVisualTheme = 'settings.visual_theme';
   static const _kSound = 'settings.sound';
   static const _kHaptics = 'settings.haptics';
   static const _kOnboarded = 'settings.onboarded';
@@ -87,12 +77,15 @@ class AppSettings extends ChangeNotifier {
   static const _kMusicVol = 'settings.music_volume';
   static const _kSfxVol = 'settings.sfx_volume';
   static const _kAppearance = 'settings.appearance';
+  static const _kSkin = 'settings.station_skin';
+  static const _kCtlSens = 'settings.controller_sensitivity';
+  static const _kCtlLeft = 'settings.controller_left_handed';
+  static const _kNotify = 'settings.notifications';
 
   late GraphicsQuality _quality;
   late bool _reducedMotion;
   late String _languageCode;
-  late NxVisualTheme _visualTheme;
-  late NxAppearanceMode _appearanceMode;
+  late StationSkin _skin;
   late bool _sound;
   late bool _haptics;
   late bool _onboarded;
@@ -131,8 +124,34 @@ class AppSettings extends ChangeNotifier {
   GraphicsQuality get quality => _quality;
   bool get reducedMotion => _reducedMotion;
   String get languageCode => _languageCode;
-  NxVisualTheme get visualTheme => _visualTheme;
-  NxAppearanceMode get appearanceMode => _appearanceMode;
+  /// The Station UI skin (UI.zip `setTheme('neon'|'white')`).
+  StationSkin get stationSkin => _skin;
+  set stationSkin(StationSkin v) {
+    if (_skin == v) return;
+    _skin = v;
+    _store.setString(_kSkin, v.name);
+    notifyListeners();
+  }
+
+  /// Controller screen: touch sensitivity 10–100 and left-handed button layout (read by games that support them).
+  int get controllerSensitivity => (_store.getInt(_kCtlSens) ?? 60).clamp(10, 100);
+  set controllerSensitivity(int v) {
+    _store.setInt(_kCtlSens, v.clamp(10, 100));
+    notifyListeners();
+  }
+
+  bool get leftHanded => _store.getBool(_kCtlLeft) ?? false;
+  set leftHanded(bool v) {
+    _store.setBool(_kCtlLeft, v);
+    notifyListeners();
+  }
+
+  /// In-app notification banners (tournament reminders, announcements, invites).
+  bool get notifications => _store.getBool(_kNotify) ?? true;
+  set notifications(bool v) {
+    _store.setBool(_kNotify, v);
+    notifyListeners();
+  }
   bool get isFa => _languageCode == 'fa';
   Locale get locale => Locale(_languageCode);
   bool get sound => _sound;
@@ -176,21 +195,6 @@ class AppSettings extends ChangeNotifier {
   set languageCode(String v) {
     _languageCode = v;
     _store.setString(_kLang, v);
-    notifyListeners();
-  }
-
-  set visualTheme(NxVisualTheme v) {
-    if (_visualTheme == v) return;
-    _visualTheme = v;
-    _store.setString(_kVisualTheme, v.name);
-    notifyListeners();
-  }
-
-  set appearanceMode(NxAppearanceMode v) {
-    if (_appearanceMode == v) return;
-    _appearanceMode = v;
-    _visualTheme = v == NxAppearanceMode.light ? NxVisualTheme.gold : NxVisualTheme.neon;
-    _store.setString(_kAppearance, v.name);
     notifyListeners();
   }
 
