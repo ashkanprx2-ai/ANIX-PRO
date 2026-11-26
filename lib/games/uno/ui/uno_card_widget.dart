@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/nx_theme.dart';
+import '../../../ui/kit/station_compat.dart';
 import '../core/uno_models.dart';
 
 /// ANIX colour for each card suit.

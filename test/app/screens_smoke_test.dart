@@ -1,6 +1,7 @@
-// Smoke tests: the main menu, every reported game screen, the chat screens and the sign-in screens build and run a
-// few seconds of frames without exceptions, in English and Persian (RTL). Also drives the real app router as a
-// guest: the dock / menu destinations must open a page (or the explicit sign-in screen), never bounce to /hub.
+// Smoke tests: the Station home, every Station screen, every registered game (detail page + a vs-bot match), the
+// chat screens and the sign-in screens build and run a few seconds of frames without exceptions, in English and
+// Persian (RTL). Also drives the real app router as a guest: menu destinations open a page (or the explicit sign-in
+// screen), never bounce to /hub.
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,19 +11,19 @@ import 'package:nexora/app/app.dart';
 import 'package:nexora/core/profile/profile_service.dart';
 import 'package:nexora/core/settings/app_settings.dart';
 import 'package:nexora/core/storage/local_store.dart';
-import 'package:nexora/core/theme/nx_theme.dart';
-import 'package:nexora/core/ui2/nx2_widgets.dart';
 import 'package:nexora/games/game_registry.dart';
-import 'package:nexora/worlds/arcade/arcade_page.dart';
+import 'package:nexora/ui/screens/ai_screens.dart';
+import 'package:nexora/ui/screens/auth_screens.dart';
+import 'package:nexora/ui/screens/event_screens.dart';
+import 'package:nexora/ui/screens/game_screens.dart';
+import 'package:nexora/ui/screens/profile_screens.dart';
+import 'package:nexora/ui/screens/rooms_screens.dart';
+import 'package:nexora/ui/screens/shop_screens.dart';
+import 'package:nexora/ui/shell/station_page.dart';
+import 'package:nexora/ui/theme/station_theme.dart';
 import 'package:nexora/worlds/arcade/game_host_page.dart';
-import 'package:nexora/worlds/arcade/game_setup_page.dart';
 import 'package:nexora/worlds/arcade/online/online_lobby_page.dart';
-import 'package:nexora/worlds/auth/auth_page.dart';
-import 'package:nexora/worlds/auth/signin_required_page.dart';
-import 'package:nexora/worlds/hub/hub_page.dart';
 import 'package:nexora/worlds/orbit_network/orbit_network_page.dart';
-import 'package:nexora/worlds/rooms/rooms_page.dart';
-import 'package:nexora/worlds/social_hub/social_hub_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void _phone(WidgetTester tester) {
@@ -76,15 +77,23 @@ void main() {
   final List<String> reportedGames = kGames.map((GameInfo g) => g.id).toList();
 
   final Map<String, (Widget Function(), Type)> screens = <String, (Widget Function(), Type)>{
-    'main menu (hub)': (() => const HubPage(), HubPage),
-    'arcade (PLAY)': (() => const ArcadePage(), ArcadePage),
-    'rooms (dock GAME)': (() => const RoomsPage(), RoomsPage),
-    'chat + media hub, messages tab': (() => const SocialHubPage(initial: 1), OrbitNetworkPage),
+    'station home': (() => const StationPage(), StationPage),
+    'all games': (() => const StationGamesScreen(), StationGamesScreen),
+    'rooms': (() => const StationRoomsScreen(), StationRoomsScreen),
     'chat (orbit network)': (() => const OrbitNetworkPage(), OrbitNetworkPage),
-    'sign-in': (() => const AuthPage(), AuthPage),
-    'sign-in required': (() => const SignInRequiredPage(from: '/social'), SignInRequiredPage),
+    'sign-in': (() => const StationAuthPage(), StationAuthPage),
+    'sign-in required': (() => const StationSignInRequired(from: '/social'), StationSignInRequired),
+    'onboarding': (() => const StationOnboarding(), StationOnboarding),
+    'AI (ORACLE / LUNA)': (() => const StationAiScreen(), StationAiScreen),
+    'profile': (() => const StationProfileScreen(), StationProfileScreen),
+    'account': (() => const StationAccountScreen(), StationAccountScreen),
+    'settings': (() => const StationSettingsScreen(), StationSettingsScreen),
+    'controller': (() => const StationControllerScreen(), StationControllerScreen),
+    'shop': (() => const StationShopScreen(), StationShopScreen),
+    'lucky wheel': (() => const StationWheelScreen(), StationWheelScreen),
+    'missions': (() => const StationMissionsScreen(weekly: false), StationMissionsScreen),
     for (final String id in reportedGames) ...<String, (Widget Function(), Type)>{
-      'game setup $id': (() => GameSetupPage(gameId: id), GameSetupPage),
+      'game page $id': (() => StationGameScreen(gameId: id), StationGameScreen),
       'game $id vs bot': (() => _host(gameById(id)!), GameHostPage),
     },
   };
@@ -105,7 +114,7 @@ void main() {
         await tester.pumpWidget(UncontrolledProviderScope(
           container: c,
           child: MaterialApp.router(
-            theme: buildNxTheme(),
+            theme: buildStationTheme(StationSkin.neon),
             routerConfig: router,
             locale: Locale(lang),
             supportedLocales: const <Locale>[Locale('fa'), Locale('en')],
@@ -134,7 +143,7 @@ void main() {
     _phone(tester);
     final List<String> errs = _captureErrors();
     await tester.pumpWidget(ProviderScope(
-      child: MaterialApp(theme: buildNxTheme(), home: const OnlineLobbyPage(gameId: 'pool8')),
+      child: MaterialApp(theme: buildStationTheme(StationSkin.neon), home: const OnlineLobbyPage(gameId: 'pool8')),
     ));
     await _frames(tester, 10);
     final bool shown = find.byType(OnlineLobbyPage).evaluate().length == 1;
@@ -168,23 +177,21 @@ void main() {
       final GoRouter r = GoRouter.of(tester.element(find.byType(Navigator).first));
       r.go('/hub');
       await _frames(tester, 10);
-      expect(find.byType(HubPage), findsOneWidget);
-
-      // Dock GAME button -> Rooms (was bounced to /hub for guests).
-      await tester.tap(find.descendant(of: find.byType(Nx2Dock), matching: find.text(lang == 'fa' ? 'بازی' : 'GAME')));
-      await _frames(tester, 10);
-      expect(find.byType(RoomsPage), findsOneWidget);
-      expect(find.byType(HubPage, skipOffstage: false), findsOneWidget, reason: 'no duplicate home page');
+      expect(find.byType(StationPage), findsOneWidget);
 
       final Map<String, Type> expected = <String, Type>{
-        '/world/nexora_arcade': ArcadePage,
-        '/arcade/pool8': GameSetupPage,
-        '/arcade/finger_soccer': GameSetupPage,
-        '/social': SignInRequiredPage,
-        '/world/orbit_network': SignInRequiredPage,
-        '/tournaments': SignInRequiredPage,
-        '/leaderboard': SignInRequiredPage,
-        '/online/finger_soccer': SignInRequiredPage,
+        '/rooms': StationRoomsScreen,
+        '/s/games': StationGamesScreen,
+        '/arcade/pool8': StationGameScreen,
+        '/arcade/finger_soccer': StationGameScreen,
+        '/oracle': StationAiScreen,
+        '/settings': StationSettingsScreen,
+        '/s/profile': StationProfileScreen,
+        '/social': StationSignInRequired,
+        '/world/orbit_network': StationSignInRequired,
+        '/tournaments': StationSignInRequired,
+        '/leaderboard': StationSignInRequired,
+        '/online/finger_soccer': StationSignInRequired,
       };
       for (final MapEntry<String, Type> e in expected.entries) {
         r.go('/hub');
@@ -192,11 +199,10 @@ void main() {
         r.push(e.key);
         await _frames(tester, 12);
         expect(find.byType(e.value), findsOneWidget, reason: e.key);
-        expect(find.byType(HubPage, skipOffstage: false), findsOneWidget, reason: '${e.key}: no duplicate home page');
-        // Back returns to the menu.
+        expect(find.byType(StationPage, skipOffstage: false), findsOneWidget, reason: '${e.key}: no duplicate home page');
         r.pop();
         await _frames(tester, 10);
-        expect(find.byType(HubPage), findsOneWidget, reason: '${e.key}: back');
+        expect(find.byType(StationPage), findsOneWidget, reason: '${e.key}: back');
       }
       expect(tester.takeException(), isNull);
       expect(errs, isEmpty);

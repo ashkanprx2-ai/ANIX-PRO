@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/widgets/user_profile_preview.dart';
+import '../../../ui/kit/station_compat.dart';
+import '../../../ui/widgets/user_profile_preview.dart';
 import '../data/supabase_nova_repository.dart';
 import '../state/nova_controller.dart';
 import 'nova_visuals.dart';
-import '../../../core/ui2/luxe.dart';
 
 /// Followers / following of a real account (shared `follows` table), with a follow toggle for other people.
 class NovaFollowBar extends ConsumerStatefulWidget {

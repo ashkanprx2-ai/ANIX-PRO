@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/widgets/nx_widgets.dart';
+import '../../../ui/kit/station_compat.dart';
+
 import '../../core/game_contract.dart';
 import '../core/mafia_engine.dart';
 import '../core/mafia_lines.dart';

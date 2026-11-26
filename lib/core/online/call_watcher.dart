@@ -7,7 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../backend/backend_gateway.dart';
 import '../backend/supabase_backend.dart';
 import '../settings/app_settings.dart';
-import '../ui2/luxe.dart';
+import '../../ui/kit/station_compat.dart';
 import 'online_service.dart';
 
 /// Rings anywhere in the app when someone starts an Orbit Network call in one of my chats

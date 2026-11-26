@@ -7,8 +7,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/online/cloud_profile_sync.dart';
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/widgets/nx_widgets.dart';
+import '../../../ui/kit/station_compat.dart';
+
 import '../../../games/game_registry.dart';
 import '../../../worlds/arcade/online/online_match_page.dart';
 import '../data/models.dart';
@@ -18,8 +18,7 @@ import '../domain/prize_split.dart';
 import 'bracket_view.dart';
 import 't_common.dart';
 
-import '../../../core/ui2/anix_kit.dart';
-import '../../../core/ui2/luxe.dart';
+
 
 /// Tournament detail: rules, countdowns, prize pool, players, register / code / withdraw, live bracket or
 /// league table, my next match with the Ready button, match list and history.

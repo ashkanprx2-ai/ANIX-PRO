@@ -4,14 +4,14 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../core/theme/nx_theme.dart';
+import '../../../ui/kit/station_compat.dart';
 import '../../core/game_contract.dart';
 import '../core/mafia_engine.dart';
 import '../core/mafia_models.dart';
 import 'mafia_visuals.dart';
 import 'mafia_widgets.dart';
 
-import '../../../core/ui2/anix_kit.dart';
+
 enum _NStage { setup, pass, nightIntro, nightStep, detectiveAnswer, dawn, day, nominate, defense, vote, verdict, over }
 
 enum _NightStep { mafia, doctor, detective, sniper }

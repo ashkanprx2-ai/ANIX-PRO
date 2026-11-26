@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../../core/assets/app_assets.dart';
-import '../../../core/theme/nx_theme.dart';
+import '../../../ui/kit/station_compat.dart';
 import '../core/mafia_models.dart';
 
 /// Visual language of the Mafia station: moonlit night, dawn day, glowing cards.

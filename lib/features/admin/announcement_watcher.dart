@@ -6,8 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/online/online_service.dart';
 import '../../core/storage/local_store.dart';
-import '../../core/theme/nx_theme.dart';
-
+import '../../ui/kit/station_compat.dart';
 /// Shows admin announcements (`nx_announcements`, Realtime + catch-up on start) once per device.
 class AnnouncementWatcher {
   AnnouncementWatcher(this._ref, this._messenger);

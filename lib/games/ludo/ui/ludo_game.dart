@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:nexora/core/theme/nx_theme.dart';
+import 'package:nexora/ui/kit/station_compat.dart';
 import 'package:nexora/games/core/game_contract.dart';
 
 import '../core/ludo_bot.dart';

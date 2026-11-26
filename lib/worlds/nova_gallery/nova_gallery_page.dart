@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/profile/profile_service.dart';
 import '../../core/settings/app_settings.dart';
-import '../../core/theme/nx_theme.dart';
-import '../../core/widgets/nx_widgets.dart';
+import '../../ui/kit/station_compat.dart';
+
 import 'models/nova_models.dart';
 import 'state/nova_controller.dart';
 import 'ui/nova_follow.dart';
@@ -13,8 +13,7 @@ import 'ui/nova_post_card.dart';
 import 'ui/nova_tabs.dart';
 import 'ui/nova_visuals.dart';
 
-import '../../core/ui2/anix_kit.dart';
-import '../../core/ui2/luxe.dart';
+
 
 /// NOVA GALLERY — the social network world (offline-first).
 class NovaGalleryPage extends ConsumerStatefulWidget {

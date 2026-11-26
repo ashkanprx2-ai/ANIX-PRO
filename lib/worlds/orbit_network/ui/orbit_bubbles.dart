@@ -4,8 +4,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/assets/app_assets.dart';
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/widgets/nx_widgets.dart';
+import '../../../ui/kit/station_compat.dart';
+
 import '../../nova_gallery/models/art_asset.dart';
 import '../../nova_gallery/models/nova_models.dart';
 import '../../nova_gallery/ui/nova_visuals.dart';
@@ -14,7 +14,7 @@ import '../models/arcade_refs.dart';
 import '../models/orbit_models.dart';
 import '../../../games/arcade_kit/arcade_icon.dart';
 
-import '../../../core/ui2/anix_kit.dart';
+
 String orbitTime(DateTime t) => '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
 
 /// Honest bottom sheet for features that require the server (calls, contacts...).

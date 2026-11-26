@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
-import '../../../core/theme/nx_theme.dart';
+import '../../../ui/kit/station_compat.dart';
 import '../../core/game_contract.dart';
 import '../core/pool_bot.dart';
 import '../core/pool_config.dart';
@@ -15,8 +15,7 @@ import 'pool_hud.dart';
 import 'pool_painter.dart';
 import 'pool_scene.dart';
 import 'pool_skins.dart';
-import '../../../core/ui2/nx2_board_art.dart';
-
+import '../../shared/board_art.dart';
 enum _Stage { aiming, striking, rolling, over }
 
 enum _BotStage { idle, thinking, aiming, charging }
@@ -33,7 +32,7 @@ class BilliardsGame extends StatefulWidget {
 
 class _BilliardsGameState extends State<BilliardsGame>
     with SingleTickerProviderStateMixin {
-  NxThemeColors _theme = NxThemeColors.gold;
+  NxThemeColors _theme = NxThemeColors.gameplay;
   int _skin = poolSkinIndex();
 
   void _nextSkin() {

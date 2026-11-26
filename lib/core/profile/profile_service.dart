@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../storage/local_store.dart';
 import 'achievements.dart';
-import '../ui2/oracle_buddy.dart' show OracleBus;
+import '../companion/companion_bus.dart';
 
 /// A recorded activity (shown in Personal Orbit timeline).
 class ActivityEntry {
@@ -82,7 +82,7 @@ class ProfileService extends ChangeNotifier {
   String? customTeamUrl;
   String? customTeamPath;
 
-  /// Portrait from the ANIX avatar base set (assets/ui/anix/avatars), shown in the rank frame.
+  /// Portrait from the ANIX avatar base set (assets/avatar/portraits), shown in the rank frame.
   String portrait = '01-vanguard';
   int xp = 0;
   int coins = 0;
@@ -589,6 +589,14 @@ class ProfileService extends ChangeNotifier {
   void equip(String slot, String itemId) {
     if (!owns(itemId)) return;
     equipped[slot] = itemId;
+    _save();
+    notifyListeners();
+  }
+
+  /// A free preference slot that is not a shop item (e.g. `companion` = oracle | luna). Synced like [equipped].
+  void setPreference(String slot, String value) {
+    if (equipped[slot] == value) return;
+    equipped[slot] = value;
     _save();
     notifyListeners();
   }

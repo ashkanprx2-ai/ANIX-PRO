@@ -35,47 +35,47 @@ class AppAssets {
   static const avatarGearVisorPanel = 'assets/avatar/gear/visor_panel.webp';
   static const avatarGearWatch = 'assets/avatar/gear/watch.webp';
   static const charactersOracleHeroOrbit =
-      'assets/characters/oracle/hero_orbit.webp';
+      'assets/characters/oracle/hero.webp';
   static const charactersOracleAvatarUser =
-      'assets/characters/oracle/avatar_user.webp';
+      'assets/characters/oracle/avatar.webp';
   static const charactersOracleEmotesEmoteAlert =
-      'assets/characters/oracle/emotes/emote_alert.webp';
+      'assets/characters/oracle/confused.webp';
   static const charactersOracleEmotesEmoteCheer =
-      'assets/characters/oracle/emotes/emote_cheer.webp';
+      'assets/characters/oracle/cheer.webp';
   static const charactersOracleEmotesEmoteIdle =
-      'assets/characters/oracle/emotes/emote_idle.webp';
+      'assets/characters/oracle/happy.webp';
   static const charactersOracleEmotesEmotePoint =
-      'assets/characters/oracle/emotes/emote_point.webp';
+      'assets/characters/oracle/smart.webp';
   static const charactersOracleEmotesEmoteSmile =
-      'assets/characters/oracle/emotes/emote_smile.webp';
+      'assets/characters/oracle/happy.webp';
   static const charactersOracleEmotesEmoteWave =
-      'assets/characters/oracle/emotes/emote_wave.webp';
+      'assets/characters/oracle/salute.webp';
   static const charactersOracleEmotesHeroFront =
-      'assets/characters/oracle/emotes/hero_front.webp';
+      'assets/characters/oracle/hero.webp';
   static const charactersOraclePosesAlert =
-      'assets/characters/oracle/poses/alert.webp';
+      'assets/characters/oracle/confused.webp';
   static const charactersOraclePosesCalm =
-      'assets/characters/oracle/poses/calm.webp';
+      'assets/characters/oracle/happy.webp';
   static const charactersOraclePosesCheer =
-      'assets/characters/oracle/poses/cheer.webp';
+      'assets/characters/oracle/cheer.webp';
   static const charactersOraclePosesConfused =
-      'assets/characters/oracle/poses/confused.webp';
+      'assets/characters/oracle/confused.webp';
   static const charactersOraclePosesCraft =
-      'assets/characters/oracle/poses/craft.webp';
+      'assets/characters/oracle/smart.webp';
   static const charactersOraclePosesHappy =
-      'assets/characters/oracle/poses/happy.webp';
+      'assets/characters/oracle/happy.webp';
   static const charactersOraclePosesHeroWave =
-      'assets/characters/oracle/poses/hero_wave.webp';
+      'assets/characters/oracle/salute.webp';
   static const charactersOraclePosesIdle =
-      'assets/characters/oracle/poses/idle.webp';
+      'assets/characters/oracle/happy.webp';
   static const charactersOraclePosesPower =
-      'assets/characters/oracle/poses/power.webp';
+      'assets/characters/oracle/cool.webp';
   static const charactersOraclePosesPresent =
-      'assets/characters/oracle/poses/present.webp';
+      'assets/characters/oracle/sign.webp';
   static const charactersOraclePosesSleep =
-      'assets/characters/oracle/poses/sleep.webp';
+      'assets/characters/oracle/sleep.webp';
   static const charactersOraclePosesSpin =
-      'assets/characters/oracle/poses/spin.webp';
+      'assets/characters/oracle/gamer.webp';
   static const gamesBackgammonBoardNxGold =
       'assets/games/backgammon/board_nx_gold.webp';
   static const gamesBackgammonCheckerDark =
@@ -263,99 +263,7 @@ class AppAssets {
       'assets/progression/club_badges/badge_club_wolf.webp';
   static const progressionClubBadgesBadgeClubYakuza =
       'assets/progression/club_badges/badge_club_yakuza.webp';
-  static const uiHoloFramesHoloFrame01 =
-      'assets/ui/holo_frames/holo_frame_01.webp';
-  static const uiHoloFramesHoloFrame02 =
-      'assets/ui/holo_frames/holo_frame_02.webp';
-  static const uiHoloFramesHoloFrame03 =
-      'assets/ui/holo_frames/holo_frame_03.webp';
-  static const uiHoloFramesHoloFrame04 =
-      'assets/ui/holo_frames/holo_frame_04.webp';
-  static const uiHoloFramesHoloFrame05 =
-      'assets/ui/holo_frames/holo_frame_05.webp';
-  static const uiHoloFramesHoloFrame06 =
-      'assets/ui/holo_frames/holo_frame_06.webp';
-  static const uiHoloFramesHoloFrame07 =
-      'assets/ui/holo_frames/holo_frame_07.webp';
-  static const uiHoloFramesHoloFrame08 =
-      'assets/ui/holo_frames/holo_frame_08.webp';
-  static const uiHoloFramesHoloSheetA =
-      'assets/ui/holo_frames/holo_sheet_a.webp';
-  static const uiHoloFramesHoloSheetB =
-      'assets/ui/holo_frames/holo_sheet_b.webp';
-  static const uiKitUiBar04 = 'assets/ui/kit/ui_bar_04.webp';
-  static const uiKitUiBar10 = 'assets/ui/kit/ui_bar_10.webp';
-  static const uiKitUiBar16 = 'assets/ui/kit/ui_bar_16.webp';
-  static const uiKitUiElement01 = 'assets/ui/kit/ui_element_01.webp';
-  static const uiKitUiElement02 = 'assets/ui/kit/ui_element_02.webp';
-  static const uiKitUiElement03 = 'assets/ui/kit/ui_element_03.webp';
-  static const uiKitUiElement05 = 'assets/ui/kit/ui_element_05.webp';
-  static const uiKitUiElement08 = 'assets/ui/kit/ui_element_08.webp';
-  static const uiKitUiElement12 = 'assets/ui/kit/ui_element_12.webp';
-  static const uiKitUiElement13 = 'assets/ui/kit/ui_element_13.webp';
-  static const uiKitUiElement14 = 'assets/ui/kit/ui_element_14.webp';
-  static const uiKitUiElement15 = 'assets/ui/kit/ui_element_15.webp';
-  static const uiKitUiIcon06 = 'assets/ui/kit/ui_icon_06.webp';
-  static const uiKitUiPanel07 = 'assets/ui/kit/ui_panel_07.webp';
-  static const uiKitUiPanel09 = 'assets/ui/kit/ui_panel_09.webp';
-  static const uiKitUiPanel11 = 'assets/ui/kit/ui_panel_11.webp';
-  static const worldsHubPortalsArcadeGateLarge =
-      'assets/worlds/hub/portals/arcade_gate_large.webp';
-  static const worldsHubPortalsNexoraArcade =
-      'assets/worlds/hub/portals/nexora_arcade.webp';
-  static const worldsHubPortalsNexoraExchange =
-      'assets/worlds/hub/portals/nexora_exchange.webp';
-  static const worldsHubPortalsNovaGallery =
-      'assets/worlds/hub/portals/nova_gallery.webp';
-  static const worldsHubPortalsOracleCore =
-      'assets/worlds/hub/portals/oracle_core.webp';
-  static const worldsHubPortalsOrbitNetwork =
-      'assets/worlds/hub/portals/orbit_network.webp';
-  static const worldsHubPortalsPersonalOrbit =
-      'assets/worlds/hub/portals/personal_orbit.webp';
-  static const worldsHubPortalsSocialStation =
-      'assets/worlds/hub/portals/social_station.webp';
-  static const worldsHubPropsCaptainChairBlue =
-      'assets/worlds/hub/props/captain_chair_blue.webp';
-  static const worldsHubPropsCaptainChairNavy =
-      'assets/worlds/hub/props/captain_chair_navy.webp';
   // Compatibility aliases used by the cinematic Journey scene.
-  static const worldsHubShipNexoraCruiserNx01 =
-      'assets/worlds/hub/ship/nexora_cruiser_nx01.webp';
-  static const worldsHubPropsCommandDeskMain =
-      'assets/worlds/hub/props/command_desk_main.webp';
-  static const worldsHubPropsCommandPlatformOctagon =
-      'assets/worlds/hub/props/command_platform_octagon.webp';
-  static const worldsHubPropsCommandPlatformWide =
-      'assets/worlds/hub/props/command_platform_wide.webp';
-  static const worldsHubPropsPodiumHologram =
-      'assets/worlds/hub/props/podium_hologram.webp';
-  static const worldsHubPropsSetCargoCrate =
-      'assets/worlds/hub/props/set/cargo_crate.webp';
-  static const worldsHubPropsSetCommandDesk =
-      'assets/worlds/hub/props/set/command_desk.webp';
-  static const worldsHubPropsSetCommsTerminal =
-      'assets/worlds/hub/props/set/comms_terminal.webp';
-  static const worldsHubPropsSetEnergyCore =
-      'assets/worlds/hub/props/set/energy_core.webp';
-  static const worldsHubPropsSetFloorPad =
-      'assets/worlds/hub/props/set/floor_pad.webp';
-  static const worldsHubPropsSetHoloChamber =
-      'assets/worlds/hub/props/set/holo_chamber.webp';
-  static const worldsHubPropsSetHoloProjector =
-      'assets/worlds/hub/props/set/holo_projector.webp';
-  static const worldsHubPropsSetInfoKiosk =
-      'assets/worlds/hub/props/set/info_kiosk.webp';
-  static const worldsHubPropsSetOrbitalGlobe =
-      'assets/worlds/hub/props/set/orbital_globe.webp';
-  static const worldsHubPropsSetPortalDoor =
-      'assets/worlds/hub/props/set/portal_door.webp';
-  static const worldsHubPropsSetReactorPod =
-      'assets/worlds/hub/props/set/reactor_pod.webp';
-  static const worldsHubPropsSetRoboticSeat =
-      'assets/worlds/hub/props/set/robotic_seat.webp';
-  static const worldsHubPropsSetServerRack =
-      'assets/worlds/hub/props/set/server_rack.webp';
   static const worldsPersonalOrbitDecorBanner =
       'assets/worlds/personal_orbit/decor/banner.webp';
   static const worldsPersonalOrbitDecorCrystalArch =
@@ -389,8 +297,6 @@ class AppAssets {
   static const worldsPersonalOrbitDecorTerrariumGlobe =
       'assets/worlds/personal_orbit/decor/terrarium_globe.webp';
 
-  static String portal(String worldId) =>
-      'assets/worlds/hub/portals/$worldId.webp';
   static String pedestal(String gameId) =>
       'assets/arcade/pedestals/$gameId.webp';
   static String gear(String id) => 'assets/avatar/gear/$id.webp';
@@ -400,12 +306,6 @@ class AppAssets {
       'assets/progression/achievements/$id.webp';
   static String clubBadge(String id) =>
       'assets/progression/club_badges/$id.webp';
-  static String oraclePose(String pose) {
-    if (pose == 'idle' || pose == 'hero_wave') {
-      return charactersOracleAvatarUser;
-    }
-    return 'assets/characters/oracle/poses/$pose.webp';
-  }
 
   static String disc(String id) => 'assets/games/shared/discs/$id.webp';
   static String puckTop(String skin) =>

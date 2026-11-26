@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/settings/app_settings.dart';
-import '../../core/theme/nx_theme.dart';
+import '../../ui/kit/station_compat.dart';
 import 'legal_texts.dart';
 
 /// `/legal/privacy` and `/legal/terms` (P0 #6). Reachable without signing in (sign-up links here).
@@ -18,13 +18,11 @@ class LegalPage extends StatelessWidget {
     final bool privacy = kind == 'privacy';
     final List<LegalSection> sections = privacy ? (fa ? privacyFa : privacyEn) : (fa ? termsFa : termsEn);
     final NxThemeColors visual = NxThemeColors.of(context);
-    return Scaffold(
-      backgroundColor: visual.background,
-      appBar: AppBar(
-        title: Text(privacy ? context.tx('حریم خصوصی', 'Privacy Policy') : context.tx('شرایط استفاده', 'Terms of Use')),
-        leading: BackButton(onPressed: () => context.canPop() ? context.pop() : context.go('/auth')),
-      ),
-      body: ListView(
+    return StationScreen(
+      title: privacy ? context.tx('حریم خصوصی', 'Privacy Policy') : context.tx('شرایط استفاده', 'Terms of Use'),
+      balance: false,
+      onBack: () => context.canPop() ? context.pop() : context.go('/auth'),
+      child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
         children: <Widget>[
           Text(context.tx('آخرین به‌روزرسانی: $legalVersion', 'Last updated: $legalVersion'),

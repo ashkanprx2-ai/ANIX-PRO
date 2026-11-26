@@ -13,12 +13,12 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:nexora/core/theme/nx_theme.dart';
+import 'package:nexora/ui/kit/station_compat.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nexora/core/economy/gem_shop.dart';
 import 'package:nexora/core/online/online_service.dart';
 import 'package:nexora/core/profile/profile_service.dart';
-import 'package:nexora/core/widgets/user_avatar.dart';
+import 'package:nexora/ui/widgets/user_avatar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:nexora/games/core/game_contract.dart';
@@ -33,7 +33,6 @@ import 'fs_flame.dart';
 import '../intro/fs_game_bar.dart';
 import '../intro/fs_intro_data.dart';
 import '../intro/fs_score_table.dart';
-import '../../../core/ui2/luxe.dart';
 
 const String _a = 'assets/games/bermuda/';
 
@@ -2287,8 +2286,7 @@ class _BermudaViewState extends State<BermudaView>
                               elevation: 5,
                               shadowColor: visual.accent.withValues(alpha: .30),
                               textStyle: const TextStyle(
-                                  fontFamily: kNxFont,
-                                  fontFamilyFallback: kNxFontFallback,
+                                  fontFamily: kStationFont,
                                   fontWeight: FontWeight.w900,
                                   fontSize: 15,
                                   letterSpacing: .5),

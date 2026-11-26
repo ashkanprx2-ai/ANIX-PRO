@@ -6,11 +6,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/online/online_service.dart';
 import '../../core/settings/app_settings.dart';
-import '../../core/theme/nx_theme.dart';
-import '../../core/ui2/anix_brand.dart';
-import '../../core/ui2/luxe.dart';
-import '../../core/widgets/nx_widgets.dart';
-import '../settings/account_page.dart' show nxAuthError;
+import '../../ui/kit/station_compat.dart';
+
+import '../../ui/screens/auth_screens.dart' show nxAuthError;
 
 /// Password recovery, step 1 (P0 #2): send the recovery e-mail, then either type the code from it here or tap its
 /// link on this phone (`nexora://login-callback/reset`). Both sign the user in for the reset only and lead to
@@ -83,14 +81,11 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
     final OnlineService o = ref.watch(onlineProvider);
     final NxThemeColors visual = NxThemeColors.of(context);
     final int wait = o.resetCooldownLeft(_email.text);
-    return Scaffold(
-      backgroundColor: visual.background,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Text(context.tx('بازیابی رمز عبور', 'Reset password')),
-        leading: BackButton(onPressed: () => context.canPop() ? context.pop() : context.go('/auth')),
-      ),
-      body: NxBrandBackground(
+    return StationScreen(
+      title: context.tx('بازیابی رمز عبور', 'Reset password'),
+      balance: false,
+      onBack: () => context.canPop() ? context.pop() : context.go('/auth'),
+      child: NxBrandBackground(
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
@@ -98,7 +93,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 460),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
-                  const AnixLogo(height: 84),
+                  SizedBox(height: 84, child: Image.asset(StationPalette.of(context).logo, fit: BoxFit.contain)),
                   const SizedBox(height: 14),
                   Text(
                     context.tx(
@@ -231,14 +226,11 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
     final OnlineService o = ref.watch(onlineProvider);
     final NxThemeColors visual = NxThemeColors.of(context);
     final bool ready = o.user != null && !o.isGuest;
-    return Scaffold(
-      backgroundColor: visual.background,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: false,
-        title: Text(context.tx('رمز عبور تازه', 'New password')),
-      ),
-      body: NxBrandBackground(
+    return StationScreen(
+      title: context.tx('رمز عبور تازه', 'New password'),
+      balance: false,
+      back: false,
+      child: NxBrandBackground(
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(

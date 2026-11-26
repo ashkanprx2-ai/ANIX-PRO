@@ -5,8 +5,7 @@
 // v6.1: one row per player (team games: every seat, with its side's goals) showing the player's avatar like the
 // reference; the crest is the fallback when an avatar is unknown.
 import 'package:flutter/material.dart';
-import 'package:nexora/core/widgets/user_avatar.dart';
-
+import 'package:nexora/ui/widgets/user_avatar.dart';
 import 'fs_intro_data.dart';
 import 'fs_intro_ui.dart';
 

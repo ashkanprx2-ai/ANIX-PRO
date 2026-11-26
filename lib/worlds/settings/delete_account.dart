@@ -6,9 +6,8 @@ import '../../core/online/online_service.dart';
 import '../../core/profile/profile_service.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/storage/local_store.dart';
-import '../../core/theme/nx_theme.dart';
-import '../../core/ui2/anix_kit.dart';
-import '../../core/ui2/luxe.dart';
+import '../../ui/kit/station_compat.dart';
+
 
 /// "Delete account" (store requirement, P0 #1).
 ///
@@ -56,16 +55,15 @@ class DeleteAccountButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final OnlineService online = ref.watch(onlineProvider);
     final bool account = online.user != null && !online.isGuest;
-    return OutlinedButton.icon(
+    return StationButton(
       key: const ValueKey<String>('delete_account'),
-      style: OutlinedButton.styleFrom(foregroundColor: NxColors.danger),
-      icon: online.busy
-          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-          : const Icon(Icons.delete_forever_rounded),
-      label: Text(account
+      danger: true,
+      busy: online.busy,
+      icon: Icons.delete_forever_rounded,
+      label: account
           ? context.tx('حذف همیشگی حساب کاربری', 'Delete account permanently')
-          : context.tx('پاک کردن همه‌ی داده‌های این گوشی', 'Erase all data on this phone')),
-      onPressed: online.busy ? null : () => account ? _deleteAccount(context, ref) : _wipeGuest(context, ref),
+          : context.tx('پاک کردن همه‌ی داده‌های این گوشی', 'Erase all data on this phone'),
+      onTap: online.busy ? null : () => account ? _deleteAccount(context, ref) : _wipeGuest(context, ref),
     );
   }
 

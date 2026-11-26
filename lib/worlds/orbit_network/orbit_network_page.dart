@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/settings/app_settings.dart';
-import '../../core/theme/nx_theme.dart';
-import '../../core/widgets/nx_widgets.dart';
+import '../../ui/kit/station_compat.dart';
+
 import 'models/orbit_models.dart';
 import 'state/orbit_controller.dart';
 import 'ui/orbit_sheets.dart';
 import 'ui/orbit_tabs.dart';
 
-import '../../core/ui2/anix_kit.dart';
+
 /// ORBIT NETWORK — the messenger world (offline-first).
 class OrbitNetworkPage extends ConsumerStatefulWidget {
   const OrbitNetworkPage({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/nx_theme.dart';
+import '../../../ui/kit/station_compat.dart';
 import 'uno_table_widgets.dart';
 
 /// Opaque screen shown between turns in pass-and-play so hands stay hidden.

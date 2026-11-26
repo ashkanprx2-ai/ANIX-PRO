@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../core/companion/companion.dart';
 
 import '../../core/audio/sfx_service.dart';
 import 'package:flutter/services.dart';
@@ -9,8 +10,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/audio/music_service.dart';
 import '../../core/profile/profile_service.dart';
 import '../../core/settings/app_settings.dart';
-import '../../core/theme/nx_theme.dart';
-import '../../core/widgets/nx_widgets.dart';
+import '../../ui/kit/station_compat.dart';
+
 import '../../core/online/online_service.dart';
 import '../../games/arcade_kit/arcade_meta.dart';
 import '../../games/game_registry.dart';
@@ -18,7 +19,7 @@ import '../oracle_core/oracle_game_sheet.dart';
 import '../oracle_core/persona/oracle_persona.dart';
 import '../oracle_core/persona/oracle_persona_widgets.dart';
 
-import '../../core/ui2/anix_kit.dart';
+
 /// Hosts any GameModule: exit button, pause-confirm, result screen, XP, rematch.
 class GameHostPage extends ConsumerStatefulWidget {
   const GameHostPage({
@@ -201,8 +202,8 @@ class _GameHostPageState extends ConsumerState<GameHostPage> {
               color: Colors.black.withValues(alpha: 0.35),
               shape: const CircleBorder(),
               child: IconButton(
-                tooltip: 'ORACLE',
-                icon: const Icon(Icons.smart_toy_rounded, color: Color(0xFFF6E7BD)),
+                tooltip: CompanionInfo.of(CompanionController.activeId).nameEn,
+                icon: ClipOval(child: Image.asset(CompanionInfo.of(CompanionController.activeId).avatar, width: 30, height: 30, fit: BoxFit.cover)),
                 onPressed: () => OracleGameSheet.show(context, widget.game),
               ),
             ),

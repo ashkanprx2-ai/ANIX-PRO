@@ -7,8 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../games/game_registry.dart';
 import '../settings/app_settings.dart';
 import 'online_service.dart';
-import '../ui2/luxe.dart';
-
+import '../../ui/kit/station_compat.dart';
 /// Shows real-time game invitations from friends anywhere in the app.
 class InviteWatcher {
   InviteWatcher(this._ref, this._messenger, this._open, {this.onWatch});

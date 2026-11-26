@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../core/ui2/page_turn.dart';
 
+import '../core/catalog/catalog.dart';
+import '../core/online/online_service.dart';
 import '../core/profile/profile_service.dart';
+import '../core/settings/app_settings.dart';
 import '../core/storage/local_store.dart';
 import '../features/admin/admin_access.dart';
 import '../features/admin/admin_page.dart';
@@ -13,36 +15,27 @@ import '../features/tournaments/ui/admin/tournament_wizard_page.dart';
 import '../features/tournaments/ui/tournament_detail_page.dart';
 import '../features/tournaments/ui/tournament_inbox_page.dart';
 import '../features/tournaments/ui/tournaments_page.dart';
-import '../worlds/arcade/arcade_page.dart';
-import '../worlds/arcade/game_setup_page.dart';
-import '../worlds/arcade/online/leaderboard_page.dart';
+import '../ui/screens/ai_screens.dart';
+import '../ui/screens/auth_screens.dart';
+import '../ui/screens/board_screen.dart';
+import '../ui/screens/event_screens.dart';
+import '../ui/screens/game_screens.dart';
+import '../ui/screens/profile_screens.dart';
+import '../ui/screens/rooms_screens.dart';
+import '../ui/screens/shop_screens.dart';
+import '../ui/screens/social_screens.dart';
+import '../ui/shell/station_page.dart';
 import '../worlds/arcade/online/online_lobby_page.dart';
 import '../worlds/arcade/online/online_match_page.dart';
-import '../worlds/auth/auth_page.dart';
 import '../worlds/auth/password_reset_pages.dart';
-import '../worlds/auth/signin_required_page.dart';
-import '../worlds/hub/hub_page.dart';
 import '../worlds/legal/legal_page.dart';
-import '../worlds/hub/luxe_station_page.dart';
-import '../worlds/intro/intro_video_page.dart';
-import '../worlds/nexora_exchange/exchange_page.dart';
 import '../worlds/nova_gallery/nova_gallery_page.dart';
-import '../worlds/onboarding/onboarding_page.dart';
-import '../worlds/oracle_core/oracle_core_page.dart';
 import '../worlds/oracle_core/persona/oracle_config_page.dart';
 import '../worlds/orbit_network/orbit_network_page.dart';
 import '../worlds/orbit_network/ui/orbit_call_page.dart';
-import '../worlds/personal_orbit/personal_orbit_page.dart';
-import '../worlds/settings/account_page.dart';
-import '../worlds/settings/settings_page.dart';
 import '../worlds/settings/blocked_users_page.dart';
-import '../worlds/rooms/rooms_page.dart';
 import '../worlds/rooms/talk_room_page.dart';
-import '../worlds/social_hub/social_hub_page.dart';
-import '../worlds/personal_orbit/rewards_page.dart';
 import '../worlds/social_station/social_station_page.dart';
-import '../core/online/online_service.dart';
-import '../core/settings/app_settings.dart';
 import 'auth_gate.dart';
 
 GoRouter buildRouter(WidgetRef ref) {
@@ -117,33 +110,54 @@ GoRouter buildRouter(WidgetRef ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/auth', pageBuilder: (context, state) => _fade(state, const AuthPage())),
-      GoRoute(
-        path: kSignInRequiredPath,
-        builder: (context, state) => SignInRequiredPage(from: state.uri.queryParameters['from'] ?? ''),
-      ),
+      GoRoute(path: '/auth', pageBuilder: (context, state) => _fade(state, const StationAuthPage())),
+      GoRoute(path: kSignInRequiredPath, builder: (context, state) => StationSignInRequired(from: state.uri.queryParameters['from'] ?? '')),
       GoRoute(
         path: '/intro',
-        pageBuilder: (context, state) => _fade(
-          state,
-          IntroVideoPage(next: state.uri.queryParameters['next'] ?? '/hub'),
-        ),
+        pageBuilder: (context, state) => _fade(state, StationSplash(next: state.uri.queryParameters['next'] ?? '/hub')),
       ),
-      GoRoute(path: '/onboarding', pageBuilder: (context, state) => _fade(state, const OnboardingPage())),
-      GoRoute(path: '/hub', pageBuilder: (context, state) => _fade(state, const HubPage())),
+      GoRoute(path: '/onboarding', pageBuilder: (context, state) => _fade(state, const StationOnboarding())),
+      GoRoute(path: '/hub', pageBuilder: (context, state) => _fade(state, const StationPage())),
       GoRoute(
         path: '/station/:k',
-        pageBuilder: (context, state) => _warp(state, LuxeStationPage(k: state.pathParameters['k'] ?? '')),
+        pageBuilder: (context, state) => _fade(state, StationPage(initialWorld: int.tryParse(state.pathParameters['k'] ?? ''))),
       ),
-      GoRoute(path: '/rooms', pageBuilder: (context, state) => _warp(state, const RoomsPage())),
+      // ---- Station screens (`/s/...`)
+      GoRoute(path: '/s/profile', builder: (context, state) => const StationProfileScreen()),
+      GoRoute(path: '/s/controller', builder: (context, state) => const StationControllerScreen()),
+      GoRoute(path: '/s/games', builder: (context, state) => StationGamesScreen(records: state.uri.queryParameters['records'] == '1')),
+      GoRoute(path: '/s/missions/daily', builder: (context, state) => const StationMissionsScreen(weekly: false)),
+      GoRoute(path: '/s/missions/weekly', builder: (context, state) => const StationMissionsScreen(weekly: true)),
+      GoRoute(path: '/s/news', builder: (context, state) => const StationNewsScreen()),
+      GoRoute(path: '/s/calendar', builder: (context, state) => const StationCalendarScreen()),
+      GoRoute(path: '/s/gift', builder: (context, state) => const StationGiftBoxScreen()),
+      GoRoute(path: '/s/wheel', builder: (context, state) => const StationWheelScreen()),
+      GoRoute(path: '/s/medals', builder: (context, state) => const StationCollectionScreen(trophies: false)),
+      GoRoute(path: '/s/trophies', builder: (context, state) => const StationCollectionScreen(trophies: true)),
+      GoRoute(path: '/s/event/:kind', builder: (context, state) => StationEventScreen(kind: state.pathParameters['kind'] ?? 'daily')),
+      GoRoute(path: '/s/history', builder: (context, state) => const StationHistoryScreen()),
+      GoRoute(path: '/s/forecast', builder: (context, state) => const StationForecastScreen()),
+      GoRoute(path: '/s/analysis', builder: (context, state) => const StationForecastScreen(analysis: true)),
+      GoRoute(path: '/s/tips', builder: (context, state) => const StationTipsScreen()),
+      GoRoute(path: '/s/friends', builder: (context, state) => const StationFriendsScreen()),
+      GoRoute(path: '/s/send-gift', builder: (context, state) => const StationSendGiftScreen()),
+      GoRoute(path: '/s/viewers', builder: (context, state) => const StationViewersScreen()),
+      GoRoute(path: '/s/listen', builder: (context, state) => const StationRoomsScreen(listenOnly: true)),
+      GoRoute(path: '/s/shop', builder: (context, state) => const StationShopScreen()),
+      GoRoute(path: '/s/gems', builder: (context, state) => const StationGemsScreen()),
+      GoRoute(path: '/s/frames', builder: (context, state) => const StationShopScreen(only: ItemCategory.frame)),
+      GoRoute(path: '/s/themes', builder: (context, state) => const StationThemesScreen()),
+      GoRoute(path: '/chat/:id', builder: (context, state) => StationChatScreen(chatId: state.pathParameters['id'] ?? '')),
+      GoRoute(path: '/rooms', builder: (context, state) => const StationRoomsScreen()),
       GoRoute(path: '/room/:id', builder: (context, state) => TalkRoomPage(roomId: state.pathParameters['id'] ?? '')),
-      GoRoute(path: '/social', pageBuilder: (context, state) => _warp(state, const SocialHubPage())),
-      GoRoute(path: '/rewards', pageBuilder: (context, state) => _warp(state, const RewardsPage())),
-      GoRoute(path: '/settings', builder: (context, state) => const SettingsPage()),
-      GoRoute(path: '/settings/blocked', builder: (context, state) => const BlockedUsersPage()),
+      GoRoute(path: '/social', builder: (context, state) => const StationChatsScreen()),
+      GoRoute(path: '/rewards', builder: (context, state) => const StationGiftBoxScreen()),
+      GoRoute(path: '/settings', builder: (context, state) => const StationSettingsScreen()),
+      GoRoute(path: '/account', builder: (context, state) => const StationAccountScreen()),
       GoRoute(path: '/admin/oracle', builder: (context, state) => const OracleConfigPage()),
       GoRoute(path: '/admin', builder: (context, state) => const AdminPage()),
       GoRoute(path: '/force-password', builder: (context, state) => const ForcePasswordPage()),
+      GoRoute(path: '/settings/blocked', builder: (context, state) => const BlockedUsersPage()),
       GoRoute(
         path: '/forgot-password',
         builder: (context, state) => ForgotPasswordPage(email: state.uri.queryParameters['email']),
@@ -151,19 +165,15 @@ GoRouter buildRouter(WidgetRef ref) {
       GoRoute(path: '/reset-password', builder: (context, state) => const ResetPasswordPage()),
       GoRoute(path: '/legal/privacy', builder: (context, state) => const LegalPage(kind: 'privacy')),
       GoRoute(path: '/legal/terms', builder: (context, state) => const LegalPage(kind: 'terms')),
-      GoRoute(path: '/account', builder: (context, state) => const AccountPage()),
       GoRoute(
         path: '/oracle',
-        pageBuilder: (context, state) => _warp(
-          state,
-          _WorldVisit(id: 'oracle_core', child: OracleCorePage(initialQuery: state.uri.queryParameters['q'])),
-        ),
+        builder: (context, state) => _WorldVisit(id: 'oracle_core', child: StationAiScreen(initialQuery: state.uri.queryParameters['q'])),
       ),
       GoRoute(
         path: '/world/:id',
-        pageBuilder: (context, state) {
-          final id = state.pathParameters['id'] ?? '';
-          return _warp(state, _WorldVisit(id: id, child: _worldPage(id)));
+        builder: (context, state) {
+          final String id = state.pathParameters['id'] ?? '';
+          return _WorldVisit(id: id, child: _worldPage(id));
         },
       ),
       GoRoute(
@@ -199,7 +209,7 @@ GoRouter buildRouter(WidgetRef ref) {
       ),
       GoRoute(
         path: '/leaderboard',
-        builder: (context, state) => LeaderboardPage(initialGame: state.uri.queryParameters['game']),
+        builder: (context, state) => StationBoardScreen(initialGame: state.uri.queryParameters['game']),
       ),
       GoRoute(
         path: '/tournaments',
@@ -232,10 +242,10 @@ GoRouter buildRouter(WidgetRef ref) {
       ),
       GoRoute(
         path: '/arcade/:gameId',
-        builder: (context, state) => GameSetupPage(gameId: state.pathParameters['gameId'] ?? ''),
+        builder: (context, state) => StationGameScreen(gameId: state.pathParameters['gameId'] ?? ''),
       ),
     ],
-    errorBuilder: (context, state) => RouteNotFoundPage(location: state.uri.toString()),
+    errorBuilder: (context, state) => StationNotFound(location: state.uri.toString()),
   );
 }
 
@@ -245,18 +255,18 @@ Widget _worldPage(String id) {
       return const NovaGalleryPage();
     case 'orbit_network':
       return const OrbitNetworkPage();
-    case 'nexora_arcade':
-      return const ArcadePage();
-    case 'oracle_core':
-      return const OracleCorePage();
-    case 'personal_orbit':
-      return const PersonalOrbitPage();
     case 'social_station':
       return const SocialStationPage();
+    case 'oracle_core':
+      return const StationAiScreen();
+    case 'personal_orbit':
+      return const StationProfileScreen();
+    case 'nexora_arcade':
+      return const StationGamesScreen();
     case 'nexora_exchange':
-      return const ExchangePage();
+      return const StationShopScreen();
     default:
-      return const HubPage();
+      return const StationPage();
   }
 }
 
@@ -266,16 +276,6 @@ CustomTransitionPage<void> _fade(GoRouterState state, Widget child) => CustomTra
       transitionDuration: const Duration(milliseconds: 450),
       transitionsBuilder: (context, animation, secondary, child) =>
           FadeTransition(opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut), child: child),
-    );
-
-/// Paper page-turn into a world (see NxPageTurn). Reduced motion -> plain fade.
-CustomTransitionPage<void> _warp(GoRouterState state, Widget child) => CustomTransitionPage<void>(
-      key: state.pageKey,
-      child: child,
-      transitionDuration: const Duration(milliseconds: 620),
-      reverseTransitionDuration: const Duration(milliseconds: 420),
-      transitionsBuilder: (context, animation, secondary, child) =>
-          NxPageTurn(animation: animation, secondary: secondary, child: child),
     );
 
 /// Records the first visit to each world (for the World Traveler achievement).

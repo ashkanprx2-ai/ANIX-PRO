@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/widgets/nx_widgets.dart';
+import '../../../ui/kit/station_compat.dart';
+
 import '../data/models.dart';
 import '../data/tournament_repository.dart';
 import 't_common.dart';

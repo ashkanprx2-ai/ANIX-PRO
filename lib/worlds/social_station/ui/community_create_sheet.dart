@@ -3,14 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/profile/profile_service.dart';
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/widgets/nx_widgets.dart';
+import '../../../ui/kit/station_compat.dart';
+
 import '../../orbit_network/models/arcade_refs.dart';
 import '../models/social_models.dart';
 import '../state/social_controller.dart';
 import 'social_widgets.dart';
 
-import '../../../core/ui2/anix_kit.dart';
+
 class _EditorResult {
   const _EditorResult(this.community, this.outcome);
   final Community community;

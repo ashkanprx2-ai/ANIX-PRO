@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../core/theme/nx_theme.dart';
-
+import '../ui/kit/station_compat.dart';
 /// The seven worlds of ANIX (Vision §5). Single registry used by Hub,
 /// router, ORACLE and search.
 class NexoraWorld {

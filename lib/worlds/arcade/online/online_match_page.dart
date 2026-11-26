@@ -17,16 +17,15 @@ import '../../../core/online/online_service.dart';
 import '../../../core/online/room_voice.dart';
 import '../../../core/online/social_api.dart';
 import '../../../core/safety/safety_actions.dart';
-import '../../../core/ui2/luxe.dart';
+
 import '../../../core/profile/profile_service.dart';
-import '../../../core/safety/safety_actions.dart';
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
+import '../../../ui/kit/station_compat.dart';
 import '../../../games/game_registry.dart';
 import '../../oracle_core/persona/oracle_persona.dart';
 import '../../oracle_core/persona/oracle_persona_widgets.dart';
 
-import '../../../core/ui2/anix_kit.dart';
+
 /// Hosts one online match: opens the move link, builds the game in online mode,
 /// rebuilds + replays the log on reconnect/resync, reports the result and shows it.
 class OnlineMatchPage extends ConsumerStatefulWidget {

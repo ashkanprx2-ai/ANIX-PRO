@@ -9,6 +9,8 @@ import 'package:go_router/go_router.dart';
 
 import '../core/audio/music_service.dart';
 import '../core/backend/backend_gateway.dart';
+import '../core/companion/companion.dart';
+import '../worlds/oracle_core/persona/oracle_persona.dart';
 import '../core/online/call_watcher.dart';
 import '../core/online/cloud_profile_sync.dart';
 import '../core/online/invite_watcher.dart';
@@ -16,11 +18,12 @@ import '../core/online/match_resume.dart';
 import '../core/online/online_service.dart';
 import '../core/push/push_service.dart';
 import '../core/settings/app_settings.dart';
-import '../core/ui2/oracle_buddy.dart';
+import '../core/companion/companion_bus.dart';
+import '../ui/theme/station_theme.dart';
+import '../ui/widgets/companion_buddy.dart';
 import '../core/update/app_gate.dart';
 import '../core/update/app_updater.dart';
 import '../core/update/update_banner.dart';
-import '../core/theme/nx_theme.dart';
 import '../features/admin/announcement_watcher.dart';
 import '../features/tournaments/tournament_watcher.dart';
 import 'router.dart';
@@ -56,6 +59,9 @@ class _NexoraAppState extends ConsumerState<NexoraApp> {
   @override
   void initState() {
     super.initState();
+    // The active companion (ORACLE / LUNA) decides which persona every ORACLE-engine caller talks to.
+    CompanionController.onSwitch.add((CompanionId c) => OraclePersona.activate(c.name));
+    OraclePersona.activate(ref.read(companionProvider).active.name);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref.read(onlineProvider).addListener(_syncAuthMode);
@@ -112,7 +118,7 @@ class _NexoraAppState extends ConsumerState<NexoraApp> {
     return MaterialApp.router(
       title: 'NEXORA',
       debugShowCheckedModeBanner: false,
-      theme: buildNxTheme(settings.visualTheme, settings.appearanceMode),
+      theme: buildStationTheme(settings.stationSkin),
       locale: settings.locale,
       supportedLocales: const [Locale('fa'), Locale('en')],
       localizationsDelegates: const [
@@ -137,7 +143,7 @@ class _NexoraAppState extends ConsumerState<NexoraApp> {
               child: UpdateOverlay(
                 child: Stack(children: <Widget>[
                   child ?? const SizedBox.shrink(),
-                  Positioned.fill(child: OracleBuddy(router: _router)),
+                  Positioned.fill(child: CompanionBuddy(router: _router)),
                 ]),
               ),
             ),

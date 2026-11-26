@@ -5,17 +5,16 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/profile/profile_service.dart';
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/widgets/nx_widgets.dart';
-import '../../../core/widgets/user_profile_preview.dart';
+import '../../../ui/kit/station_compat.dart';
+
+import '../../../ui/widgets/user_profile_preview.dart';
 import '../../../core/safety/safety_actions.dart';
 import '../models/nova_models.dart';
 import '../state/nova_controller.dart';
 import 'nova_composer.dart';
 import 'nova_visuals.dart';
 
-import '../../../core/ui2/anix_kit.dart';
-import '../../../core/ui2/luxe.dart';
+
 
 final RegExp _uuid = RegExp(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
 

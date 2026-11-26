@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../../core/companion/companion.dart';
 
 import 'package:nexora/core/storage/local_store.dart';
 
@@ -154,18 +155,18 @@ class OracleTutorialCard extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            gradient: const LinearGradient(colors: <Color>[Color(0xF2182A5E), Color(0xF22A1556)]),
-            border: Border.all(color: const Color(0xFFD9B872)),
-            boxShadow: const <BoxShadow>[BoxShadow(color: Color(0x66D9B872), blurRadius: 18)],
+            gradient: const LinearGradient(colors: <Color>[Color(0xF2110D2E), Color(0xF2191045)]),
+            border: Border.all(color: const Color(0xFFFFC27A)),
+            boxShadow: const <BoxShadow>[BoxShadow(color: Color(0x66FF7A3D), blurRadius: 18)],
           ),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-            Image.asset('assets/characters/oracle/moods/laugh.webp',
-                width: 40, height: 40, errorBuilder: (_, __, ___) => const Icon(Icons.smart_toy_rounded, color: Color(0xFFF6E7BD))),
+            Image.asset(CompanionInfo.of(CompanionController.activeId).mood(CompanionMood.cheer),
+                width: 40, height: 40, errorBuilder: (_, __, ___) => const Icon(Icons.smart_toy_rounded, color: Color(0xFFFFE3C2))),
             const SizedBox(width: 8),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: <Widget>[
-                Text('ORACLE · ${tutorial.title}',
-                    style: const TextStyle(color: Color(0xFFF6E7BD), fontSize: 11, fontWeight: FontWeight.w800)),
+                Text('${CompanionInfo.of(CompanionController.activeId).nameEn} · ${tutorial.title}',
+                    style: const TextStyle(color: Color(0xFFFFE3C2), fontSize: 11, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 2),
                 Text(tutorial.line,
                     style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800, height: 1.35)),
@@ -190,8 +191,8 @@ class OracleResultLine extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 12),
       child: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-        Image.asset('assets/characters/oracle/moods/laugh.webp',
-            width: 34, height: 34, errorBuilder: (_, __, ___) => const Icon(Icons.smart_toy_rounded, color: Color(0xFFF6E7BD))),
+        Image.asset(CompanionInfo.of(CompanionController.activeId).mood(CompanionMood.cheer),
+            width: 34, height: 34, errorBuilder: (_, __, ___) => const Icon(Icons.smart_toy_rounded, color: Color(0xFFFFE3C2))),
         const SizedBox(width: 8),
         Flexible(
           child: Container(
@@ -199,7 +200,7 @@ class OracleResultLine extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               color: const Color(0xCC1B2350),
-              border: Border.all(color: const Color(0xFFD9B872).withValues(alpha: .7)),
+              border: Border.all(color: const Color(0xFFFFC27A).withValues(alpha: .7)),
             ),
             child: Text(text,
                 textDirection: TextDirection.rtl,

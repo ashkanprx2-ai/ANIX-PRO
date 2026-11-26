@@ -6,8 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/profile/profile_service.dart';
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/widgets/nx_widgets.dart';
+import '../../../ui/kit/station_compat.dart';
+
 import '../models/art_asset.dart';
 import '../models/nova_models.dart';
 
@@ -21,11 +21,11 @@ class NovaGradientStyle {
 
 const List<NovaGradientStyle> kNovaGradients = <NovaGradientStyle>[
   NovaGradientStyle('سحابی صورتی', 'Pink Nebula', <Color>[Color(0xFFFF6FB5), Color(0xFF7B3FF2), Color(0xFF1A0B2E)]),
-  NovaGradientStyle('شفق طلایی', 'Golden Aurora', <Color>[Color(0xFFFFC857), Color(0xFFFF6FB5), Color(0xFF5A1E4F)]),
-  NovaGradientStyle('افق یخی', 'Ice Horizon', <Color>[Color(0xFF2EE6D6), Color(0xFF00C2FF), Color(0xFF14130F)]),
+  NovaGradientStyle('شفق طلایی', 'Golden Aurora', <Color>[Color(0xFFFFC27A), Color(0xFFFF6FB5), Color(0xFF5A1E4F)]),
+  NovaGradientStyle('افق یخی', 'Ice Horizon', <Color>[Color(0xFF2EE6D6), Color(0xFF00C2FF), Color(0xFF110D2E)]),
   NovaGradientStyle('ابرنواختر', 'Supernova', <Color>[Color(0xFFFF4F6E), Color(0xFFFFB020), Color(0xFF2A0B3A)]),
   NovaGradientStyle('کهکشان بنفش', 'Violet Galaxy', <Color>[Color(0xFF9D7BFF), Color(0xFF7B3FF2), Color(0xFF0B0820)]),
-  NovaGradientStyle('سیاه‌چاله', 'Black Hole', <Color>[Color(0xFF07080C), Color(0xFF1D1B15), Color(0xFFFF6FB5)]),
+  NovaGradientStyle('سیاه‌چاله', 'Black Hole', <Color>[Color(0xFF04031A), Color(0xFF1D1B15), Color(0xFFFF6FB5)]),
   NovaGradientStyle('زمرد کیهانی', 'Cosmic Emerald', <Color>[Color(0xFF7CFF8A), Color(0xFF2EE6D6), Color(0xFF04141F)]),
   NovaGradientStyle('طلوع مریخ', 'Mars Dawn', <Color>[Color(0xFFFF8A5B), Color(0xFFFF4FA3), Color(0xFF3B1450)]),
 ];
@@ -66,7 +66,7 @@ class NovaAvatar extends StatelessWidget {
       decoration: ring
           ? const BoxDecoration(
               shape: BoxShape.circle,
-              gradient: SweepGradient(colors: <Color>[Color(0xFFFF6FB5), Color(0xFFFFC857), Color(0xFFFF6FB5)]),
+              gradient: SweepGradient(colors: <Color>[Color(0xFFFF6FB5), Color(0xFFFFC27A), Color(0xFFFF6FB5)]),
             )
           : null,
       child: Container(

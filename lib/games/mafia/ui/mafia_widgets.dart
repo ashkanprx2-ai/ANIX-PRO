@@ -2,11 +2,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/nx_theme.dart';
+import '../../../ui/kit/station_compat.dart';
 import '../core/mafia_models.dart';
 import 'mafia_visuals.dart';
 
-import '../../../core/ui2/anix_kit.dart';
+
 /// Everything a seat on the ring needs to draw itself.
 class SeatInfo {
   const SeatInfo({

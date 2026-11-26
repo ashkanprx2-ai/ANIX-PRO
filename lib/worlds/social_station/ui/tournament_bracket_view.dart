@@ -4,15 +4,15 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/profile/profile_service.dart';
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/widgets/nx_widgets.dart';
+import '../../../ui/kit/station_compat.dart';
+
 import '../../orbit_network/models/arcade_refs.dart';
 import '../models/social_models.dart';
 import '../models/tournament_bracket.dart';
 import '../state/social_controller.dart';
 import 'social_widgets.dart';
 
-import '../../../core/ui2/anix_kit.dart';
+
 String roundName(BuildContext context, int round, int roundCount) {
   final int fromEnd = roundCount - 1 - round;
   if (fromEnd == 0) return context.tx('فینال', 'Final');

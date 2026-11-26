@@ -11,6 +11,7 @@ library;
 import 'dart:math' as math;
 
 import '../core/oracle_text.dart';
+import 'luna_persona_data.dart';
 import 'oracle_persona_data.dart';
 
 // ======================================================================== helpers
@@ -230,15 +231,39 @@ class OracleTutorial {
 // ======================================================================== persona
 
 class OraclePersona {
-  OraclePersona({Map<String, dynamic>? config, math.Random? rng, DateTime Function()? clock})
+  OraclePersona({Map<String, dynamic>? config, math.Random? rng, DateTime Function()? clock, this.companion = 'oracle'})
       : rng = rng ?? math.Random(),
         cooldowns = OracleCooldowns(clock: clock) {
     bag = OracleShuffleBag(this.rng);
     applyConfig(config);
   }
 
-  /// App-wide instance (the store replaces its config with the admin-edited one from Supabase).
-  static OraclePersona instance = OraclePersona();
+  /// App-wide instance = the ACTIVE companion's persona (ORACLE or LUNA). The store replaces each persona's config
+  /// with the admin-edited one from Supabase; [activate] swaps which one answers.
+  static OraclePersona instance = forCompanion('oracle');
+
+  static final Map<String, OraclePersona> _byCompanion = <String, OraclePersona>{};
+
+  /// The persona of one companion ('oracle' | 'luna'), created on first use with its own defaults.
+  static OraclePersona forCompanion(String companion) {
+    final String k = companion == 'luna' ? 'luna' : 'oracle';
+    return _byCompanion.putIfAbsent(k, () => OraclePersona(companion: k));
+  }
+
+  /// Makes [companion] the persona every caller of [instance] talks to (keeps the session context).
+  static void activate(String companion) {
+    final OraclePersona next = forCompanion(companion);
+    if (identical(next, instance)) return;
+    next.displayName = instance.displayName;
+    next.sessionMatches = instance.sessionMatches;
+    next.lastOutcome = instance.lastOutcome;
+    instance = next;
+  }
+
+  /// 'oracle' or 'luna' — picks the default dialogue set and the signature catchphrase.
+  final String companion;
+  bool get isLuna => companion == 'luna';
+  Map<String, dynamic> get defaults => isLuna ? kLunaPersonaDefaults : kOraclePersonaDefaults;
 
   final math.Random rng;
   final OracleCooldowns cooldowns;
@@ -252,7 +277,7 @@ class OraclePersona {
   String? lastOutcome;
 
   void applyConfig(Map<String, dynamic>? over) {
-    cfg = over == null ? Map<String, dynamic>.from(kOraclePersonaDefaults) : _deepMerge(kOraclePersonaDefaults, over);
+    cfg = over == null ? Map<String, dynamic>.from(defaults) : _deepMerge(defaults, over);
     final List<OraclePlayer> ps = <OraclePlayer>[];
     final Object? raw = cfg['players'];
     if (raw is List) {
@@ -273,15 +298,21 @@ class OraclePersona {
 
   // ---------------------------------------------------------------- signature
 
-  /// The stretched signature "جاااااااااان" (10 ا by default; naturally varies between min and max).
+  /// The stretched signature: ORACLE's "جاااااااااان" (10 ا by default), LUNA's "عزیییییزم" — configured by
+  /// `signature` {stem, letter, tail, short} and `jan_stretch` {min, max, base}; naturally varies between min and max.
   String jan() {
     final Map<dynamic, dynamic> s = (cfg['jan_stretch'] as Map?) ?? const <String, int>{};
     final int lo = (s['min'] as num?)?.toInt() ?? 8, hi = (s['max'] as num?)?.toInt() ?? 13, base = (s['base'] as num?)?.toInt() ?? 10;
     final int n = rng.nextDouble() < .55 ? base : lo + rng.nextInt(math.max(1, hi - lo + 1));
-    return 'ج${'ا' * n}ن';
+    final Map<dynamic, dynamic> sig = (cfg['signature'] as Map?) ?? const <String, String>{};
+    final String stem = '${sig['stem'] ?? 'ج'}', letter = '${sig['letter'] ?? 'ا'}', tail = '${sig['tail'] ?? 'ن'}';
+    return '$stem${letter * n}$tail';
   }
 
-  static final RegExp _shortJan = RegExp(r'(^|[\s\n«"(])جان(?=[!؟?\s\n.،]|$)');
+  /// The short, un-stretched form of the signature that [render] upgrades ("جان" for ORACLE, "عزیزم" for LUNA).
+  String get _short => '${(cfg['signature'] as Map?)?['short'] ?? 'جان'}';
+
+  RegExp get _shortJan => RegExp('(^|[\\s\\n«"(])${RegExp.escape(_short)}(?=[!؟?\\s\\n.،]|\$)');
 
   /// Fills `{jan}`, `{name}`, `{score}`, `{names}` and upgrades any short signature "جان" to the stretched form.
   String render(String line, {String? name, String? score, String? names}) {
@@ -320,12 +351,12 @@ class OraclePersona {
     if (line == null) return render('${cfg['unknown_player']}');
     final String body = render(line);
     // occasionally a playful signature tail (never on every reply, never when the line already has it)
-    if (!body.contains('جاا') && on('jan') && rng.nextInt(4) == 0) return '$body\n${jan()}!';
+    if (!body.contains(jan().substring(0, 3)) && on('jan') && rng.nextInt(4) == 0) return '$body\n${jan()}!';
     return body;
   }
 
   static final RegExp _whoIsPattern = RegExp(r'(\S+)\s+(کیه|کی هست|کیست|رو میشناسی|را میشناسی|رو می شناسی|رو معرفی کن)$');
-  static const Set<String> _notNames = <String>{'تو', 'من', 'اون', 'این', 'اوراکل', 'oracle', 'سازنده', 'صاحب', 'کی', 'چی'};
+  static const Set<String> _notNames = <String>{'تو', 'من', 'اون', 'این', 'اوراکل', 'oracle', 'لونا', 'luna', 'سازنده', 'صاحب', 'کی', 'چی'};
 
   /// "X کیه؟" for a name that is not in the profile DB → honest "don't know yet" (never invents facts).
   String? unknownPlayerReply(String input) {
@@ -485,6 +516,7 @@ class OraclePersona {
     ];
     final OraclePlayer? me = displayName.isEmpty ? null : matcher.byDisplayName(displayName);
     return <String, dynamic>{
+      'companion': companion,
       'display_name': displayName,
       if (me != null) 'me_profile': me.id,
       'players': <Map<String, dynamic>>[

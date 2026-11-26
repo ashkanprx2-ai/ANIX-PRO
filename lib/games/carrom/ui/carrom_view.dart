@@ -6,9 +6,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:nexora/core/assets/app_assets.dart';
 import 'package:nexora/core/economy/carrom_cosmetics.dart';
 import 'package:nexora/core/economy/carrom_shop_view.dart';
-import 'package:nexora/core/ui2/nx_kit.dart';
+import 'package:nexora/games/shared/nx_kit_art.dart';
 import 'package:nexora/games/shared/wood_pieces.dart';
-import 'package:nexora/core/theme/nx_theme.dart';
+import 'package:nexora/ui/kit/station_compat.dart';
 import 'package:nexora/games/core/game_contract.dart';
 import '../core/carrom_config.dart';
 import '../core/carrom_match.dart';
@@ -16,7 +16,7 @@ import 'cr_controller.dart';
 import 'cr_fx.dart';
 import 'cr_painter.dart';
 
-import '../../../core/ui2/anix_kit.dart';
+
 const String _kRulesFa =
     'هدف: هر ۹ مهره‌ی رنگ خودت را (سفید برای پایین، مشکی برای بالا) به چاله‌ها بینداز و ملکه‌ی قرمز را پوشش بده.\n\n'
     '• استرایکر را با اسلایدر روی خط پایه جابه‌جا کن، سپس روی صفحه بکش و رها کن؛ هرچه بیشتر بکشی ضربه قوی‌تر است.\n'

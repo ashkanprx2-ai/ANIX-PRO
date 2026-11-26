@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../profile/profile_service.dart';
-import '../ui2/nx_kit.dart';
+import '../../games/shared/nx_kit_art.dart';
 import 'carrom_cosmetics.dart';
 
 const Color _kGold = Color(0xFFFFD27A);

@@ -14,9 +14,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../profile/profile_service.dart';
-import '../ui2/anix_kit.dart';
-import '../ui2/luxe.dart';
-import '../ui2/nx_kit.dart';
+import '../../ui/kit/station_compat.dart';
+
+import '../../games/shared/nx_kit_art.dart';
 import 'gem_shop.dart';
 
 /// Profile slot of the equipped victory effect.

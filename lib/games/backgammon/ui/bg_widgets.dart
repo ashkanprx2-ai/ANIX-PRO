@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'package:nexora/core/assets/app_assets.dart';
-import 'package:nexora/core/theme/nx_theme.dart';
+import 'package:nexora/ui/kit/station_compat.dart';
 import 'package:nexora/games/shared/wood_pieces.dart';
 import 'bg_geometry.dart';
 

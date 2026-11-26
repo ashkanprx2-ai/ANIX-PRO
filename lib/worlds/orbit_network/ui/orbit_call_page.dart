@@ -9,8 +9,8 @@ import '../../../core/backend/supabase_backend.dart';
 import '../../../core/online/online_config.dart';
 import '../../../core/online/voice_connect.dart';
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/widgets/nx_widgets.dart';
+import '../../../ui/kit/station_compat.dart';
+
 import '../data/supabase_orbit_repository.dart';
 import '../state/orbit_controller.dart';
 

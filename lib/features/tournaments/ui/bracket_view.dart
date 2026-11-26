@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/settings/app_settings.dart';
-import '../../../core/ui2/anix_kit.dart';
-import '../../../core/theme/nx_theme.dart';
+import '../../../ui/kit/station_compat.dart';
+
 import '../data/models.dart';
 import 't_common.dart';
 
@@ -133,7 +133,7 @@ class _BracketViewState extends State<BracketView> {
           child: IgnorePointer(
             child: Opacity(
               opacity: .35,
-              child: Image.asset(AnixAssets.sceneArenaPodium, fit: BoxFit.fitWidth, cacheWidth: 900),
+              child: Image.asset('assets/station/neon2/bg2.webp', fit: BoxFit.fitWidth, cacheWidth: 900),
             ),
           ),
         ),
@@ -153,7 +153,7 @@ class _BracketViewState extends State<BracketView> {
               top: 28 + gf.dy - 140 < 0 ? 0 : 28 + gf.dy - 140,
               width: 120,
               height: 132,
-              child: Image.asset(AnixAssets.bracket('crest_champion'), fit: BoxFit.contain, cacheWidth: 300),
+              child: Image.asset('assets/station/neon/trophy.webp', fit: BoxFit.contain, cacheWidth: 300),
             ),
           Positioned.fill(
             child: RepaintBoundary(
@@ -399,7 +399,7 @@ class _MatchCard extends StatelessWidget {
               top: 0,
               bottom: 0,
               child: Center(
-                  child: Image.asset(AnixAssets.bracket(badge), width: 22, height: 22, cacheWidth: 64)),
+                  child: StationIcon(badge.contains('champ') || badge.contains('gold') ? 'r2c5' : 'r4c3', size: 22)),
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,

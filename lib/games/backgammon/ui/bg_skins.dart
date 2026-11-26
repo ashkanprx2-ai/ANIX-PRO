@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:nexora/core/assets/app_assets.dart';
 import 'package:nexora/core/storage/local_store.dart';
-import 'package:nexora/core/ui2/nx2_board_art.dart';
+import 'package:nexora/games/shared/board_art.dart';
 import 'bg_geometry.dart';
 
 /// Backgammon board skins. NX2 boards are fitted onto [BgGeom] with knot maps: every triangle tip of the art

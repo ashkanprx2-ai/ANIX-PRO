@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../online/online_service.dart';
 import '../settings/app_settings.dart';
-import '../theme/nx_theme.dart';
-import '../ui2/anix_kit.dart';
-import '../ui2/luxe.dart';
+import '../../ui/kit/station_compat.dart';
+
 
 /// Report / block helpers shared by every surface (P0 #7): profiles, chat messages, posts, comments, stories,
 /// communities, rooms and online match results.

@@ -2,17 +2,18 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
-import '../../../core/ui2/nx2_widgets.dart';
+import '../../../ui/kit/station_compat.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/online/online_service.dart';
 import 'json_form_editor.dart';
+import 'luna_persona_data.dart';
 import 'oracle_persona.dart';
 import 'oracle_persona_data.dart';
 import 'oracle_persona_store.dart';
 
-/// Admin: edit ORACLE's personality config (players & aliases, lines, greetings, spontaneous lines, reactions,
+/// Admin: edit the personality config of ORACLE (row 1) or LUNA (row 2) (players & aliases, lines, greetings, spontaneous lines, reactions,
 /// tutorials, tour texts, frequencies, cooldowns, category switches). Saved to Supabase (`nx_oracle_persona_save`,
 /// owner / 'oracle' permission only, audited); every app picks it up on its next refresh.
 class OracleConfigPage extends ConsumerStatefulWidget {
@@ -28,6 +29,9 @@ class _OracleConfigPageState extends ConsumerState<OracleConfigPage> {
   bool _loading = true, _saving = false, _json = false, _dirty = false;
   int _formKey = 0;
   String? _msg;
+  String _who = 'oracle';
+
+  Map<String, dynamic> get _defaults => _who == 'luna' ? kLunaPersonaDefaults : kOraclePersonaDefaults;
 
   static Map<String, dynamic> _copy(Map<String, dynamic> m) =>
       Map<String, dynamic>.from(jsonDecode(jsonEncode(m)) as Map);
@@ -40,9 +44,9 @@ class _OracleConfigPageState extends ConsumerState<OracleConfigPage> {
 
   Future<void> _load() async {
     final SupabaseClient? c = ref.read(onlineProvider).client;
-    Map<String, dynamic> data = _copy(kOraclePersonaDefaults);
+    Map<String, dynamic> data = _copy(_defaults);
     try {
-      final Map<String, dynamic>? row = await c?.from('nx_oracle_persona').select('data, version').eq('id', 1).maybeSingle();
+      final Map<String, dynamic>? row = await c?.from('nx_oracle_persona').select('data, version').eq('id', OraclePersonaStore.rowOf(_who)).maybeSingle();
       final Object? d = row?['data'];
       if (d is Map && d.isNotEmpty) data = _copy(Map<String, dynamic>.from(d));
     } catch (_) {}
@@ -85,7 +89,7 @@ class _OracleConfigPageState extends ConsumerState<OracleConfigPage> {
       return;
     }
     setState(() => _saving = true);
-    final String? err = await OraclePersonaStore.save(c, _copy(_data));
+    final String? err = await OraclePersonaStore.save(c, _copy(_data), companion: _who);
     if (!mounted) return;
     setState(() {
       _saving = false;
@@ -100,79 +104,97 @@ class _OracleConfigPageState extends ConsumerState<OracleConfigPage> {
     super.dispose();
   }
 
+  Future<void> _switch(String who) async {
+    if (who == _who) return;
+    if (_dirty && !await showStationConfirm(context, title: 'تغییرات ذخیره‌نشده دور ریخته شود؟', confirm: 'بله', danger: true)) return;
+    setState(() {
+      _who = who;
+      _loading = true;
+      _dirty = false;
+      _json = false;
+      _msg = null;
+      _formKey++;
+    });
+    await _load();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final StationPalette p = StationPalette.of(context);
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: Nx2.deep,
-        appBar: AppBar(
-          backgroundColor: const Color(0xFF14130F),
-          title: const Text('شخصیت اوراکل'),
-          actions: <Widget>[
-            IconButton(
-              tooltip: _json ? 'فرم' : 'JSON (پیشرفته)',
-              icon: Icon(_json ? Icons.view_list_rounded : Icons.data_object_rounded),
-              onPressed: _loading ? null : _toggleJson,
+      child: StationScreen(
+        title: 'شخصیت اوراکل و لونا',
+        balance: false,
+        actions: <Widget>[
+          StationRoundButton(
+            tooltip: _json ? 'فرم' : 'JSON (پیشرفته)',
+            icon: _json ? Icons.view_list_rounded : Icons.data_object_rounded,
+            onTap: _loading ? null : _toggleJson,
+          ),
+          StationRoundButton(
+            tooltip: 'پیش‌فرض',
+            icon: Icons.restore_rounded,
+            onTap: () => setState(() {
+              _data = _copy(_defaults);
+              _c.text = const JsonEncoder.withIndent('  ').convert(_data);
+              _dirty = true;
+              _formKey++;
+            }),
+          ),
+          StationRoundButton(
+            tooltip: 'ذخیره',
+            icon: Icons.save_rounded,
+            active: _dirty,
+            onTap: _saving || _loading ? null : _save,
+          ),
+        ],
+        child: Column(children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: StationSeg(labels: const <String>['اوراکل', 'لونا'], index: _who == 'luna' ? 1 : 0, onChanged: (int i) => _switch(i == 1 ? 'luna' : 'oracle')),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
+            child: Text(
+              _msg ??
+                  'هر بخش را باز کن و ویرایش کن: بازیکن‌ها و اسم‌های دیگرشان، جمله‌ها، خوشامدها، جمله‌های خودجوش، '
+                      'واکنش برد/باخت، آموزش‌ها، متن تورها، احتمال‌ها و روشن/خاموش هر بخش. {jan} = «جاااااااااان».',
+              style: TextStyle(fontFamily: kStationFont, color: p.mute, fontSize: 12, height: 1.7),
             ),
-            IconButton(
-              tooltip: 'پیش‌فرض',
-              icon: const Icon(Icons.restore_rounded),
-              onPressed: () => setState(() {
-                _data = _copy(kOraclePersonaDefaults);
-                _c.text = const JsonEncoder.withIndent('  ').convert(_data);
-                _dirty = true;
-                _formKey++;
-              }),
-            ),
-            IconButton(
-              tooltip: 'ذخیره',
-              icon: _saving
-                  ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                  : Icon(Icons.save_rounded, color: _dirty ? const Color(0xFFFFC857) : null),
-              onPressed: _saving || _loading ? null : _save,
-            ),
-          ],
-        ),
-        body: _loading
-            ? const Center(child: CircularProgressIndicator())
-            : Column(children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Text(
-                    _msg ??
-                        'هر بخش را باز کن و ویرایش کن: بازیکن‌ها و اسم‌های دیگرشان، جمله‌ها، خوشامدها، جمله‌های خودجوش، '
-                            'واکنش برد/باخت، آموزش‌ها، متن تورها، احتمال‌ها و روشن/خاموش هر بخش. {jan} = «جاااااااااان».',
-                    style: const TextStyle(color: Color(0xFFF6E7BD), fontSize: 12),
-                  ),
-                ),
-                Expanded(
-                  child: _json
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Directionality(
-                            textDirection: TextDirection.ltr,
-                            child: TextField(
-                              controller: _c,
-                              maxLines: null,
-                              expands: true,
-                              onChanged: (_) => _dirty = true,
-                              style: const TextStyle(color: Colors.white, fontFamily: 'monospace', fontSize: 12),
-                              decoration: const InputDecoration(
-                                  border: OutlineInputBorder(), filled: true, fillColor: Color(0xFF0E1838)),
+          ),
+          Expanded(
+            child: _loading
+                ? Center(child: CircularProgressIndicator(color: p.gold))
+                : _json
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: TextField(
+                            controller: _c,
+                            maxLines: null,
+                            expands: true,
+                            onChanged: (_) => _dirty = true,
+                            style: TextStyle(color: p.ink, fontFamily: 'monospace', fontSize: 12),
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: p.inputFill,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide(color: p.line)),
                             ),
                           ),
-                        )
-                      : JsonFormEditor(
-                          key: ValueKey<int>(_formKey),
-                          value: _data,
-                          labels: kOracleConfigLabels,
-                          onChanged: () {
-                            if (!_dirty) setState(() => _dirty = true);
-                          },
                         ),
-                ),
-              ]),
+                      )
+                    : JsonFormEditor(
+                        key: ValueKey<String>('$_who-$_formKey'),
+                        value: _data,
+                        labels: kOracleConfigLabels,
+                        onChanged: () {
+                          if (!_dirty) setState(() => _dirty = true);
+                        },
+                      ),
+          ),
+        ]),
       ),
     );
   }

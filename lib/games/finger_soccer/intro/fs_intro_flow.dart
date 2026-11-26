@@ -84,11 +84,11 @@ class _FsIntroFlowState extends State<FsIntroFlow> {
     return <FsSidePlayer>[
       FsSidePlayer(
           name: me,
-          portrait: 'assets/ui/anix/avatars/${pr?.portrait ?? '01-vanguard'}.webp',
+          portrait: 'assets/avatar/portraits/${pr?.portrait ?? '01-vanguard'}.webp',
           badge: 'سطح ${fsFa(pr?.level ?? 1)}'),
       _bot
-          ? const FsSidePlayer(name: 'ربات', portrait: 'assets/ui/anix/avatars/04-iron-warden.webp', badge: 'ربات')
-          : const FsSidePlayer(name: 'بازیکن ۲', portrait: 'assets/ui/anix/avatars/02-cyber-scout.webp', badge: 'مهمان'),
+          ? const FsSidePlayer(name: 'ربات', portrait: 'assets/avatar/portraits/04-iron-warden.webp', badge: 'ربات')
+          : const FsSidePlayer(name: 'بازیکن ۲', portrait: 'assets/avatar/portraits/02-cyber-scout.webp', badge: 'مهمان'),
     ];
   }
 

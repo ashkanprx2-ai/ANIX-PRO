@@ -8,10 +8,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/online/cloud_profile_sync.dart';
 import '../../../core/online/online_service.dart';
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/ui2/nx2_assets.dart';
-import '../../../core/ui2/nx2_widgets.dart';
-import '../../../core/widgets/nx_widgets.dart';
+import '../../../ui/kit/station_compat.dart';
+
 import '../../../games/game_registry.dart';
 import '../data/models.dart';
 import '../data/tournament_repository.dart';
@@ -19,8 +17,7 @@ import '../domain/bracket.dart';
 import '../domain/prize_split.dart';
 import 't_common.dart';
 
-import '../../../core/ui2/anix_kit.dart';
-import '../../../core/ui2/luxe.dart';
+
 
 /// Tournaments list: registering / upcoming / live / finished / mine, with filters and live countdowns.
 class TournamentsPage extends ConsumerStatefulWidget {
@@ -328,10 +325,9 @@ class _TournamentsPageState extends ConsumerState<TournamentsPage>
                     gold: true,
                     padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
                     child: Row(children: <Widget>[
-                      Image.asset(Nx2Assets.badgesTrophyGold,
+                      Image.asset('assets/station/neon/trophy.webp',
                           width: 46, height: 56, cacheWidth: 140),
-                      Image.asset(Nx2Assets.badgesTrophyWings,
-                          width: 34, height: 44, cacheWidth: 110),
+                      const StationIcon('r2c5', size: 40),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Column(
@@ -382,7 +378,7 @@ class _TournamentsPageState extends ConsumerState<TournamentsPage>
                               color: tAccent(context).withValues(alpha: 0.42)),
                         ),
                         padding: const EdgeInsets.all(3),
-                        child: Image.asset(AnixAssets.trophy('gold'), fit: BoxFit.contain,
+                        child: Image.asset('assets/station/neon2/trophy.webp', fit: BoxFit.contain,
                             errorBuilder: (_, __, ___) => Icon(Icons.emoji_events_rounded, color: tAccent(context))),
                       ),
                       const SizedBox(width: 12),
@@ -565,7 +561,7 @@ class _TournamentsPageState extends ConsumerState<TournamentsPage>
       child: items.isEmpty
           ? ListView(children: <Widget>[
               const SizedBox(height: 80),
-              Center(child: Image.asset(AnixAssets.trophy('champion'), height: 96)),
+              Center(child: Image.asset('assets/station/neon/trophy.webp', height: 96)),
               const SizedBox(height: 10),
               Center(
                 child: Text(context.tx('چیزی اینجا نیست', 'Nothing here yet'),

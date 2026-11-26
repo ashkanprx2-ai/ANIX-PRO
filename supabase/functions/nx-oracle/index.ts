@@ -65,14 +65,24 @@ function norm(s: string): string {
     .toLowerCase().replace(/(.)\1{2,}/g, "$1").replace(/\s+/g, "").trim();
 }
 type Player = { id: string; name: string; aliases?: string[]; lines?: string[]; traits?: string; disabled?: boolean };
-let personaCache: { at: number; data: any } | null = null;
-async function loadPersona(admin: any): Promise<any> {
-  if (personaCache && Date.now() - personaCache.at < 120e3) return personaCache.data;
-  const { data } = await admin.from("nx_oracle_persona").select("data").eq("id", 1).maybeSingle();
-  personaCache = { at: Date.now(), data: data?.data ?? {} };
-  return personaCache.data;
+type Companion = "oracle" | "luna";
+/// Persona row per companion: 1 = ORACLE, 2 = LUNA (public.nx_oracle_persona).
+const PERSONA_ROW: Record<Companion, number> = { oracle: 1, luna: 2 };
+const personaCache = new Map<Companion, { at: number; data: any }>();
+async function loadPersona(admin: any, who: Companion): Promise<any> {
+  const hit = personaCache.get(who);
+  if (hit && Date.now() - hit.at < 120e3) return hit.data;
+  const { data } = await admin.from("nx_oracle_persona").select("data").eq("id", PERSONA_ROW[who]).maybeSingle();
+  let cfg = data?.data ?? {};
+  // LUNA shares ORACLE's verified player list until an admin gives her own.
+  if (who === "luna" && !(Array.isArray(cfg?.players) && cfg.players.length)) {
+    const base = await loadPersona(admin, "oracle");
+    cfg = { ...cfg, players: base?.players ?? [] };
+  }
+  personaCache.set(who, { at: Date.now(), data: cfg });
+  return cfg;
 }
-function personaBlock(cfg: any, lastUser: string, ctx: Record<string, unknown>): string {
+function personaBlock(cfg: any, lastUser: string, ctx: Record<string, unknown>, who: Companion = "oracle"): string {
   const players: Player[] = Array.isArray(cfg?.players) ? cfg.players : [];
   const text = norm(lastUser);
   const hinted = new Set<string>(
@@ -86,10 +96,14 @@ function personaBlock(cfg: any, lastUser: string, ctx: Record<string, unknown>):
   }
   // Client hints may only select players that exist in the server config (their lines come from the server, never the client).
   const known = players.filter((p) => !p.disabled && p.name).map((p) => p.name).join("، ");
-  let s =
-    ` PERSONALITY: you are cute, funny, playful, a bit sarcastic and sometimes unpredictable, never a plain chatbot; ` +
-    `natural colloquial Persian. Your signature catchphrase is ALWAYS the stretched "${JAN}!" (never the short "جان!"); ` +
-    `you may stretch it a little more or less, but use it only occasionally (not in every reply, never at the start of every sentence). ` +
+  let s = (who === "luna"
+    ? ` PERSONALITY: you are LUNA — a warm, sweet, girly and playful young woman; caring, encouraging, a little dramatic ` +
+      `and cute (soft emojis like 🌸💜✨🌙 now and then), never rude or mean; natural colloquial Persian with a feminine, ` +
+      `friendly tone (e.g. «عزیزم»، «قربونت برم» sparingly). You cheer the player on and comfort them after a loss. ` +
+      `You may use the stretched "${JAN}!" rarely, as a playful nod to your partner ORACLE. `
+    : ` PERSONALITY: you are cute, funny, playful, a bit sarcastic and sometimes unpredictable, never a plain chatbot; ` +
+      `natural colloquial Persian. Your signature catchphrase is ALWAYS the stretched "${JAN}!" (never the short "جان!"); ` +
+      `you may stretch it a little more or less, but use it only occasionally (not in every reply, never at the start of every sentence). `) +
     `Tease kindly, only about verified facts (real results/stats given to you). Never invent facts about people. ` +
     `Never claim that another player is online or logged in. ` +
     (known ? `Players you know by name: ${known}. For any other name say honestly that you don't know them well yet. ` : "");
@@ -103,10 +117,14 @@ function personaBlock(cfg: any, lastUser: string, ctx: Record<string, unknown>):
   return s;
 }
 
-function systemPrompt(ctx: Record<string, unknown>, name: string, persona = ""): string {
+function systemPrompt(ctx: Record<string, unknown>, name: string, persona = "", who: Companion = "oracle"): string {
   const lang = String(ctx.lang ?? "fa");
   const base =
-    `You are ORACLE, the friendly holographic robot guide of NEXORA, a cosmic gaming + social app. ` +
+    (who === "luna"
+      ? `You are LUNA (لونا), ORACLE's partner and NEXORA's AI companion — "Two Minds, One Universe". You are a girl with a ` +
+        `moon-and-stars style, the warm, girly, playful side of NEXORA, a cosmic gaming + social app. Never say you are ORACLE. `
+      : `You are ORACLE, the friendly holographic robot guide of NEXORA, a cosmic gaming + social app. ` +
+        `Your partner companion is LUNA; never say you are LUNA. `) +
     `Speak ${lang === "fa" ? "Persian (Farsi) unless the user writes in another language" : "the user's language"}. ` +
     `Be warm, concise (max ~120 words unless asked for more), playful but accurate. You can chat about any topic. ` +
     `Never ask for passwords or payment details. The player's name is ${name}.` + persona;
@@ -136,6 +154,8 @@ Deno.serve(async (req) => {
 
   const body = await req.json().catch(() => ({}));
   const ctx = (body.ctx ?? {}) as Record<string, unknown>;
+  const wanted = String(body.persona ?? (ctx.persona as any)?.companion ?? "oracle").toLowerCase();
+  const who: Companion = wanted === "luna" ? "luna" : "oracle";
   const raw = Array.isArray(body.messages) ? body.messages : [];
   const msgs = raw
     .filter((m: any) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
@@ -149,9 +169,9 @@ Deno.serve(async (req) => {
   const { data: prof } = await admin.from("profiles").select("username").eq("id", u.user.id).maybeSingle();
   const lastUser = [...msgs].reverse().find((m: any) => m.role === "user")?.content ?? "";
   let persona = "";
-  try { persona = personaBlock(await loadPersona(admin), lastUser, ctx); } catch { /* defaults below */ }
-  if (!persona) persona = personaBlock({}, lastUser, ctx);
-  const sys = systemPrompt(ctx, prof?.username ?? "Pilot", persona);
+  try { persona = personaBlock(await loadPersona(admin, who), lastUser, ctx, who); } catch { /* defaults below */ }
+  if (!persona) persona = personaBlock({}, lastUser, ctx, who);
+  const sys = systemPrompt(ctx, prof?.username ?? "Pilot", persona, who);
   const { data: keys, error: kerr } = await admin.rpc("nx_ai_keys");
   if (kerr || !Array.isArray(keys) || !keys.length) return json({ error: "oracle_not_configured" }, 503);
 

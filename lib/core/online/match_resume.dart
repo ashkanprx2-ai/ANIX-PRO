@@ -7,7 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../games/game_registry.dart';
 import '../settings/app_settings.dart';
 import '../storage/local_store.dart';
-import '../ui2/luxe.dart';
+import '../../ui/kit/station_compat.dart';
 import 'online_service.dart';
 
 /// The online match this phone was last playing, kept on the device so the player can get back into it after the app

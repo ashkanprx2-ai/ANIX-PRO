@@ -14,8 +14,7 @@ import '../core/bm_engine.dart';
 import '../core/fs_custom_teams.dart';
 import 'fs_intro_data.dart';
 import 'fs_intro_ui.dart';
-import '../../../core/ui2/luxe.dart';
-
+import '../../../ui/kit/station_compat.dart';
 /// Locked team: confirm + buy with gems (server-side deduct and unlock). True when the team is now owned.
 Future<bool> fsBuyTeam(BuildContext context, BmTeam t, bool fa) async {
   final GemShop shop = GemShop.instance;

@@ -6,9 +6,9 @@ import 'package:file_picker/file_picker.dart';
 
 import '../../../core/profile/profile_service.dart';
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/widgets/nx_widgets.dart';
-import '../../../core/widgets/user_profile_preview.dart';
+import '../../../ui/kit/station_compat.dart';
+
+import '../../../ui/widgets/user_profile_preview.dart';
 import '../../nova_gallery/models/art_asset.dart';
 import '../../nova_gallery/ui/nova_composer.dart' show showArtAssetPicker;
 import '../models/orbit_models.dart';
@@ -21,8 +21,6 @@ import 'orbit_call_page.dart';
 import 'orbit_bubbles.dart';
 import 'orbit_sheets.dart';
 
-import '../../../core/ui2/anix_kit.dart';
-import '../../../core/ui2/luxe.dart';
 import '../../../core/safety/safety_actions.dart';
 
 /// One conversation (Saved Orbit, group or channel).

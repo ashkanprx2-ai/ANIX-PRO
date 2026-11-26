@@ -23,7 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../games/core/net_link.dart';
-import '../ui2/luxe.dart';
+import '../../ui/kit/station_compat.dart';
 import 'match_link.dart';
 import 'online_service.dart';
 

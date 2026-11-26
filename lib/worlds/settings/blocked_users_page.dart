@@ -4,8 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/online/online_service.dart';
 import '../../core/safety/safety_actions.dart';
 import '../../core/settings/app_settings.dart';
-import '../../core/theme/nx_theme.dart';
-
+import '../../ui/kit/station_compat.dart';
 /// Settings → Blocked users (P0 #7): everyone the signed-in user blocked, with Unblock.
 class BlockedUsersPage extends ConsumerStatefulWidget {
   const BlockedUsersPage({super.key});
@@ -41,10 +40,10 @@ class _BlockedUsersPageState extends ConsumerState<BlockedUsersPage> {
   Widget build(BuildContext context) {
     final NxThemeColors visual = NxThemeColors.of(context);
     final List<Map<String, dynamic>>? rows = _rows;
-    return Scaffold(
-      backgroundColor: visual.background,
-      appBar: AppBar(title: Text(context.tx('کاربران مسدودشده', 'Blocked users'))),
-      body: _failed
+    return StationScreen(
+      title: context.tx('کاربران مسدودشده', 'Blocked users'),
+      balance: false,
+      child: _failed
           ? Center(
               child: TextButton(onPressed: _load, child: Text(context.tx('بارگذاری نشد؛ دوباره', 'Could not load; retry'))))
           : rows == null

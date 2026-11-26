@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/backend/backend_gateway.dart';
 import '../../core/backend/supabase_backend.dart';
-import '../../core/ui2/oracle_mascot.dart';
+import '../../core/companion/companion.dart';
+import '../../ui/widgets/companion_widgets.dart';
 import '../../games/game_registry.dart';
 import 'persona/oracle_persona.dart';
 
@@ -33,6 +34,7 @@ class _OracleGameSheetState extends ConsumerState<OracleGameSheet> {
   bool _busy = false;
 
   bool get _fa => Localizations.localeOf(context).languageCode == 'fa';
+  CompanionInfo get _c => CompanionInfo.of(CompanionController.activeId);
 
   Future<void> _ask(String q) async {
     if (q.trim().isEmpty || _busy) return;
@@ -62,8 +64,8 @@ class _OracleGameSheetState extends ConsumerState<OracleGameSheet> {
     answer ??= '';
     if (answer.isEmpty) {
       answer = _fa
-          ? 'الان به هوش آنلاین ORACLE وصل نیستم. قوانین ${widget.game.nameFa}:\n${widget.game.rulesFa}'
-          : "I can't reach ORACLE online right now. ${widget.game.nameEn} rules:\n${widget.game.rulesEn}";
+          ? 'الان به هوش آنلاین ${_c.nameFa} وصل نیستم. قوانین ${widget.game.nameFa}:\n${widget.game.rulesFa}'
+          : "I can't reach ${_c.nameEn} online right now. ${widget.game.nameEn} rules:\n${widget.game.rulesEn}";
     }
     if (!mounted) return;
     setState(() {
@@ -100,16 +102,16 @@ class _OracleGameSheetState extends ConsumerState<OracleGameSheet> {
           gradient: LinearGradient(
               begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: <Color>[Color(0xFF13204A), Color(0xFF0A0F26)]),
           boxShadow: <BoxShadow>[BoxShadow(color: Color(0x5539E6FF), blurRadius: 30)],
-          border: Border(top: BorderSide(color: Color(0xFFD9B872), width: 1.2)),
+          border: Border(top: BorderSide(color: Color(0xFFFFC27A), width: 1.2)),
         ),
         child: Column(children: <Widget>[
           const SizedBox(height: 8),
           Row(children: <Widget>[
             const SizedBox(width: 12),
-            SizedBox(width: 56, height: 56, child: OracleMascot(mood: _busy ? OracleMood.think : OracleMood.happy)),
+            SizedBox(width: 56, height: 56, child: CompanionMascot(mood: _busy ? CompanionMood.smart : CompanionMood.happy, size: 56)),
             const SizedBox(width: 8),
             Expanded(
-              child: Text('ORACLE · ${_fa ? widget.game.nameFa : widget.game.nameEn}',
+              child: Text('${_c.name(_fa)} · ${_fa ? widget.game.nameFa : widget.game.nameEn}',
                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
             ),
             IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close_rounded, color: Colors.white70)),
@@ -124,8 +126,8 @@ class _OracleGameSheetState extends ConsumerState<OracleGameSheet> {
                     label: Text(l),
                     onPressed: _busy ? null : () => _ask(q),
                     backgroundColor: const Color(0xFF1C2D63),
-                    labelStyle: const TextStyle(color: Color(0xFFF6E7BD)),
-                    side: const BorderSide(color: Color(0x66D9B872)),
+                    labelStyle: const TextStyle(color: Color(0xFFFFE3C2)),
+                    side: const BorderSide(color: Color(0x66FF7A3D)),
                   ),
                 ),
             ]),
@@ -152,7 +154,7 @@ class _OracleGameSheetState extends ConsumerState<OracleGameSheet> {
                     decoration: BoxDecoration(
                       color: me ? const Color(0xFF2B1F5C) : const Color(0xFF12305A),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: me ? const Color(0x66F6E7BD) : const Color(0x66D9B872)),
+                      border: Border.all(color: me ? const Color(0x66F6E7BD) : const Color(0x66FF7A3D)),
                     ),
                     child: Text(m['content'] ?? '', style: const TextStyle(color: Colors.white, height: 1.45)),
                   ),
@@ -172,7 +174,7 @@ class _OracleGameSheetState extends ConsumerState<OracleGameSheet> {
                     textInputAction: TextInputAction.send,
                     onSubmitted: _ask,
                     decoration: InputDecoration(
-                      hintText: _fa ? 'از ORACLE بپرس…' : 'Ask ORACLE…',
+                      hintText: _fa ? 'از ${_c.nameFa} بپرس…' : 'Ask ${_c.nameEn}…',
                       hintStyle: const TextStyle(color: Colors.white38),
                       filled: true,
                       fillColor: const Color(0xFF0E1838),

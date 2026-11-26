@@ -5,7 +5,7 @@ import 'package:livekit_client/livekit_client.dart' as lk;
 
 import '../backend/supabase_backend.dart';
 import '../settings/app_settings.dart' show NxTx;
-import '../ui2/nx2_widgets.dart' show Nx2;
+import '../../ui/kit/station_compat.dart';
 import 'online_config.dart';
 import 'online_service.dart';
 import 'voice_connect.dart';

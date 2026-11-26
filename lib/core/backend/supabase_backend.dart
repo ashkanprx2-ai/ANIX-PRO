@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../companion/companion.dart';
 
 import '../online/online_config.dart';
 import '../online/online_service.dart';
@@ -130,7 +131,9 @@ class SupabaseBackend extends BackendGateway {
   Future<Map<String, dynamic>?> oracleInvoke(Map<String, dynamic> body) async {
     final SupabaseClient? c = _c;
     if (c == null || c.auth.currentSession == null) return null;
-    final FunctionResponse r = await c.functions.invoke('nx-oracle', body: body).timeout(const Duration(seconds: 40));
+    // Which companion answers (ORACLE or LUNA): the Edge Function picks the system prompt + persona row from it.
+    final Map<String, dynamic> payload = <String, dynamic>{'persona': CompanionController.activeId.name, ...body};
+    final FunctionResponse r = await c.functions.invoke('nx-oracle', body: payload).timeout(const Duration(seconds: 40));
     final dynamic d = r.data;
     return d is Map ? Map<String, dynamic>.from(d) : null;
   }

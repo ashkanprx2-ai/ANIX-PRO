@@ -6,11 +6,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/online/online_service.dart';
 import '../../core/settings/app_settings.dart';
-import '../../core/theme/nx_theme.dart';
+import '../../ui/kit/station_compat.dart';
 import 'admin_access.dart';
 
-import '../../core/ui2/anix_kit.dart';
-import '../../core/ui2/luxe.dart';
+
 
 /// Admin panel. Tabs appear only for the permissions the signed-in admin holds; the server checks every call again
 /// (auth project: users/bans, grants, admins, announcements, moderation, ORACLE · games project: rooms, tournaments)
@@ -51,7 +50,7 @@ class _AdminPageState extends ConsumerState<AdminPage> {
       if (a.can(AdminPerm.rooms)) const _Tab('rooms', 'اتاق‌ها', 'Rooms', Icons.meeting_room_rounded),
       if (a.can(AdminPerm.rooms)) const _Tab('matches', 'بازی‌های زنده', 'Live matches', Icons.sports_esports_rounded),
       if (a.can(AdminPerm.announcements)) const _Tab('announcements', 'اطلاعیه', 'Announcements', Icons.campaign_rounded),
-      if (a.can(AdminPerm.oracle)) const _Tab('oracle', 'اوراکل', 'ORACLE', Icons.psychology_alt_rounded),
+      if (a.can(AdminPerm.oracle)) const _Tab('oracle', 'اوراکل و لونا', 'ORACLE & LUNA', Icons.psychology_alt_rounded),
       if (a.can(AdminPerm.admins)) const _Tab('audit', 'گزارش', 'Audit log', Icons.receipt_long_rounded),
       if (a.isAdmin) const _Tab('errors', 'خطاهای برنامه', 'App errors', Icons.bug_report_rounded),
     ];
@@ -1119,7 +1118,7 @@ class _OracleTab extends StatelessWidget {
             child: ListTile(
           contentPadding: EdgeInsets.zero,
           leading: const Icon(Icons.psychology_alt_rounded, color: NxColors.gold),
-          title: Text(context.tx('ویرایش شخصیت اوراکل', 'Edit ORACLE personality')),
+          title: Text(context.tx('ویرایش شخصیت اوراکل و لونا', 'Edit ORACLE & LUNA personalities')),
           subtitle: Text(context.tx('بازیکن‌ها، جمله‌ها، خوشامدها، آموزش‌ها، تور و تنظیمات — با فرم',
               'Players, lines, greetings, tutorials, tour and settings — as a form')),
           trailing: const Icon(Icons.chevron_right_rounded),

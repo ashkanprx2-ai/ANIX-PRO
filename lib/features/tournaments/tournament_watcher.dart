@@ -14,8 +14,7 @@ import '../../core/settings/app_settings.dart';
 import 'data/models.dart';
 import 'data/tournament_repository.dart';
 import 'domain/reminders.dart';
-import '../../core/ui2/luxe.dart';
-
+import '../../ui/kit/station_compat.dart';
 /// Device notifications (the app has no FCM): immediate ones for tournament events that arrive while the
 /// app runs in the background, and scheduled 10-minute reminders that fire even when the app is closed.
 class TLocalNotifier {

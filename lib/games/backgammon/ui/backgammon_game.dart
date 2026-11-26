@@ -4,14 +4,14 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:nexora/core/theme/nx_theme.dart';
+import 'package:nexora/ui/kit/station_compat.dart';
 import 'package:nexora/games/core/game_contract.dart';
 
 import '../core/backgammon_bot.dart';
 import '../core/backgammon_rules.dart';
 import 'bg_geometry.dart';
 import 'bg_skins.dart';
-import '../../../core/ui2/nx2_board_art.dart';
+import '../../shared/board_art.dart';
 import 'bg_widgets.dart';
 import 'package:nexora/games/shared/wood_pieces.dart';
 

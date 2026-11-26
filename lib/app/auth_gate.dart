@@ -22,6 +22,7 @@ bool isOnlineOnlyPath(String path) =>
     path == '/settings/blocked' ||
     path.startsWith('/online/') ||
     path.startsWith('/call/') ||
+    path.startsWith('/chat/') ||
     path == '/tournaments' ||
     path.startsWith('/tournaments/') ||
     path.startsWith('/t/') ||

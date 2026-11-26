@@ -15,10 +15,9 @@ import '../../core/online/room_voice.dart';
 import '../../core/online/voice_connect.dart';
 import '../../core/economy/gem_shop.dart';
 import '../../core/settings/app_settings.dart';
-import '../../core/ui2/anix_kit.dart';
-import '../../core/ui2/luxe.dart';
-import '../../core/ui2/nx2_widgets.dart';
-import '../../core/widgets/user_avatar.dart';
+import '../../ui/kit/station_compat.dart';
+
+import '../../ui/widgets/user_avatar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../games/finger_soccer/core/bm_data.dart';
@@ -619,7 +618,7 @@ class _TalkRoomPageState extends ConsumerState<TalkRoomPage> {
         body: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
-                image: AssetImage(AnixAssets.sceneVoiceStage),
+                image: AssetImage('assets/station/neon2/bg1.webp'),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(Color(0xE0070306), BlendMode.darken)),
           ),
@@ -732,7 +731,7 @@ class _TalkRoomPageState extends ConsumerState<TalkRoomPage> {
       ),
       child: Column(children: <Widget>[
         Row(children: <Widget>[
-          Image.asset(AnixAssets.icon('mic'), width: 24, height: 24),
+          const StationIcon('r3c1', size: 24),
           const SizedBox(width: 6),
           Text(context.tx('صحنه‌ی صدا', 'Voice stage'),
               style: const TextStyle(color: Nx2.text, fontWeight: FontWeight.w900)),
@@ -823,7 +822,7 @@ class _TalkRoomPageState extends ConsumerState<TalkRoomPage> {
               border: Border(bottom: BorderSide(color: on ? Nx2.magenta : Colors.transparent, width: 3)),
             ),
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-              Image.asset(AnixAssets.icon(icon), width: 22, height: 22),
+              StationIcon(icon, size: 22),
               const SizedBox(width: 6),
               Text(label,
                   style: TextStyle(color: on ? Nx2.text : Nx2.muted, fontWeight: FontWeight.w800, fontSize: 13)),
@@ -834,9 +833,9 @@ class _TalkRoomPageState extends ConsumerState<TalkRoomPage> {
     }
 
     return Row(children: <Widget>[
-      tab(0, 'chat', context.tx('گفتگو', 'Chat')),
-      tab(1, 'friends', '${context.tx('اعضا', 'Members')} ${_members.length}'),
-      tab(2, 'gamepad', context.tx('بازی‌ها', 'Games')),
+      tab(0, 'r3c3', context.tx('گفتگو', 'Chat')),
+      tab(1, 'r3c4', '${context.tx('اعضا', 'Members')} ${_members.length}'),
+      tab(2, 'r1c1', context.tx('بازی‌ها', 'Games')),
     ]);
   }
 
@@ -1033,7 +1032,7 @@ class _TalkRoomPageState extends ConsumerState<TalkRoomPage> {
           padding: const EdgeInsets.all(12),
           child: Row(children: <Widget>[
             Image.asset('assets/arcade/pedestals/$_game.webp', width: 64, height: 64,
-                errorBuilder: (_, __, ___) => Image.asset(AnixAssets.icon('gamepad'), width: 48)),
+                errorBuilder: (_, __, ___) => const StationIcon('r1c1', size: 48)),
             const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
@@ -1056,7 +1055,7 @@ class _TalkRoomPageState extends ConsumerState<TalkRoomPage> {
           Nx2Panel(
             padding: const EdgeInsets.all(14),
             child: Row(children: <Widget>[
-              Image.asset(AnixAssets.icon('versus'), width: 36),
+              const StationIcon('r4c6', size: 36),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(context.tx('بازی در جریان است. بعد از پایان همه به اتاق برمی‌گردند.',

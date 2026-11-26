@@ -4,15 +4,14 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../core/profile/profile_service.dart';
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/widgets/nx_widgets.dart';
+import '../../../ui/kit/station_compat.dart';
+
 import '../models/art_asset.dart';
 import '../models/nova_models.dart';
 import '../state/nova_controller.dart';
 import 'nova_visuals.dart';
 
-import '../../../core/ui2/anix_kit.dart';
-import '../../../core/ui2/luxe.dart';
+
 
 /// XP for a real published post (the profile's daily cap still applies).
 const int kNovaPostXp = 12;

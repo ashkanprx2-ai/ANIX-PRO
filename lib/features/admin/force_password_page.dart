@@ -4,9 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/online/online_service.dart';
 import '../../core/settings/app_settings.dart';
-import '../../core/theme/nx_theme.dart';
+import '../../ui/kit/station_compat.dart';
 import 'admin_access.dart';
-import '../../core/ui2/luxe.dart';
 
 /// Shown (and not dismissible) while the account must change its password — e.g. the default main admin login
 /// `admin` / `admin` on first sign-in. Admin RPCs refuse until the password is changed (server side).

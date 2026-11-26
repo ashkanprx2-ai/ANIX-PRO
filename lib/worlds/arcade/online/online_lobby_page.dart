@@ -13,13 +13,11 @@ import '../../../core/online/room_capacity.dart';
 import '../../../core/online/room_voice.dart';
 import '../../../core/online/social_api.dart';
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/ui2/luxe.dart';
-import '../../../core/widgets/nx_widgets.dart';
+import '../../../ui/kit/station_compat.dart';
+
 import '../../../games/game_registry.dart';
 import 'online_match_page.dart';
 
-import '../../../core/ui2/anix_kit.dart';
 import '../../../core/safety/safety_actions.dart';
 class _Seat {
   _Seat(

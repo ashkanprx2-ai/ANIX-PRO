@@ -3,15 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/profile/profile_service.dart';
 import '../../core/settings/app_settings.dart';
-import '../../core/theme/nx_theme.dart';
-import '../../core/widgets/nx_widgets.dart';
+import '../../ui/kit/station_compat.dart';
+
 import 'models/social_models.dart';
 import 'state/social_controller.dart';
 import 'ui/community_create_sheet.dart';
 import 'ui/community_detail_page.dart';
 import 'ui/social_widgets.dart';
 
-import '../../core/ui2/anix_kit.dart';
+
 /// SOCIAL STATION — communities, events and community tournaments (offline-first).
 class SocialStationPage extends ConsumerStatefulWidget {
   const SocialStationPage({super.key});

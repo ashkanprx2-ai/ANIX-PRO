@@ -94,8 +94,8 @@ const List<ChallengeDef> kDailyChallenges = <ChallengeDef>[
       target: 2,
       xp: 20,
       coins: 15,
-      titleFa: 'دو سؤال از ORACLE بپرس',
-      titleEn: 'Ask ORACLE two questions',
+      titleFa: 'دو سؤال از اوراکل یا لونا بپرس',
+      titleEn: 'Ask ORACLE or LUNA two questions',
       route: '/world/oracle_core'),
 ];
 

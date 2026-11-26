@@ -55,18 +55,37 @@ flutter:
           weight: 700
         - asset: assets/fonts/Estedad-Black.ttf
           weight: 900
+    - family: Vazirmatn
+      fonts:
+        - asset: assets/fonts/Vazirmatn-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Vazirmatn-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Vazirmatn-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Vazirmatn-Bold.ttf
+          weight: 700
+    - family: CormorantGaramond
+      fonts:
+        - asset: assets/fonts/CormorantGaramond-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/CormorantGaramond-SemiBold.ttf
+          weight: 600
     - family: Lalezar
       fonts:
         - asset: assets/fonts/Lalezar-Regular.ttf
   assets:
-    - assets/luxe/
-    - assets/luxe/icons/
     - assets/arcade/pedestals/
     - assets/avatar/gear/
+    - assets/avatar/portraits/
+    - assets/characters/
     - assets/characters/oracle/
-    - assets/characters/oracle/emotes/
-    - assets/characters/oracle/poses/
-    - assets/characters/oracle/moods/
+    - assets/characters/luna/
+    - assets/station/
+    - assets/station/icons/
+    - assets/station/neon/
+    - assets/station/neon2/
+    - assets/station/white/
     - assets/branding/
     - assets/games/backgammon/
     - assets/games/billiards/
@@ -127,32 +146,8 @@ flutter:
     - assets/games/gate_shooter/sfx/
     - assets/progression/achievements/
     - assets/progression/club_badges/
-    - assets/ui/holo_frames/
-    - assets/ui/kit/
-    - assets/worlds/hub/portals/
-    - assets/worlds/hub/props/
-    - assets/worlds/hub/props/set/
     - assets/worlds/personal_orbit/decor/
     - assets/media/
     - assets/sfx/ui/
-    - assets/ui/nx2/badges/
-    - assets/ui/nx2/bg/
     - assets/ui/nx2/boards/
-    - assets/ui/nx2/chests/
     - assets/ui/nx2/frames/
-    - assets/ui/nx2/oracle/
-    - assets/ui/nx2/tiles/
-    - assets/ui/anix/avatars/
-    - assets/ui/anix/bg/
-    - assets/ui/anix/buttons/
-    - assets/ui/anix/card/
-    - assets/ui/anix/bracket/
-    - assets/ui/anix/frames/
-    - assets/ui/anix/icons/
-    - assets/ui/anix/scenes/
-    - assets/ui/anix/trophies/
-    - assets/ui/anix/modal/
-    - assets/ui/anix/nav/
-    - assets/ui/anix/rank/
-    - assets/ui/anix/toggle/
-    - assets/ui/anix/tooltip/

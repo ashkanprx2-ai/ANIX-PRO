@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/profile/profile_service.dart';
 import '../../../core/safety/safety_actions.dart';
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
+import '../../../ui/kit/station_compat.dart';
 import '../models/nova_models.dart';
 import '../state/nova_controller.dart';
 import 'nova_visuals.dart';

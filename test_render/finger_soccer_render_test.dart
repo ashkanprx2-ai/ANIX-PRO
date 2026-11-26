@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nexora/core/settings/app_settings.dart';
 import 'package:nexora/core/storage/local_store.dart';
-import 'package:nexora/core/theme/nx_theme.dart';
+import 'package:nexora/ui/kit/station_compat.dart';
 import 'package:nexora/games/finger_soccer/core/bm_engine.dart';
 import 'package:nexora/games/finger_soccer/ui/bm_painter.dart';
 import 'package:nexora/games/finger_soccer/ui/bm_view.dart';
@@ -42,7 +42,7 @@ void main() {
       container: c,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: buildNxTheme(),
+        theme: buildStationTheme(StationSkin.neon),
         builder: (BuildContext context, Widget? child) =>
             RepaintBoundary(key: kShotKey, child: child ?? const SizedBox.shrink()),
         home: GameHostPage(game: g, mode: GameMode.vsBot, difficulty: BotDifficulty.normal, players: g.defaultPlayers),

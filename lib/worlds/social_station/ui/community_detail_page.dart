@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/widgets/nx_widgets.dart';
+import '../../../ui/kit/station_compat.dart';
+
 import '../models/social_models.dart';
 import '../state/social_controller.dart';
 import 'community_create_sheet.dart';
@@ -12,7 +12,7 @@ import 'community_tabs.dart';
 import 'social_widgets.dart';
 import 'tournament_bracket_view.dart';
 
-import '../../../core/ui2/anix_kit.dart';
+
 /// The shareable invitation text for a community.
 String inviteText(BuildContext context, Community c) => context.tx(
       'به جامعه «${c.name}» در نیکسورا بپیوند! 🚀\nکد دعوت: ${c.inviteCode}\nدر Social Station روی «ورود با کد دعوت» بزن.',

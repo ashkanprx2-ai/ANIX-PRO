@@ -6,9 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/online/social_api.dart';
 import '../../../core/profile/profile_service.dart';
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/widgets/nx_widgets.dart';
-import '../../../core/widgets/user_profile_preview.dart';
+import '../../../ui/kit/station_compat.dart';
+
+import '../../../ui/widgets/user_profile_preview.dart';
 import '../models/nova_models.dart';
 import '../state/nova_controller.dart';
 import 'nova_composer.dart';
@@ -109,7 +109,7 @@ class NovaStoriesRow extends ConsumerWidget {
                   gradient: SweepGradient(
                     colors: s.viewed
                         ? const <Color>[Colors.white38, Colors.white24, Colors.white38]
-                        : const <Color>[Color(0xFFFF6FB5), Color(0xFFFFC857), Color(0xFFFF6FB5)],
+                        : const <Color>[Color(0xFFFF6FB5), Color(0xFFFFC27A), Color(0xFFFF6FB5)],
                   ),
                 ),
                 child: Container(

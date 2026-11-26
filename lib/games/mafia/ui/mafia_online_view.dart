@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:nexora/core/theme/nx_theme.dart';
-import 'package:nexora/core/widgets/nx_widgets.dart';
+import 'package:nexora/ui/kit/station_compat.dart';
+
 import 'package:nexora/games/core/game_contract.dart';
 import 'package:nexora/games/core/server_game.dart';
 

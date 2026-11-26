@@ -4,10 +4,10 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:nexora/core/storage/local_store.dart';
-import 'package:nexora/core/ui2/nx2_board_art.dart';
+import 'package:nexora/games/shared/board_art.dart';
 import 'package:flutter/services.dart';
-import 'package:nexora/core/ui2/nx_kit.dart';
-import 'package:nexora/core/theme/nx_theme.dart';
+import 'package:nexora/games/shared/nx_kit_art.dart';
+import 'package:nexora/ui/kit/station_compat.dart';
 import 'package:nexora/games/core/game_contract.dart';
 
 import '../core/snl_rules.dart';

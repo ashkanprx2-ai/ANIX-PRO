@@ -6,9 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/profile/profile_service.dart';
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/widgets/nx_widgets.dart';
-import '../../../core/widgets/user_profile_preview.dart';
+import '../../../ui/kit/station_compat.dart';
+
+import '../../../ui/widgets/user_profile_preview.dart';
 import '../models/orbit_models.dart';
 import '../state/orbit_controller.dart';
 import 'orbit_bubbles.dart';
@@ -18,8 +18,7 @@ import 'orbit_call_page.dart';
 import 'orbit_chat_page.dart';
 import 'orbit_sheets.dart';
 
-import '../../../core/ui2/anix_kit.dart';
-import '../../../core/ui2/luxe.dart';
+
 
 void openOrbitChat(BuildContext context, String chatId, {String? focusMessageId}) {
   Navigator.of(context).push<void>(MaterialPageRoute<void>(

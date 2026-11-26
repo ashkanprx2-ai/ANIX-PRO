@@ -5,6 +5,7 @@ library;
 
 import 'dart:async';
 import 'dart:convert';
+import '../../../core/companion/companion.dart';
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -185,18 +186,18 @@ class _OracleTourOverlayState extends State<OracleTourOverlay> with SingleTicker
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   gradient: const LinearGradient(colors: <Color>[Color(0xF5182A5E), Color(0xF52A1556)]),
-                  border: Border.all(color: const Color(0xFFD9B872), width: 1.2),
+                  border: Border.all(color: const Color(0xFFFFC27A), width: 1.2),
                   boxShadow: const <BoxShadow>[BoxShadow(color: Color(0x8839E6FF), blurRadius: 24)],
                 ),
                 child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
                   Row(children: <Widget>[
-                    Image.asset('assets/characters/oracle/moods/wave.webp',
-                        width: 46, height: 46, errorBuilder: (_, __, ___) => const Icon(Icons.smart_toy_rounded, color: Color(0xFFF6E7BD))),
+                    Image.asset(CompanionInfo.of(CompanionController.activeId).mood(CompanionMood.salute),
+                        width: 46, height: 46, errorBuilder: (_, __, ___) => const Icon(Icons.smart_toy_rounded, color: Color(0xFFFFE3C2))),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(s.title,
                           textDirection: dirOf(s.title),
-                          style: const TextStyle(color: Color(0xFFF6E7BD), fontSize: 15, fontWeight: FontWeight.w900)),
+                          style: const TextStyle(color: Color(0xFFFFE3C2), fontSize: 15, fontWeight: FontWeight.w900)),
                     ),
                     Text('${_i + 1}/${widget.steps.length}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
                   ]),
@@ -210,7 +211,7 @@ class _OracleTourOverlayState extends State<OracleTourOverlay> with SingleTicker
                     ),
                     const Spacer(),
                     FilledButton(
-                      style: FilledButton.styleFrom(backgroundColor: const Color(0xFFD9B872), foregroundColor: Colors.black),
+                      style: FilledButton.styleFrom(backgroundColor: const Color(0xFFFFC27A), foregroundColor: Colors.black),
                       onPressed: _next,
                       child: Text(_i >= widget.steps.length - 1 ? (fa ? 'فهمیدم!' : 'Got it!') : (fa ? 'بعدی' : 'Next'),
                           style: const TextStyle(fontWeight: FontWeight.w900)),
@@ -247,7 +248,7 @@ class _SpotPainter extends CustomPainter {
         Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2
-          ..color = const Color(0xFFD9B872)
+          ..color = const Color(0xFFFFC27A)
           ..maskFilter = MaskFilter.blur(BlurStyle.solid, g));
   }
 

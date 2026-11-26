@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/assets/app_assets.dart';
 import '../../../core/profile/profile_service.dart';
 import '../../../core/settings/app_settings.dart';
-import '../../../core/theme/nx_theme.dart';
-import '../../../core/widgets/nx_widgets.dart';
+import '../../../ui/kit/station_compat.dart';
+
 import '../../../core/online/social_api.dart';
 import '../data/orbit_shared_inbox.dart';
 import '../models/arcade_refs.dart';
@@ -14,8 +14,7 @@ import '../state/orbit_controller.dart';
 import 'orbit_bubbles.dart';
 import '../../../games/arcade_kit/arcade_icon.dart';
 
-import '../../../core/ui2/anix_kit.dart';
-import '../../../core/ui2/luxe.dart';
+
 
 /// Club badge ids usable as group/channel/community icons.
 const List<String> kOrbitBadges = <String>[
