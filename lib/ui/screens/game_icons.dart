@@ -26,5 +26,16 @@ String stationGameIcon(String id) => switch (id) {
       'stack_tower' => 'g_puzzle',
       'tetris_rush' => 'g_puzzle',
       'game_2048' => 'g_puzzle',
-      _ => 'r4c5',
+      // Newest games (arena integration): their own pedestal art in the Station object style.
+      'piano_tiles' => 'assets/arcade/pedestals/piano_tiles.webp',
+      'gate_shooter' => 'assets/arcade/pedestals/gate_shooter.webp',
+      'water_sort' => 'assets/arcade/pedestals/water_sort.webp',
+      _ => _kPedestals.contains(id) ? 'assets/arcade/pedestals/$id.webp' : 'r4c5',
     };
+
+/// Games that ship a pedestal image in assets/arcade/pedestals/ (fallback art for any game added later).
+const Set<String> _kPedestals = <String>{
+  'backgammon', 'basketball_battle', 'billiards', 'bomb_arena', 'carrom', 'finger_soccer', 'gate_shooter', 'kart_racing',
+  'ludo', 'mafia', 'mini_golf', 'obstacle_race', 'piano_tiles', 'pool8', 'quiz', 'snakes_ladders', 'spy_mafia',
+  'traffic_racer', 'uno', 'water_sort',
+};
