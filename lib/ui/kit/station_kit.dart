@@ -1028,7 +1028,7 @@ class StationRingAvatar extends StatelessWidget {
   final String? imageUrl;
   final int? level;
 
-  /// Painted portrait id (assets/avatar/portraits/<id>.webp); `01-vanguard` when unset.
+  /// Painted portrait id (`assets/avatar/portraits/<id>.webp`); `01-vanguard` when unset.
   final String? portrait;
 
   @override

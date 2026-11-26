@@ -18,7 +18,6 @@ import '../core/online/match_resume.dart';
 import '../core/online/online_service.dart';
 import '../core/push/push_service.dart';
 import '../core/settings/app_settings.dart';
-import '../core/companion/companion_bus.dart';
 import '../ui/theme/station_theme.dart';
 import '../ui/widgets/companion_buddy.dart';
 import '../core/update/app_gate.dart';

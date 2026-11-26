@@ -29,9 +29,8 @@ String _hhmm(BuildContext context, DateTime t) {
   final DateTime l = t.toLocal();
   final DateTime n = DateTime.now();
   if (l.year == n.year && l.month == n.month && l.day == n.day) {
-    return nxNum(context, int.parse('${l.hour}'), group: false).padLeft(2, stationFa(context) ? '۰' : '0') +
-        ':' +
-        nxNum(context, l.minute, group: false).padLeft(2, stationFa(context) ? '۰' : '0');
+    final String z = stationFa(context) ? '۰' : '0';
+    return '${nxNum(context, l.hour, group: false).padLeft(2, z)}:${nxNum(context, l.minute, group: false).padLeft(2, z)}';
   }
   if (n.difference(l).inDays < 2) return stx(context, 'دیروز', 'Yesterday');
   return '${nxNum(context, l.day)}/${nxNum(context, l.month)}';
@@ -407,12 +406,13 @@ class _StationSendGiftScreenState extends ConsumerState<StationSendGiftScreen> {
     if (f.isEmpty) return;
     setState(() => _busy = true);
     final NxUser to = f[_f];
+    final bool fa = stationFa(context);
     final OrbitController ctl = ref.read(orbitControllerProvider);
     final String? chat = await ctl.openDirect(to.id);
     final (String, String, String, String) gift = kGifts[_g];
     if (chat != null) {
       await ctl.send(chat,
-          authorName: ref.read(profileProvider).username, text: '${gift.$2} ${stationFa(context) ? 'یک ${gift.$3} برایت فرستادم!' : 'I sent you a ${gift.$4}!'}');
+          authorName: ref.read(profileProvider).username, text: '${gift.$2} ${fa ? 'یک ${gift.$3} برایت فرستادم!' : 'I sent you a ${gift.$4}!'}');
     }
     if (!mounted) return;
     setState(() => _busy = false);

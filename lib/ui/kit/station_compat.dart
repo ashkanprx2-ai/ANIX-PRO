@@ -232,7 +232,7 @@ class GlassPanel extends StatelessWidget {
       radius: radius,
       padding: padding,
       border: borderColor == null ? null : LinearGradient(colors: <Color>[borderColor!, borderColor!.withValues(alpha: .35)]),
-      glow: tint == null ? null : tint!.withValues(alpha: (tint!.a * 4).clamp(0, .45)),
+      glow: tint?.withValues(alpha: (tint!.a * 4).clamp(0, .45)),
       child: child,
     );
     return onTap == null ? s : StationPress(onTap: onTap, tilt: false, child: s);

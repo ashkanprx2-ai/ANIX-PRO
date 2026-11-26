@@ -18,7 +18,7 @@ class InviteWatcher {
   /// Opens the online lobby for (gameId, code).
   final void Function(String gameId, String code) _open;
 
-  /// RS-01: opens an in-app route for a watch invite ('/match/<id>?game=<g>&watch=1'). Null: watch invites are ignored.
+  /// RS-01: opens an in-app route for a watch invite (`/match/<id>?game=<g>&watch=1`). Null: watch invites are ignored.
   final void Function(String route)? onWatch;
 
   RealtimeChannel? _ch;
