@@ -423,7 +423,7 @@ class StationSignInRequired extends StatelessWidget {
             label: stx(context, 'بازی‌های آفلاین', 'Offline games'),
             icon: Icons.sports_esports_rounded,
             ghost: true,
-            onTap: () => context.pushReplacement('/s/games')),
+            onTap: () => context.go('/station/0')),
       ],
     );
   }

@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/online/online_service.dart';
 import '../../core/profile/profile_service.dart';
 import '../../core/settings/app_settings.dart';
+import '../kit/station_hub_grid.dart';
 import '../kit/station_kit.dart';
 import 'station_worlds.dart';
 
@@ -29,8 +30,6 @@ class _StationPageState extends ConsumerState<StationPage> with TickerProviderSt
   int _idx = 0;
   int? _world; // open world
   int _tab = 0;
-  bool _more = false;
-  bool _drawer = false;
   bool _pop = false;
   double _dragDx = 0;
   late final AnimationController _pos = AnimationController.unbounded(vsync: this, value: 0);
@@ -40,9 +39,11 @@ class _StationPageState extends ConsumerState<StationPage> with TickerProviderSt
     super.initState();
     final int? w = widget.initialWorld;
     if (w != null && w >= 0 && w < _worlds.length) {
-      _idx = w;
       _world = w;
-      _pos.value = w.toDouble();
+      if (w < kStationCarouselWorlds) {
+        _idx = w;
+        _pos.value = w.toDouble();
+      }
     }
   }
 
@@ -55,7 +56,7 @@ class _StationPageState extends ConsumerState<StationPage> with TickerProviderSt
   bool get _reduced => ref.read(settingsProvider).reducedMotion;
 
   void _go(int k) {
-    final int n = k.clamp(0, _worlds.length - 1);
+    final int n = k.clamp(0, kStationCarouselWorlds - 1);
     setState(() => _idx = n);
     if (_reduced) {
       _pos.value = n.toDouble();
@@ -68,48 +69,38 @@ class _StationPageState extends ConsumerState<StationPage> with TickerProviderSt
   void _openWorld(int i) {
     setState(() {
       _world = i;
-      _idx = i;
+      if (i < kStationCarouselWorlds) _idx = i;
       _tab = 0;
-      _more = false;
-      _drawer = false;
       _pop = false;
     });
-    _pos.value = i.toDouble();
+    if (i < kStationCarouselWorlds) _pos.value = i.toDouble();
     if (ref.read(settingsProvider).haptics) HapticFeedback.mediumImpact();
   }
 
   void _closeWorld() => setState(() => _world = null);
 
   void _nav(String target) {
-    setState(() {
-      _pop = false;
-      _drawer = false;
-    });
-    if (target == 'more') {
-      setState(() => _more = !_more);
-      return;
-    }
-    setState(() => _more = false);
+    setState(() => _pop = false);
     if (target == 'home') {
       _closeWorld();
-    } else if (target == 'chat') {
-      context.push('/social');
     } else if (target == 'rooms') {
       context.push('/rooms');
     } else if (target.startsWith('w')) {
       _openWorld(int.parse(target.substring(1)));
+    } else if (target.startsWith('world:')) {
+      _openWorld(int.parse(target.substring(6)));
+    } else if (target == 'action:theme') {
+      final AppSettings s = ref.read(settingsProvider);
+      s.stationSkin = s.stationSkin == StationSkin.white ? StationSkin.neon : StationSkin.white;
+      stationToast(context, s.stationSkin == StationSkin.white ? stx(context, 'تم سفید فعال شد', 'White theme on') : stx(context, 'تم نارنجی ـ سرمه‌ای فعال شد', 'Neon theme on'));
     } else if (target.startsWith('/')) {
       context.push(target);
     }
   }
 
   bool _back() {
-    if (_drawer || _more || _pop) {
-      setState(() {
-        _drawer = false;
-        _more = false;
-        _pop = false;
-      });
+    if (_pop) {
+      setState(() => _pop = false);
       return true;
     }
     if (_world != null) {
@@ -156,72 +147,24 @@ class _StationPageState extends ConsumerState<StationPage> with TickerProviderSt
             if (inWorld) _WorldView(
               key: ValueKey<int>(_world!),
               world: _worlds[_world!],
-              color: c,
               tab: _tab,
               onTab: (int t) => setState(() => _tab = t),
               onClose: _closeWorld,
+              onItem: _nav,
             ),
             // ----------------------------------------------------------- HUD
-            if (!inWorld) ...<Widget>[
-              PositionedDirectional(top: pad.top + 14, start: 14, child: _profileHud(context, p)),
-              PositionedDirectional(
-                top: pad.top + 24,
-                end: 14,
-                child: StationRoundButton(
-                  icon: Icons.menu_rounded,
-                  tooltip: stx(context, 'پنل ناوبری', 'Navigation'),
-                  onTap: () => setState(() {
-                    _drawer = true;
-                    _pop = false;
-                  }),
-                ),
-              ),
-            ],
+            if (!inWorld) PositionedDirectional(top: pad.top + 14, start: 14, child: _profileHud(context, p)),
             if (_pop && !inWorld)
               Positioned.fill(
                 child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: () => setState(() => _pop = false)),
               ),
             if (_pop && !inWorld) PositionedDirectional(top: pad.top + 76, start: 14, child: const _ProfilePop()),
-            // ----------------------------------------------------------- more
-            if (_more)
-              Positioned.fill(
-                child: GestureDetector(
-                  onTap: () => setState(() => _more = false),
-                  child: const ColoredBox(color: Color(0x80030306)),
-                ),
-              ),
-            if (_more)
-              Positioned(left: 14, right: 14, bottom: pad.bottom + 104, child: _MorePanel(onPick: _nav)),
             // ----------------------------------------------------------- nav
             Positioned(
               left: 14,
               right: 14,
               bottom: pad.bottom + 12,
-              child: _NavBar(
-                active: _more ? 'more' : (inWorld ? 'w$_world' : 'home'),
-                onTap: _nav,
-              ),
-            ),
-            // ----------------------------------------------------------- drawer
-            if (_drawer)
-              Positioned.fill(
-                child: GestureDetector(
-                  onTap: () => setState(() => _drawer = false),
-                  child: ColoredBox(color: p.isLight ? const Color(0x730C1A4A) : const Color(0x8C03030C)),
-                ),
-              ),
-            AnimatedPositionedDirectional(
-              duration: const Duration(milliseconds: 400),
-              curve: kStationEase,
-              top: 0,
-              bottom: 0,
-              end: _drawer ? 0 : -math.min(MediaQuery.sizeOf(context).width * .86, 340) - 20,
-              width: math.min(MediaQuery.sizeOf(context).width * .86, 340),
-              child: _Drawer(
-                worlds: _worlds,
-                onWorld: (int i) => _openWorld(i),
-                onClose: () => setState(() => _drawer = false),
-              ),
+              child: _NavBar(active: inWorld ? 'w$_world' : 'home', onTap: _nav),
             ),
           ]),
         ),
@@ -269,7 +212,7 @@ class _StationPageState extends ConsumerState<StationPage> with TickerProviderSt
         ),
         const SizedBox(height: 14),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-          for (int i = 0; i < _worlds.length; i++)
+          for (int i = 0; i < kStationCarouselWorlds; i++)
             GestureDetector(
               onTap: () => _go(i),
               child: AnimatedContainer(
@@ -294,7 +237,7 @@ class _StationPageState extends ConsumerState<StationPage> with TickerProviderSt
     final double cw = math.min(sz.width * .6, 236);
     final double ch = cw * 4.3 / 3;
     final double pos = _pos.value;
-    final List<int> order = List<int>.generate(_worlds.length, (int i) => i)
+    final List<int> order = List<int>.generate(kStationCarouselWorlds, (int i) => i)
       ..sort((int a, int b) => (b - pos).abs().compareTo((a - pos).abs()));
     return Stack(clipBehavior: Clip.none, alignment: Alignment.center, children: <Widget>[
       for (final int k in order)
@@ -463,164 +406,58 @@ class _ProfilePop extends ConsumerWidget {
   }
 }
 
-/// `#world` — head (orb, title, close), `#wtabs` and the item grid (`.ic`).
+/// A hub (`#world`): header, chip row and the shared [StationHubGrid]. «بیشتر» adds sign-in when signed out.
 class _WorldView extends ConsumerWidget {
-  const _WorldView({super.key, required this.world, required this.color, required this.tab, required this.onTab, required this.onClose});
+  const _WorldView({super.key, required this.world, required this.tab, required this.onTab, required this.onClose, required this.onItem});
   final StationWorld world;
-  final Color color;
   final int tab;
   final ValueChanged<int> onTab;
   final VoidCallback onClose;
+  final ValueChanged<String> onItem;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final StationPalette p = StationPalette.of(context);
     final bool fa = stationFa(context);
-    final List<StationItem> list = world.items.where((StationItem x) => tab == 0 || x.tab == tab).toList();
-    final List<String> tabs = <String>[stx(context, 'همه', 'All'), ...(fa ? world.tabsFa : world.tabsEn)];
+    final bool signedIn = ref.watch(onlineProvider.select((OnlineService o) => o.user != null && !o.isGuest));
+    final List<StationItem> list = <StationItem>[
+      ...world.items.where((StationItem x) => tab == 0 || x.tab == tab),
+      if (world.k == 'more' && !signedIn)
+        const StationItem(fa: 'ورود / ثبت‌نام', en: 'Sign in', tab: 0, rarity: 1, icon: 'assets/station/hub/account.webp', route: '/auth'),
+    ];
+    final List<String> tabs = <String>[if ((fa ? world.tabsFa : world.tabsEn).isNotEmpty) stx(context, 'همه', 'All'), ...(fa ? world.tabsFa : world.tabsEn)];
+    final double bottom = MediaQuery.paddingOf(context).bottom + 92 + 28;
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 450),
       curve: kStationEase,
-      builder: (_, double v, Widget? c) {
-        final Matrix4 m = Matrix4.identity()
-          ..setEntry(3, 2, 1 / 1200)
-          ..rotateY((1 - v) * -14 * math.pi / 180)
-          ..scaleByDouble(1 + (1 - v) * .04, 1 + (1 - v) * .04, 1, 1);
-        return Opacity(opacity: v, child: Transform(alignment: Alignment.center, transform: m, child: c));
-      },
+      builder: (_, double v, Widget? c) => Opacity(opacity: v, child: Transform.translate(offset: Offset(0, 18 * (1 - v)), child: c)),
       child: SafeArea(
         bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 6, 0, 10),
-              child: Row(children: <Widget>[
-                Container(
-                  width: 52,
-                  height: 52,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: p.isLight
-                        ? p.plate
-                        : RadialGradient(center: const Alignment(-.3, -.4), colors: <Color>[color.withValues(alpha: .3), color.withValues(alpha: 0)]),
-                    border: Border.all(color: p.isLight ? const Color(0xFFE0B04A) : color.withValues(alpha: .45), width: p.isLight ? 2 : 1),
-                  ),
-                  child: StationIcon(world.icon, size: 40),
-                ),
-                const SizedBox(width: 14),
-                Expanded(child: Text(fa ? world.fa : world.en, style: TextStyle(fontSize: 21, fontWeight: FontWeight.w400, color: p.ink))),
-                StationRoundButton(icon: Icons.close_rounded, size: 42, onTap: onClose, tooltip: stx(context, 'بازگشت', 'Back')),
-              ]),
-            ),
-            SizedBox(
-              height: 52,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.only(top: 4, bottom: 14),
-                children: <Widget>[
-                  for (int k = 0; k < tabs.length; k++)
-                    Padding(
-                      padding: const EdgeInsetsDirectional.only(end: 8),
-                      child: StationPill(label: tabs[k], on: k == tab, onTap: () => onTab(k)),
-                    ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: GridView.builder(
-                padding: EdgeInsets.fromLTRB(2, 4, 2, 150 + MediaQuery.paddingOf(context).bottom),
-                physics: const BouncingScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, mainAxisSpacing: 14, crossAxisSpacing: 14, childAspectRatio: 1.25),
-                itemCount: list.length + (world.k == 'personal' ? 1 : 0),
-                itemBuilder: (BuildContext context, int i) {
-                  if (world.k == 'personal') {
-                    if (i == 0) return const _ProfileStrip();
-                    i -= 1;
-                  }
-                  return _ItemTile(item: list[i], color: color, delay: i);
-                },
-              ),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
-}
-
-/// `.prof` — the profile strip at the top of the PROFILE world (spans one tile; tap opens the profile).
-class _ProfileStrip extends ConsumerWidget {
-  const _ProfileStrip();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final StationPalette p = StationPalette.of(context);
-    final ProfileService prof = ref.watch(profileProvider);
-    final bool fa = stationFa(context);
-    return StationPress(
-      onTap: () => context.push('/s/profile'),
-      child: StationSurface(
-        padding: const EdgeInsets.all(14),
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-          StationRingAvatar(name: prof.username, size: 54, imageUrl: prof.avatarUrl, level: prof.level),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
+          StationHubHeader(title: fa ? world.fa : world.en, icon: world.icon, onClose: onClose),
+          if (tabs.isNotEmpty) StationHubChips(labels: tabs, icons: world.tabIcons, index: tab, onChanged: onTab),
           const SizedBox(height: 8),
-          Text(prof.username.isEmpty ? 'NEXORA' : prof.username,
-              maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: p.ink)),
-          Text(fa ? prof.rankTitleFa : prof.rankTitleEn, style: TextStyle(fontSize: 11, color: p.mute)),
-          StationBar(prof.levelProgress, height: 4),
+          Expanded(
+            child: StationHubGrid(
+              key: PageStorageKey<String>('hub-${world.k}-$tab'),
+              padding: EdgeInsets.fromLTRB(16, 6, 16, bottom),
+              entries: <StationHubEntry>[
+                for (final StationItem it in list)
+                  StationHubEntry(
+                    label: fa ? it.fa : it.en,
+                    image: it.icon,
+                    onTap: () => (it.route.startsWith('/') && it.route != '/') ? it.open(context) : onItem(it.route),
+                  ),
+              ],
+            ),
+          ),
         ]),
       ),
     );
   }
 }
 
-/// `.ic` — one item tile (neon: `tile.webp` plate; white: navy plate with a gold frame).
-class _ItemTile extends StatelessWidget {
-  const _ItemTile({required this.item, required this.color, required this.delay});
-  final StationItem item;
-  final Color color;
-  final int delay;
-
-  @override
-  Widget build(BuildContext context) {
-    final StationPalette p = StationPalette.of(context);
-    final bool fa = stationFa(context);
-    final Widget body = Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-      StationIcon(item.icon, size: item.icon.startsWith('g_') ? 56 : 48, radius: 15),
-      const SizedBox(height: 6),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6),
-        child: Text(fa ? item.fa : item.en,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500, color: p.isLight ? Colors.white : p.ink)),
-      ),
-    ]);
-    final Widget tile = p.isLight
-        ? StationSurface(fill: p.tileFill, border: p.tileBorder, radius: 22, child: body)
-        : Container(
-            decoration: BoxDecoration(
-              image: const DecorationImage(image: AssetImage('assets/station/neon/tile.webp'), fit: BoxFit.fill),
-              borderRadius: BorderRadius.circular(22),
-              boxShadow: <BoxShadow>[const BoxShadow(color: Color(0x73000000), offset: Offset(0, 4)), BoxShadow(color: color.withValues(alpha: .18), blurRadius: 30, spreadRadius: -8)],
-            ),
-            child: body,
-          );
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0, end: 1),
-      duration: Duration(milliseconds: 800 + delay * 60),
-      curve: Interval(math.min(delay * .06, .5), 1, curve: kStationEase),
-      builder: (_, double v, Widget? c) => Opacity(opacity: v, child: Transform.translate(offset: Offset(0, 16 * (1 - v)), child: c)),
-      child: StationPress(onTap: () => item.open(context), child: tile),
-    );
-  }
-}
-
-/// `#nav` — the floating glass bar with the round centre «روم» button.
+/// `#nav` — the floating glass bar: خانه · چت · centre gold «روم» · تورنمنت · بیشتر.
 class _NavBar extends StatelessWidget {
   const _NavBar({required this.active, required this.onTap});
   final String active;
@@ -630,279 +467,89 @@ class _NavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final StationPalette p = StationPalette.of(context);
     final bool fa = stationFa(context);
-    return SizedBox(
-      height: 92,
-      child: Stack(clipBehavior: Clip.none, alignment: Alignment.bottomCenter, children: <Widget>[
-        Container(
-          height: 66,
-          decoration: BoxDecoration(
-            color: p.navBg,
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: p.navBorder, width: p.isLight ? 2 : 1),
-            boxShadow: <BoxShadow>[
-              BoxShadow(color: p.isLight ? const Color(0x59785A14) : const Color(0x66000000), offset: const Offset(0, 6)),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-          child: Row(children: <Widget>[
-            for (final StationNavEntry e in kStationNav)
-              if (e.icon == null)
-                const SizedBox(width: 74)
-              else
-                Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () => onTap(e.target),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 450),
-                      curve: kStationEase,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(22),
-                        gradient: active == e.target
-                            ? LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: <Color>[p.gold.withValues(alpha: .2), p.gold.withValues(alpha: .03)])
-                            : null,
-                        border: active == e.target ? Border.all(color: p.gold.withValues(alpha: .25)) : null,
-                      ),
-                      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-                        StationIcon(e.icon!, size: 26, nav: true),
-                        const SizedBox(height: 2),
-                        Text(fa ? e.fa : e.en,
-                            style: TextStyle(fontSize: 9.5, color: active == e.target ? p.gold2 : (p.isLight ? p.ink : p.mute))),
-                      ]),
-                    ),
-                  ),
-                ),
-          ]),
-        ),
-        // Centre «روم» button (clean pass: 62 px, label instead of art).
-        Positioned(
-          bottom: 66 - 62 + 22,
-          child: GestureDetector(
-            onTap: () => onTap('rooms'),
-            child: Container(
-              width: 62,
-              height: 62,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: p.isLight
-                    ? const RadialGradient(center: Alignment(0, -.4), colors: <Color>[Color(0xFF2B4FD0), Color(0xFF050C33)], stops: <double>[0, .72])
-                    : const RadialGradient(center: Alignment(0, -.4), colors: <Color>[Color(0xFF3A1A5A), Color(0xFF0A0820)], stops: <double>[0, .72]),
-                border: Border.all(color: p.isLight ? const Color(0xFFE8B94D) : p.gold, width: p.isLight ? 3 : 1.5),
-                boxShadow: <BoxShadow>[
-                  BoxShadow(color: p.bg.withValues(alpha: .88), spreadRadius: 6),
-                  BoxShadow(color: p.gold.withValues(alpha: .5), blurRadius: 34, spreadRadius: -4),
-                ],
-              ),
-              child: Text(fa ? 'روم' : 'ROOMS',
-                  style: TextStyle(
-                      fontSize: fa ? 15 : 11,
-                      fontWeight: FontWeight.w600,
-                      color: p.isLight ? const Color(0xFFFFD77A) : const Color(0xFFFFD2A0))),
-            ),
-          ),
-        ),
-      ]),
-    );
-  }
-}
-
-/// `#more` — the 3-column popup above the nav.
-class _MorePanel extends StatelessWidget {
-  const _MorePanel({required this.onPick});
-  final ValueChanged<String> onPick;
-
-  @override
-  Widget build(BuildContext context) {
-    final StationPalette p = StationPalette.of(context);
-    final bool fa = stationFa(context);
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 550),
-      curve: kStationEase,
-      builder: (_, double v, Widget? c) =>
-          Opacity(opacity: v, child: Transform.translate(offset: Offset(0, 24 * (1 - v)), child: Transform.scale(scale: .96 + .04 * v, child: c))),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: p.isLight ? const LinearGradient(colors: <Color>[Colors.white, Colors.white]) : p.popBg,
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: p.isLight ? const Color(0xFFD9A93A) : p.line, width: p.isLight ? 2 : 1),
-          boxShadow: const <BoxShadow>[BoxShadow(color: Color(0xA6000000), blurRadius: 60, offset: Offset(0, 30), spreadRadius: -20)],
-        ),
-        child: GridView.count(
-          crossAxisCount: 3,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
-          childAspectRatio: 1.05,
-          children: <Widget>[
-            for (final StationNavEntry e in kStationMore)
-              StationPress(
-                onTap: () => onPick(e.target),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: p.isLight ? p.plate : p.glass,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: p.isLight ? const Color(0xFFE0B04A) : p.line, width: p.isLight ? 2 : 1),
-                  ),
-                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-                    StationIcon(e.icon!, size: 34),
-                    const SizedBox(height: 6),
-                    Text(fa ? e.fa : e.en, style: TextStyle(fontSize: 12, color: p.isLight ? Colors.white : p.ink)),
-                  ]),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// `#np` — navigation drawer: me card, every world, shortcuts (rooms, chats, games, records, profile, viewers,
-/// settings, theme switch).
-class _Drawer extends ConsumerWidget {
-  const _Drawer({required this.worlds, required this.onWorld, required this.onClose});
-  final List<StationWorld> worlds;
-  final ValueChanged<int> onWorld;
-  final VoidCallback onClose;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final StationPalette p = StationPalette.of(context);
-    final ProfileService prof = ref.watch(profileProvider);
-    final bool signedIn = ref.watch(onlineProvider.select((OnlineService o) => o.user != null && !o.isGuest));
-    final bool fa = stationFa(context);
-    void go(String route) {
-      onClose();
-      Future<void>.delayed(const Duration(milliseconds: 120), () {
-        if (context.mounted) context.push(route);
-      });
-    }
-
-    final List<(String, String, VoidCallback)> links = <(String, String, VoidCallback)>[
-      ('🏠', stx(context, 'روم‌ها', 'Rooms'), () => go('/rooms')),
-      ('💬', stx(context, 'گپ‌ها', 'Chats'), () => go('/social')),
-      ('🎮', stx(context, 'همه‌ی بازی‌ها', 'All games'), () => go('/s/games')),
-      ('📊', stx(context, 'رکوردها', 'Records'), () => go('/s/games?records=1')),
-      ('👤', stx(context, 'پروفایل من', 'My profile'), () => go('/s/profile')),
-      ('👁', stx(context, 'کی منو دیده؟', 'Who viewed me?'), () => go('/s/viewers')),
-      ('🤖', stx(context, 'اوراکل و لونا', 'ORACLE & LUNA'), () => go('/oracle')),
-      ('⚙️', stx(context, 'تنظیمات', 'Settings'), () => go('/settings')),
-      ('🎨', stx(context, 'تغییر تم', 'Switch theme'), () {
-        final AppSettings s = ref.read(settingsProvider);
-        s.stationSkin = s.stationSkin == StationSkin.white ? StationSkin.neon : StationSkin.white;
-        stationToast(context, s.stationSkin == StationSkin.white ? stx(context, 'تم سفید فعال شد', 'White theme on') : stx(context, 'تم نارنجی ـ سرمه‌ای فعال شد', 'Neon theme on'));
-      }),
-      if (!signedIn) ('🔑', stx(context, 'ورود / ثبت‌نام', 'Sign in'), () => go('/auth')),
-    ];
-    return Material(
-      color: Colors.transparent,
-      child: GestureDetector(
-        onHorizontalDragEnd: (DragEndDetails d) {
-          if ((d.primaryVelocity ?? 0) > 300) onClose();
-        },
-        child: Container(
-          padding: EdgeInsets.fromLTRB(16, MediaQuery.paddingOf(context).top + 16, 16, 24),
-          decoration: BoxDecoration(
-            gradient: p.isLight
-                ? const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: <Color>[Colors.white, Color(0xFFD8E5FF)])
-                : LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: <Color>[p.bg, Colors.black]),
-            border: BorderDirectional(start: BorderSide(color: p.line)),
-          ),
-          child: ListView(padding: EdgeInsets.zero, children: <Widget>[
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                gradient: p.isLight ? null : p.glass,
-                color: p.isLight ? Colors.white : null,
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: p.line, width: p.isLight ? 2 : 1),
-              ),
-              child: Row(children: <Widget>[
-                StationRingAvatar(name: prof.username, size: 42, imageUrl: prof.avatarUrl),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                    Text(prof.username.isEmpty ? 'NEXORA' : prof.username,
-                        maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: p.ink)),
-                    Text('${stx(context, 'سطح', 'Level')} ${nxNum(context, prof.level)} · ${fa ? prof.rankTitleFa : prof.rankTitleEn}',
-                        style: TextStyle(fontSize: 11, color: p.mute)),
-                  ]),
-                ),
-                Column(crossAxisAlignment: CrossAxisAlignment.end, children: <Widget>[
-                  Text('🪙 ${nxNum(context, prof.coins)}', style: TextStyle(fontSize: 12, color: p.ink)),
-                  Text('💎 ${nxNum(context, prof.gems)}', style: TextStyle(fontSize: 12, color: p.ink)),
-                ]),
-              ]),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(2, 14, 2, 8),
-              child: Text(stx(context, 'بخش‌های برنامه', 'Sections'), style: TextStyle(fontSize: 12, color: p.gold)),
-            ),
-            GridView.count(
-              crossAxisCount: 4,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              childAspectRatio: .82,
-              children: <Widget>[
-                for (int i = 0; i < worlds.length; i++)
-                  GestureDetector(
-                    onTap: () => onWorld(i),
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(2, 10, 2, 8),
-                      decoration: BoxDecoration(
-                        gradient: p.isLight ? p.plate : p.glass,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: p.isLight ? const Color(0xFFE0B04A) : p.line, width: p.isLight ? 2 : 1),
-                      ),
-                      child: Column(children: <Widget>[
-                        StationIcon(worlds[i].icon, size: 30),
-                        const SizedBox(height: 4),
-                        Text(fa ? worlds[i].fa : worlds[i].en,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 10.5, color: p.isLight ? Colors.white : p.ink)),
-                      ]),
-                    ),
-                  ),
+    return RepaintBoundary(
+      child: SizedBox(
+        height: 92,
+        child: Stack(clipBehavior: Clip.none, alignment: Alignment.bottomCenter, children: <Widget>[
+          Container(
+            height: 66,
+            decoration: BoxDecoration(
+              // Nearly opaque: the hub grid scrolls underneath.
+              color: p.isLight ? p.navBg : const Color(0xF20C0926),
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: p.navBorder, width: p.isLight ? 2 : 1),
+              boxShadow: <BoxShadow>[
+                BoxShadow(color: p.isLight ? const Color(0x59785A14) : const Color(0x66000000), offset: const Offset(0, 6)),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(2, 14, 2, 8),
-              child: Text(stx(context, 'میان‌بُرها', 'Shortcuts'), style: TextStyle(fontSize: 12, color: p.gold)),
-            ),
-            for (final (String e, String label, VoidCallback f) in links)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: GestureDetector(
-                  onTap: f,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-                    decoration: BoxDecoration(
-                      gradient: p.isLight ? null : p.glass,
-                      color: p.isLight ? Colors.white : null,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: p.line, width: p.isLight ? 2 : 1),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+            child: Row(children: <Widget>[
+              for (final StationNavEntry e in kStationNav)
+                if (e.icon == null)
+                  const SizedBox(width: 78)
+                else
+                  Expanded(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => onTap(e.target),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        curve: kStationEase,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(22),
+                          gradient: active == e.target
+                              ? LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: <Color>[p.gold.withValues(alpha: .22), p.gold.withValues(alpha: .04)])
+                              : null,
+                          border: active == e.target ? Border.all(color: p.gold.withValues(alpha: .3)) : null,
+                        ),
+                        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+                          Icon(e.icon, size: 24, color: active == e.target ? const Color(0xFFFFC24A) : (p.isLight ? p.ink : const Color(0xFFE9DDF8))),
+                          const SizedBox(height: 2),
+                          Text(fa ? e.fa : e.en,
+                              maxLines: 1,
+                              style: TextStyle(
+                                  fontFamily: kStationFont,
+                                  fontSize: 11,
+                                  height: 1.2,
+                                  fontWeight: FontWeight.w500,
+                                  color: active == e.target ? const Color(0xFFFFC24A) : (p.isLight ? p.ink : const Color(0xFFE9DDF8)))),
+                        ]),
+                      ),
                     ),
-                    child: Row(children: <Widget>[
-                      Text('$e  $label', style: TextStyle(fontSize: 14, color: p.ink)),
-                      const Spacer(),
-                      Icon(Icons.chevron_left_rounded, color: p.gold, size: 18, textDirection: TextDirection.ltr),
-                    ]),
                   ),
+            ]),
+          ),
+          // Centre «روم» button: gold ring, house icon, label.
+          Positioned(
+            bottom: 22,
+            child: GestureDetector(
+              onTap: () => onTap('rooms'),
+              child: Container(
+                width: 70,
+                height: 70,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const RadialGradient(center: Alignment(0, -.4), colors: <Color>[Color(0xFF3A2A12), Color(0xFF120A04)], stops: <double>[0, .8]),
+                  border: Border.all(color: const Color(0xFFFFC24A), width: 3),
+                  boxShadow: <BoxShadow>[
+                    BoxShadow(color: p.bg.withValues(alpha: .85), spreadRadius: 5),
+                    const BoxShadow(color: Color(0x99FFB030), blurRadius: 26, spreadRadius: -2),
+                  ],
                 ),
+                child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                  const Icon(Icons.meeting_room_rounded, size: 24, color: Color(0xFFFFC24A)),
+                  Text(fa ? 'روم' : 'ROOMS',
+                      style: TextStyle(
+                          fontFamily: kStationFont, fontSize: fa ? 13 : 9.5, height: 1.15, fontWeight: FontWeight.w700, color: const Color(0xFFFFD77A))),
+                ]),
               ),
-          ]),
-        ),
+            ),
+          ),
+        ]),
       ),
     );
   }

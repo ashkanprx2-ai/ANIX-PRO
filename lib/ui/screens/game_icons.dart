@@ -1,41 +1,15 @@
-/// Game art from UI.zip (`assets/station/icons/g_*.webp` covers and the r*c* icon atlas) per registered game id.
-String stationGameIcon(String id) => switch (id) {
-      'finger_soccer' => 'g_football',
-      'basketball_battle' => 'g_basketball',
-      'mini_golf' => 'golf',
-      'kart_racing' => 'g_kart',
-      'traffic_racer' => 'g_traffic',
-      'billiards' => 'g_8ball',
-      'pool8' => 'r1c1',
-      'backgammon' => 'g_backgammon',
-      'ludo' => 'g_ludo',
-      'snakes_ladders' => 'g_snakes',
-      'carrom' => 'g_carrom',
-      'uno' => 'g_uno',
-      'mafia' => 'g_mafia',
-      'spy_mafia' => 'g_guesswho',
-      'quiz' => 'quiz',
-      'endless_runner' => 'g_runner',
-      'obstacle_race' => 'g_runner',
-      'geo_dash' => 'g_geodash',
-      'fruit_ninja' => 'g_fruit',
-      'bomb_arena' => 'r4c6',
-      'knife_hit' => 'r5c2',
-      'helix_jump' => 'r5c1',
-      'bubble_shooter' => 'g_puzzle',
-      'stack_tower' => 'g_puzzle',
-      'tetris_rush' => 'g_puzzle',
-      'game_2048' => 'g_puzzle',
-      // Newest games (arena integration): their own pedestal art in the Station object style.
-      'piano_tiles' => 'assets/arcade/pedestals/piano_tiles.webp',
-      'gate_shooter' => 'assets/arcade/pedestals/gate_shooter.webp',
-      'water_sort' => 'assets/arcade/pedestals/water_sort.webp',
-      _ => _kPedestals.contains(id) ? 'assets/arcade/pedestals/$id.webp' : 'r4c5',
-    };
+/// The unified game icon (512 px, `assets/games/icons/<id>.webp`) of a registered game id.
+/// Every game ships its own icon; backgammon uses the dice art, and an unknown id gets the hub controller.
+String stationGameIcon(String id) {
+  if (id == 'backgammon') return 'assets/games/icons/dice_chips.webp';
+  if (_kGameIcons.contains(id)) return 'assets/games/icons/$id.webp';
+  return 'assets/station/hub/controller.webp';
+}
 
-/// Games that ship a pedestal image in assets/arcade/pedestals/ (fallback art for any game added later).
-const Set<String> _kPedestals = <String>{
-  'backgammon', 'basketball_battle', 'billiards', 'bomb_arena', 'carrom', 'finger_soccer', 'gate_shooter', 'kart_racing',
-  'ludo', 'mafia', 'mini_golf', 'obstacle_race', 'piano_tiles', 'pool8', 'quiz', 'snakes_ladders', 'spy_mafia',
-  'traffic_racer', 'uno', 'water_sort',
+/// Games with a file in assets/games/icons/ (keep in sync with the folder).
+const Set<String> _kGameIcons = <String>{
+  'basketball_battle', 'billiards', 'bomb_arena', 'bubble_shooter', 'carrom', 'crash_racing', 'dice_chips',
+  'endless_runner', 'finger_soccer', 'fruit_ninja', 'game_2048', 'gate_shooter', 'geo_dash', 'helix_jump',
+  'kart_racing', 'knife_hit', 'ludo', 'mafia', 'mini_golf', 'obstacle_race', 'piano_tiles', 'pool8', 'quiz',
+  'snakes_ladders', 'spy_mafia', 'stack_tower', 'tetris_rush', 'traffic_racer', 'uno', 'water_sort',
 };

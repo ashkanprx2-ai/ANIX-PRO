@@ -86,6 +86,8 @@ flutter:
     - assets/station/neon/
     - assets/station/neon2/
     - assets/station/white/
+    - assets/station/hub/
+    - assets/games/icons/
     - assets/branding/
     - assets/games/backgammon/
     - assets/games/billiards/

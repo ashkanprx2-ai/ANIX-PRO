@@ -29,7 +29,9 @@ Future<void> loadFonts() async {
   ];
   await fam('Roboto', rob);
   await fam('FlutterTest', rob);
-  const String a = '/workspace/work/anix/assets/fonts';
+  // The repo's own fonts (flutter test runs from the package root).
+  const String a = 'assets/fonts';
+  await fam('Vazirmatn', <String>['$a/Vazirmatn-Light.ttf', '$a/Vazirmatn-Regular.ttf', '$a/Vazirmatn-Medium.ttf', '$a/Vazirmatn-Bold.ttf']);
   await fam('ChakraPetch', <String>['$a/ChakraPetch-Regular.ttf', '$a/ChakraPetch-SemiBold.ttf', '$a/ChakraPetch-Bold.ttf']);
   await fam('Estedad', <String>['$a/Estedad-Regular.ttf', '$a/Estedad-Medium.ttf', '$a/Estedad-Bold.ttf', '$a/Estedad-Black.ttf']);
   await fam('Lalezar', <String>['$a/Lalezar-Regular.ttf']);

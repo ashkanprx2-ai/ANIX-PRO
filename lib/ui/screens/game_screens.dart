@@ -186,85 +186,39 @@ class _StationGameScreenState extends ConsumerState<StationGameScreen> {
   }
 }
 
-/// `GAMES()` — all games as `.gcard`s (all / popular / newest) and the «رکوردها» records list.
-class StationGamesScreen extends ConsumerStatefulWidget {
-  const StationGamesScreen({super.key, this.records = false});
-  final bool records;
+/// «رکوردها» — the records list of every game (the game grid itself is the Games hub, `/station/0`).
+class StationGamesScreen extends ConsumerWidget {
+  const StationGamesScreen({super.key});
 
   @override
-  ConsumerState<StationGamesScreen> createState() => _StationGamesScreenState();
-}
-
-class _StationGamesScreenState extends ConsumerState<StationGamesScreen> {
-  late int _md = widget.records ? 1 : 0;
-  int _f = 0;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final ProfileService prof = ref.watch(profileProvider);
     final StationPalette p = StationPalette.of(context);
     final bool fa = stationFa(context);
-    List<GameInfo> list = List<GameInfo>.from(kGames);
-    if (_f == 1) {
-      list.sort((GameInfo a, GameInfo b) => (prof.stats[b.id]?.played ?? 0).compareTo(prof.stats[a.id]?.played ?? 0));
-    } else if (_f == 2) {
-      list = list.where((GameInfo g) => g.isNew).toList();
-      if (list.isEmpty) list = kGames.reversed.take(8).toList();
-    }
     return StationScreen(
-      title: stx(context, 'بازی‌ها', 'Games'),
-      latin: 'GAMES',
+      title: stx(context, 'رکوردها', 'Records'),
+      latin: 'RECORDS',
       children: <Widget>[
-        StationSeg(
-          labels: <String>[stx(context, 'بازی‌ها', 'Games'), stx(context, 'رکوردها', 'Records')],
-          index: _md,
-          onChanged: (int i) => setState(() => _md = i),
-        ),
-        if (_md == 1)
-          StationRows(children: <Widget>[
-            for (int k = 0; k < kGames.length; k++)
-              Builder(builder: (BuildContext context) {
-                final GameInfo g = kGames[k];
-                final GameStats? s = prof.stats[g.id];
-                final int best = kArcadeDefs.containsKey(g.id) ? ArcadeRecords.best(g.id, prof) : (s?.best ?? 0);
-                final double wr = (s == null || s.played == 0) ? 0 : s.won / s.played;
-                return StationRow(
-                  first: k == 0,
-                  onTap: () => context.push('/arcade/${g.id}'),
-                  leading: StationIcon(stationGameIcon(g.id), size: 40, radius: 14),
-                  title: fa ? g.nameFa : g.nameEn,
-                  subtitle: fa
-                      ? 'بهترین امتیاز ${nxNum(context, best)} · ${nxNum(context, (wr * 100).round())}٪ برد · ${nxNum(context, s?.played ?? 0)} بازی'
-                      : 'Best $best · ${(wr * 100).round()}% wins · ${s?.played ?? 0} games',
-                  trailing: Text('#${nxNum(context, k + 1)}', style: TextStyle(color: p.gold2, fontWeight: FontWeight.w500)),
-                  child: StationBar(wr),
-                );
-              }),
-          ])
-        else ...<Widget>[
-          StationSeg(
-            labels: <String>[stx(context, 'همه', 'All'), stx(context, 'محبوب‌ترین‌ها', 'Most played'), stx(context, 'جدیدترین‌ها', 'Newest')],
-            index: _f,
-            onChanged: (int i) => setState(() => _f = i),
-          ),
-          StationGrid(
-            gap: 14,
-            children: <Widget>[
-              for (int k = 0; k < list.length; k++)
-                StationGameCard(
-                  title: fa ? list[k].nameFa : list[k].nameEn,
-                  icon: stationGameIcon(list[k].id),
-                  color: p.worldColor(k),
-                  meta: <String>[
-                    list[k].supportsOnline
-                        ? (fa ? '👥 آنلاین ${nxNum(context, list[k].onlineMinPlayers)}–${nxNum(context, list[k].onlineMaxPlayers)}' : '👥 online ${list[k].onlineMinPlayers}–${list[k].onlineMaxPlayers}')
-                        : (list[k].solo ? stx(context, 'تک‌نفره', 'Solo') : stx(context, 'آفلاین', 'Offline')),
-                  ],
-                  onTap: () => context.push('/arcade/${list[k].id}'),
-                ),
-            ],
-          ),
-        ],
+        StationRows(children: <Widget>[
+          for (int k = 0; k < kGames.length; k++)
+            Builder(builder: (BuildContext context) {
+              final GameInfo g = kGames[k];
+              final GameStats? s = prof.stats[g.id];
+              final int best = kArcadeDefs.containsKey(g.id) ? ArcadeRecords.best(g.id, prof) : (s?.best ?? 0);
+              final double wr = (s == null || s.played == 0) ? 0 : s.won / s.played;
+              return StationRow(
+                first: k == 0,
+                onTap: () => context.push('/arcade/${g.id}'),
+                leading: StationIcon(stationGameIcon(g.id), size: 40),
+                title: fa ? g.nameFa : g.nameEn,
+                subtitle: fa
+                    ? 'بهترین امتیاز ${nxNum(context, best)} · ${nxNum(context, (wr * 100).round())}٪ برد · ${nxNum(context, s?.played ?? 0)} بازی'
+                    : 'Best $best · ${(wr * 100).round()}% wins · ${s?.played ?? 0} games',
+                trailing: Text('#${nxNum(context, k + 1)}', style: TextStyle(color: p.gold2, fontWeight: FontWeight.w500)),
+                child: StationBar(wr),
+              );
+            }),
+        ]),
       ],
     );
   }

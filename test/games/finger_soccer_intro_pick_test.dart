@@ -10,8 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// v3 (owner request 2026-11-20): in the pre-match intro the team on screen is the team that plays (arrows pick an
 /// owned / opponent team) and a formation is picked by tapping anywhere on its card.
 const List<FsSidePlayer> _players = <FsSidePlayer>[
-  FsSidePlayer(name: 'A', portrait: 'assets/ui/anix/avatars/01-vanguard.webp', badge: '1'),
-  FsSidePlayer(name: 'B', portrait: 'assets/ui/anix/avatars/04-iron-warden.webp', badge: '2'),
+  FsSidePlayer(name: 'A', portrait: 'assets/avatar/portraits/01-vanguard.webp', badge: '1'),
+  FsSidePlayer(name: 'B', portrait: 'assets/avatar/portraits/04-iron-warden.webp', badge: '2'),
 ];
 
 Widget _app(Widget child) => MaterialApp(home: Scaffold(backgroundColor: Colors.black, body: child));

@@ -16,8 +16,8 @@ import 'render_util.dart';
 /// The finger-soccer pre-match intro screens at 720x1600 (360x800 @2x), each frozen in the state of its reference
 /// frame: splash (counter 50), team select, formation select (bar ~75 %), shop (national teams), game bar, exit.
 const List<FsSidePlayer> _players = <FsSidePlayer>[
-  FsSidePlayer(name: 'HIIS', portrait: 'assets/ui/anix/avatars/01-vanguard.webp', badge: 'سطح ۱۴'),
-  FsSidePlayer(name: 'ربات', portrait: 'assets/ui/anix/avatars/04-iron-warden.webp', badge: 'ربات'),
+  FsSidePlayer(name: 'HIIS', portrait: 'assets/avatar/portraits/01-vanguard.webp', badge: 'سطح ۱۴'),
+  FsSidePlayer(name: 'ربات', portrait: 'assets/avatar/portraits/04-iron-warden.webp', badge: 'ربات'),
 ];
 
 Widget _app(Widget child) => ProviderScope(

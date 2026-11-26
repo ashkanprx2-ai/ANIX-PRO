@@ -125,7 +125,11 @@ GoRouter buildRouter(WidgetRef ref) {
       // ---- Station screens (`/s/...`)
       GoRoute(path: '/s/profile', builder: (context, state) => const StationProfileScreen()),
       GoRoute(path: '/s/controller', builder: (context, state) => const StationControllerScreen()),
-      GoRoute(path: '/s/games', builder: (context, state) => StationGamesScreen(records: state.uri.queryParameters['records'] == '1')),
+      GoRoute(
+          path: '/s/games',
+          // The game grid is the Games hub; this route only keeps the «رکوردها» list.
+          redirect: (context, state) => state.uri.queryParameters['records'] == '1' ? null : '/station/0',
+          builder: (context, state) => const StationGamesScreen()),
       GoRoute(path: '/s/missions/daily', builder: (context, state) => const StationMissionsScreen(weekly: false)),
       GoRoute(path: '/s/missions/weekly', builder: (context, state) => const StationMissionsScreen(weekly: true)),
       GoRoute(path: '/s/news', builder: (context, state) => const StationNewsScreen()),
@@ -171,6 +175,8 @@ GoRouter buildRouter(WidgetRef ref) {
       ),
       GoRoute(
         path: '/world/:id',
+        // The arcade world is the Games hub.
+        redirect: (context, state) => state.pathParameters['id'] == 'nexora_arcade' ? '/station/0' : null,
         builder: (context, state) {
           final String id = state.pathParameters['id'] ?? '';
           return _WorldVisit(id: id, child: _worldPage(id));
@@ -261,8 +267,6 @@ Widget _worldPage(String id) {
       return const StationAiScreen();
     case 'personal_orbit':
       return const StationProfileScreen();
-    case 'nexora_arcade':
-      return const StationGamesScreen();
     case 'nexora_exchange':
       return const StationShopScreen();
     default:

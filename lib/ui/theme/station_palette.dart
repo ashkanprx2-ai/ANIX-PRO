@@ -203,37 +203,34 @@ class StationPalette extends ThemeExtension<StationPalette> {
     ],
   );
 
-  /// The icon swaps the CSS does with `content:url(...)` per skin (`html[data-theme=neon] img[src$="r3c6.webp"]` …).
+  /// Resolves an atlas icon name (r1c1 … r5c6, g_*) to an asset. The atlas names that have a unified hub icon
+  /// (`assets/station/hub/*.webp`) use it in both skins, so every screen shares one icon family.
   String icon(String name, {bool nav = false}) {
-    if (skin == StationSkin.neon) {
-      if (nav && name == 'r4c4') return 'assets/station/neon/home.webp';
-      final String? n = _neonIcons[name];
-      if (n != null) return n;
-    } else if (nav) {
-      final String? w = _whiteNav[name];
-      if (w != null) return w;
-    }
+    final String? h = _hubIcons[name];
+    if (h != null) return 'assets/station/hub/$h.webp';
     return 'assets/station/icons/$name.webp';
   }
 
-  static const Map<String, String> _neonIcons = <String, String>{
-    'r3c6': 'assets/station/neon/gift.webp',
-    'r2c5': 'assets/station/neon2/trophy.webp',
-    'r5c4': 'assets/station/neon2/trophy.webp',
-    'r3c1': 'assets/station/neon/speaker.webp',
-    'r5c2': 'assets/station/neon/zigzag.webp',
-    'r4c2': 'assets/station/neon/lock.webp',
-    'r3c5': 'assets/station/neon2/planet.webp',
-    'r4c5': 'assets/station/neon2/target.webp',
-    'r3c3': 'assets/station/neon2/group.webp',
-    'r4c1': 'assets/station/neon2/bag.webp',
-  };
-
-  static const Map<String, String> _whiteNav = <String, String>{
-    'r4c4': 'assets/station/white/home.webp',
-    'r3c3': 'assets/station/white/chat.webp',
-    'r2c5': 'assets/station/white/cups.webp',
-    'r4c1': 'assets/station/white/more.webp',
+  static const Map<String, String> _hubIcons = <String, String>{
+    'r2c5': 'cup',
+    'r2c6': 'rank',
+    'r3c1': 'voice',
+    'r3c2': 'listen',
+    'r3c3': 'messages',
+    'r3c4': 'friends',
+    'r3c5': 'calendar',
+    'r3c6': 'gift',
+    'r4c1': 'shop',
+    'r4c2': 'settings',
+    'r4c3': 'medal',
+    'r4c4': 'account',
+    'r4c5': 'controller',
+    'r4c6': 'duel',
+    'r5c1': 'space',
+    'r5c2': 'ai',
+    'r5c3': 'news',
+    'r5c4': 'cup',
+    'r5c6': 'wheel',
   };
 
   @override

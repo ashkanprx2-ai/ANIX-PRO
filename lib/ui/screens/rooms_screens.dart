@@ -248,7 +248,7 @@ class _StationRoomsScreenState extends ConsumerState<StationRoomsScreen> {
             action: stx(context, 'ورود', 'Sign in'),
             onAction: () => context.go('/auth'),
           ),
-          StationButton(label: stx(context, 'همه‌ی بازی‌ها (آفلاین)', 'All games (offline)'), ghost: true, onTap: () => context.push('/s/games')),
+          StationButton(label: stx(context, 'همه‌ی بازی‌ها (آفلاین)', 'All games (offline)'), ghost: true, onTap: () => context.go('/station/0')),
         ] else ...<Widget>[
           if (!widget.listenOnly)
             Row(children: <Widget>[

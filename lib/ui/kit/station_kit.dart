@@ -82,7 +82,11 @@ class StationBackdrop extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final StationPalette p = StationPalette.of(context);
     final bool low = ref.watch(settingsProvider.select((AppSettings s) => s.quality == GraphicsQuality.low));
+    final Size screen = MediaQuery.sizeOf(context);
+    final int cacheH = (screen.height * MediaQuery.devicePixelRatioOf(context)).round();
     return Stack(fit: StackFit.expand, children: <Widget>[
+      RepaintBoundary(
+        child: Stack(fit: StackFit.expand, children: <Widget>[
       ColoredBox(color: p.bg),
       if (!p.isLight)
         const DecoratedBox(
@@ -92,7 +96,8 @@ class StationBackdrop extends ConsumerWidget {
         ),
       Opacity(
         opacity: opacity,
-        child: Image.asset(image ?? p.screenImage, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+        child: Image.asset(image ?? p.screenImage,
+            fit: BoxFit.cover, cacheHeight: cacheH > 0 ? cacheH : null, errorBuilder: (_, __, ___) => const SizedBox.shrink()),
       ),
       DecoratedBox(
         decoration: BoxDecoration(
@@ -113,6 +118,8 @@ class StationBackdrop extends ConsumerWidget {
                 center: const Alignment(0, -1), radius: 1.0, colors: <Color>[tint!.withValues(alpha: .22), tint!.withValues(alpha: 0)]),
           ),
         ),
+        ]),
+      ),
       if (dust && !low) IgnorePointer(child: StationDust(color: p.dust, opacity: p.isLight ? .45 : 1)),
       child,
     ]);
@@ -145,11 +152,8 @@ class _StationDustState extends State<StationDust> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) return const SizedBox.shrink();
-    return Opacity(
-      opacity: widget.opacity,
-      child: RepaintBoundary(
-        child: CustomPaint(painter: _DustPainter(_c, _m, widget.color), size: Size.infinite),
-      ),
+    return RepaintBoundary(
+      child: CustomPaint(painter: _DustPainter(_c, _m, widget.color, widget.opacity), size: Size.infinite),
     );
   }
 }
@@ -160,20 +164,22 @@ class _Mote {
 }
 
 class _DustPainter extends CustomPainter {
-  _DustPainter(this.anim, this.motes, this.color) : super(repaint: anim);
+  _DustPainter(this.anim, this.motes, this.color, this.opacity) : super(repaint: anim);
   final Animation<double> anim;
   final List<_Mote> motes;
   final Color color;
+  final double opacity;
+  final Paint _p = Paint();
 
   @override
   void paint(Canvas canvas, Size size) {
     final double t = anim.value * 60000;
-    final Paint p = Paint();
+    final Paint p = _p;
     for (final _Mote m in motes) {
       final double y = (m.y - t * m.s * .00003) % 1.04 - .02;
       final double x = (m.x + math.sin(t * .0003 + m.a) * .01) * size.width;
       final double al = .12 + .32 * (.5 + .5 * math.sin(t * .0011 + m.a));
-      p.color = color.withValues(alpha: al);
+      p.color = color.withValues(alpha: al * opacity);
       canvas.drawCircle(Offset(x, (1 - y) * size.height), m.r, p);
     }
   }
@@ -253,7 +259,8 @@ class _StationPressState extends ConsumerState<StationPress> with SingleTickerPr
                   widget.onTap!();
                 },
           onLongPress: widget.onLongPress,
-          child: Stack(clipBehavior: Clip.none, children: <Widget>[
+          // passthrough: the pressed child keeps the parent's (tight) constraints — a loose Stack shrank grid tiles.
+          child: Stack(clipBehavior: Clip.none, fit: StackFit.passthrough, children: <Widget>[
             AnimatedContainer(
               duration: Duration(milliseconds: _local == null ? 300 : 80),
               curve: kStationEase,

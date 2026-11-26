@@ -817,7 +817,7 @@ class StationHistoryScreen extends ConsumerWidget {
             text: stx(context, 'هنوز نبردی ثبت نشده. یک بازی بزن!', 'No battles yet. Play a game!'),
             icon: 'r4c6',
             action: stx(context, 'بازی‌ها', 'Games'),
-            onAction: () => context.push('/s/games'),
+            onAction: () => context.go('/station/0'),
           )
         else
           StationRows(children: <Widget>[

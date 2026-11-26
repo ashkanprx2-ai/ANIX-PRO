@@ -89,7 +89,8 @@ void main() {
     e.boss?.z = 6.5;
     await frames(tester, 140);
     e.health = 0;
-    await frames(tester, 160);
+    // dying plays in 0.35× slow motion (1.1 s → ~3.1 s), then the board waits 1.6 s before reporting game over.
+    await frames(tester, 300);
     await shoot(tester, '$dir/gs_7_over.png');
     expect(run.over, isTrue);
     await tester.pumpWidget(const SizedBox());

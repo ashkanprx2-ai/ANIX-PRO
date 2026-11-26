@@ -181,7 +181,7 @@ void main() {
 
       final Map<String, Type> expected = <String, Type>{
         '/rooms': StationRoomsScreen,
-        '/s/games': StationGamesScreen,
+        '/s/games?records=1': StationGamesScreen,
         '/arcade/pool8': StationGameScreen,
         '/arcade/finger_soccer': StationGameScreen,
         '/oracle': StationAiScreen,
