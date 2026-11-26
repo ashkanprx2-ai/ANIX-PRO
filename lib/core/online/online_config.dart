@@ -25,6 +25,13 @@ class OnlineConfig {
   static const String socialUrl = String.fromEnvironment('SOCIAL_SUPABASE_URL');
   static const String socialAnonKey = String.fromEnvironment('SOCIAL_SUPABASE_ANON_KEY');
 
+  /// Google "Web application" OAuth client id of the auth project (Supabase → Auth → Providers → Google → Client ID).
+  /// Public by design. Native Android sign-in passes it as `serverClientId`, so Google mints an ID token whose
+  /// audience is this id, which Supabase accepts in signInWithIdToken. The Android OAuth client (package
+  /// com.nexora.nexora + signing SHA-1) only has to exist in the same Google Cloud project; its id is not used here.
+  static const String googleWebClientId = String.fromEnvironment('GOOGLE_WEB_CLIENT_ID',
+      defaultValue: '983052501224-ifvb7oamk4rs3qo9qmj1rcsg314olhu2.apps.googleusercontent.com');
+
   static bool get enabled => supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
   static bool get gamesEnabled => gamesUrl.isNotEmpty && gamesAnonKey.isNotEmpty;
   static bool get socialEnabled => socialUrl.isNotEmpty && socialAnonKey.isNotEmpty;

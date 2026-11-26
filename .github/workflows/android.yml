@@ -107,7 +107,7 @@ jobs:
             exit 1
           fi
           # Public certificate fingerprint only (never the key itself).
-          keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | grep -E 'SHA256:' || true
+          keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | grep -E 'SHA1:|SHA256:' || true
 
       # Real release key (Cafe Bazaar / any store): used when all four secrets exist, otherwise the permanent CI key
       # above keeps signing (sideload installs). The keystore itself is never committed or printed.
@@ -125,7 +125,7 @@ jobs:
             if ! keytool -list -keystore "$RUNNER_TEMP/nxkey/release.jks" -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" >/dev/null 2>&1; then
               echo "::error::ANDROID_KEYSTORE_* secrets do not open the keystore / alias"; exit 1
             fi
-            keytool -list -v -keystore "$RUNNER_TEMP/nxkey/release.jks" -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" | grep -E 'SHA256:' || true
+            keytool -list -v -keystore "$RUNNER_TEMP/nxkey/release.jks" -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" | grep -E 'SHA1:|SHA256:' || true
             echo "NX_KEYSTORE_PATH=$RUNNER_TEMP/nxkey/release.jks" >> $GITHUB_ENV
             echo "NX_RELEASE_SIGNING=true" >> $GITHUB_ENV
             echo "Signing with the release keystore."

@@ -175,8 +175,8 @@ class _StationAuthPageState extends ConsumerState<StationAuthPage> {
     context.go(ready ? '/hub' : '/onboarding');
   }
 
-  /// Google sign-in: the browser opens Google; the app returns through nexora://login-callback and the router's
-  /// session redirect finishes the job (also when this page is gone by then).
+  /// Google sign-in, native: the phone's Google account picker → ID token → Supabase session (no browser). If
+  /// anything is missing we say so plainly in Persian and username / e-mail keeps working.
   Future<void> _google() async {
     final OnlineService online = ref.read(onlineProvider);
     if (!online.configured) {
@@ -187,34 +187,25 @@ class _StationAuthPageState extends ConsumerState<StationAuthPage> {
       _busy = true;
       _error = null;
     });
-    // The button is always shown; when the auth project reports the Google provider switched off we say so plainly
-    // instead of opening a browser page that can only fail.
     if (await online.googleProviderState() == false) {
       if (!mounted) return;
       setState(() {
         _busy = false;
-        _error = stx(context, 'ورود با گوگل هنوز روی سرور فعال نشده؛ فعلاً با نام کاربری/ایمیل وارد شو.',
-            'Google sign-in is not enabled on the server yet; please use username / e-mail for now.');
+        _error = _friendly('google_off');
       });
       return;
     }
-    final bool opened = await online.signInWithGoogle();
+    final bool ok = await online.signInWithGoogle();
     if (!mounted) return;
-    setState(() {
-      _busy = false;
-      if (!opened) _error = _friendly(online.lastError);
-    });
-    if (opened) {
-      stationToast(context, stx(context, 'ورود با گوگل در مرورگر باز شد…', 'Google sign-in opened in the browser…'));
-      void once() {
-        if (online.user != null && !online.isGuest) {
-          online.removeListener(once);
-          if (mounted) _afterSession(online);
-        }
-      }
-
-      online.addListener(once);
+    if (!ok) {
+      setState(() {
+        _busy = false;
+        // A plain "cancel" (back from the account picker) is not an error worth a red line.
+        _error = online.lastError == 'google_cancel' ? null : _friendly(online.lastError);
+      });
+      return;
     }
+    _afterSession(online);
   }
 
   String _friendly(String? value) => nxAuthError(context, value);
@@ -359,11 +350,13 @@ class _StationAuthPageState extends ConsumerState<StationAuthPage> {
                           busy: _busy,
                           onTap: _busy ? null : _submit,
                         ),
+                        _OrDivider(label: stx(context, 'یا', 'or')),
                         StationButton(
                           key: const ValueKey<String>('auth-google'),
-                          label: stx(context, 'ورود با گوگل', 'Sign in with Google'),
-                          icon: Icons.g_mobiledata_rounded,
+                          label: stx(context, 'ورود با گوگل', 'Continue with Google'),
+                          leading: const GoogleMark(size: 20),
                           ghost: true,
+                          margin: EdgeInsets.zero,
                           onTap: _busy ? null : _google,
                         ),
                         if (_error != null)
@@ -550,9 +543,90 @@ String nxAuthError(BuildContext context, String? value) {
         return stx(context, 'ثبت‌نام حساب تازه روی سرور بسته است.', 'New sign-ups are disabled on the server.');
       case 'not_configured':
         return stx(context, 'اتصال آنلاین تنظیم نشده است.', 'Online authentication is not configured.');
+      case 'google_off':
+        return stx(context, 'ورود با گوگل هنوز روی سرور فعال نشده؛ فعلاً با نام کاربری یا ایمیل وارد شو.',
+            'Google sign-in is not enabled on the server yet; use username or e-mail for now.');
+      case 'google_setup':
+        return stx(context, 'ورود با گوگل روی این نسخه هنوز کامل راه‌اندازی نشده؛ فعلاً با نام کاربری یا ایمیل وارد شو.',
+            'Google sign-in is not fully set up for this build yet; use username or e-mail for now.');
+      case 'google_unavailable':
+        return stx(context, 'ورود با گوگل روی این گوشی در دسترس نیست (حساب گوگل یا سرویس‌های گوگل پیدا نشد). با نام کاربری یا ایمیل وارد شو.',
+            'Google sign-in is not available on this phone (no Google account / Google services). Use username or e-mail.');
+      case 'google_failed':
+        return stx(context, 'ورود با گوگل انجام نشد. دوباره امتحان کن یا با نام کاربری یا ایمیل وارد شو.',
+            'Google sign-in failed. Try again, or use username or e-mail.');
+      case 'google_cancel':
+        return stx(context, 'ورود با گوگل لغو شد.', 'Google sign-in was cancelled.');
       case null:
         return stx(context, 'انجام نشد. دوباره تلاش کن.', 'That did not work. Try again.');
       default:
         return stx(context, 'خطای سرور: $value', 'Server error: $value');
     }
+}
+
+/// Thin "— or —" divider between the password login and Google, in the Station ink.
+class _OrDivider extends StatelessWidget {
+  const _OrDivider({required this.label});
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final StationPalette p = StationPalette.of(context);
+    final Widget line = Expanded(child: Container(height: 1, color: p.line));
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 16, 4, 12),
+      child: Row(children: <Widget>[
+        line,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Text(label, style: TextStyle(color: p.mute, fontSize: 12, fontFamily: kStationFont)),
+        ),
+        line,
+      ]),
+    );
+  }
+}
+
+/// The Google "G" (four-colour ring + bar) on a white disc, painted (no asset, no network) so it stays crisp at any
+/// density and costs one cached picture.
+class GoogleMark extends StatelessWidget {
+  const GoogleMark({super.key, this.size = 20});
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: Container(
+        width: size + 8,
+        height: size + 8,
+        alignment: Alignment.center,
+        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+        child: CustomPaint(size: Size.square(size), painter: const _GPainter()),
+      ),
+    );
+  }
+}
+
+class _GPainter extends CustomPainter {
+  const _GPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final double s = size.width;
+    final double w = s * .2;
+    final Rect r = Rect.fromLTWH(w / 2, w / 2, s - w, s - w);
+    final Paint pt = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w;
+    const double deg = 3.14159265 / 180;
+    // red (top), yellow (left-bottom), green (bottom), blue (right) — angles clockwise from 3 o'clock.
+    canvas.drawArc(r, -140 * deg, 95 * deg, false, pt..color = const Color(0xFFEA4335));
+    canvas.drawArc(r, 145 * deg, 75 * deg, false, pt..color = const Color(0xFFFBBC05));
+    canvas.drawArc(r, 45 * deg, 100 * deg, false, pt..color = const Color(0xFF34A853));
+    canvas.drawArc(r, 0, 45 * deg, false, pt..color = const Color(0xFF4285F4));
+    canvas.drawRect(Rect.fromLTWH(s / 2, s / 2 - w / 2, s / 2, w), Paint()..color = const Color(0xFF4285F4));
+  }
+
+  @override
+  bool shouldRepaint(_GPainter old) => false;
 }

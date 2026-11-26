@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -231,18 +232,85 @@ class OnlineService extends ChangeNotifier {
     return null;
   }
 
-  /// "Sign in with Google": Supabase OAuth (Google provider) in the system browser; Google returns to
-  /// [emailRedirect] (`nexora://login-callback`, the Android intent filter CI adds), supabase_flutter exchanges the
-  /// code and the session listener + router redirect take the user on. Returns true when the browser was opened.
+  static bool _gsiReady = false;
+
+  /// "Sign in with Google", native: Android Credential Manager (google_sign_in 7) picks the Google account on the
+  /// phone and returns an ID token for [OnlineConfig.googleWebClientId]; Supabase verifies it in
+  /// `signInWithIdToken` — no browser, no client secret, no deep link. Requires an *Android* OAuth client in the same
+  /// Google Cloud project (package com.nexora.nexora + the APK signing SHA-1); without it Google answers with a
+  /// configuration error, which we report as `google_setup`.
+  ///
+  /// Result keys in [lastError]: null on success, `google_cancel`, `google_setup`, `google_unavailable`,
+  /// `google_off` (provider disabled on the auth project), `network`, or the server message.
   Future<bool> signInWithGoogle() async {
+    if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) {
+      lastError = 'google_unavailable';
+      return false;
+    }
+    String? idToken, accessToken;
+    try {
+      final GoogleSignIn gsi = GoogleSignIn.instance;
+      if (!_gsiReady) {
+        await gsi.initialize(serverClientId: OnlineConfig.googleWebClientId);
+        _gsiReady = true;
+      }
+      if (!gsi.supportsAuthenticate()) {
+        lastError = 'google_unavailable';
+        return false;
+      }
+      const List<String> scopes = <String>['email', 'profile'];
+      final GoogleSignInAccount acct = await gsi.authenticate(scopeHint: scopes);
+      idToken = acct.authentication.idToken;
+      try {
+        // Optional: an access token lets Supabase cross-check the account; never prompts again here.
+        accessToken = (await acct.authorizationClient.authorizationForScopes(scopes))?.accessToken;
+      } catch (e) {
+        debugPrint('google authz (optional): $e');
+      }
+    } on GoogleSignInException catch (e) {
+      debugPrint('google sign-in: ${e.code} ${e.description}');
+      lastError = switch (e.code) {
+        GoogleSignInExceptionCode.canceled || GoogleSignInExceptionCode.interrupted => 'google_cancel',
+        GoogleSignInExceptionCode.clientConfigurationError ||
+        GoogleSignInExceptionCode.providerConfigurationError =>
+          'google_setup',
+        GoogleSignInExceptionCode.uiUnavailable => 'google_unavailable',
+        _ => (e.description ?? '').contains('28444') || (e.description ?? '').contains('Developer console')
+            ? 'google_setup'
+            : 'google_failed',
+      };
+      notifyListeners();
+      return false;
+    } catch (e) {
+      debugPrint('google sign-in: $e');
+      lastError = _friendly(e) == 'network' ? 'network' : 'google_failed';
+      notifyListeners();
+      return false;
+    }
+    if (idToken == null || idToken.isEmpty) {
+      lastError = 'google_setup'; // no serverClientId audience → Google returned no ID token
+      notifyListeners();
+      return false;
+    }
+    final String token = idToken;
     final bool? ok = await _run<bool>((SupabaseClient c) async {
-      return c.auth.signInWithOAuth(
-        OAuthProvider.google,
-        redirectTo: emailRedirect,
-        authScreenLaunchMode: LaunchMode.externalApplication,
-      );
+      await c.auth.signInWithIdToken(provider: OAuthProvider.google, idToken: token, accessToken: accessToken);
+      return c.auth.currentSession != null;
     });
+    if (ok != true && lastError != null) {
+      final String m = lastError!.toLowerCase();
+      if (m.contains('provider is not enabled') || m.contains('unsupported provider')) lastError = 'google_off';
+      if (m.contains('audience') || m.contains('client id')) lastError = 'google_setup';
+    }
     return ok ?? false;
+  }
+
+  /// Signs the Google account out of the phone's picker too, so the next Google sign-in can choose another account.
+  Future<void> googleSignOut() async {
+    if (!_gsiReady) return;
+    try {
+      await GoogleSignIn.instance.signOut();
+    } catch (_) {}
   }
 
   Future<bool> verifyEmailOtp(String email, String token) async {
@@ -652,6 +720,7 @@ class OnlineService extends ChangeNotifier {
       await c.auth.signOut();
       return true;
     });
+    await googleSignOut();
     if (continueAsGuest) await ensureSession();
   }
 

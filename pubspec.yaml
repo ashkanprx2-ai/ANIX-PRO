@@ -28,6 +28,7 @@ dependencies:
   video_player: ^2.10.0
   path_provider: ^2.1.5
   url_launcher: ^6.3.1
+  google_sign_in: ^7.2.0 # native Google sign-in (Credential Manager) -> supabase signInWithIdToken
   firebase_core: ^5.2.0
   firebase_messaging: ^17.1.0
 

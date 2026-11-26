@@ -446,6 +446,7 @@ class StationButton extends ConsumerStatefulWidget {
     required this.label,
     this.onTap,
     this.icon,
+    this.leading,
     this.ghost = false,
     this.small = false,
     this.expand = true,
@@ -456,6 +457,9 @@ class StationButton extends ConsumerStatefulWidget {
   final String label;
   final VoidCallback? onTap;
   final IconData? icon;
+
+  /// A custom mark in place of [icon] (e.g. a brand logo); [icon] wins when both are set.
+  final Widget? leading;
   final bool ghost;
   final bool small;
   final bool expand;
@@ -494,8 +498,10 @@ class _StationButtonState extends ConsumerState<StationButton> {
         if (widget.busy)
           SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: ink))
         else if (widget.icon != null)
-          Icon(widget.icon, size: widget.small ? 15 : 18, color: ink),
-        if (widget.icon != null || widget.busy) const SizedBox(width: 8),
+          Icon(widget.icon, size: widget.small ? 15 : 18, color: ink)
+        else if (widget.leading != null)
+          widget.leading!,
+        if (widget.icon != null || widget.leading != null || widget.busy) const SizedBox(width: 8),
         Flexible(
           child: Text(
             widget.label,
