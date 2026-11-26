@@ -26,7 +26,7 @@ BmEngine _ballOnly(int field) {
   final BmEngine e = BmEngine(_Hooks(), rng: math.Random(1));
   e.startMatch(BmConfig(
     mode: 'bot',
-    teams: const <String>['club0', 'club1'],
+    teams: const <String>['bmw', 'nike'],
     form: const <int>[0, 3],
     names: const <String>['A', 'B'],
     field: field,

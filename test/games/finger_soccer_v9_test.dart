@@ -37,7 +37,7 @@ class _H implements BmHooks {
 
 BmConfig _cfg({int field = 0, int ball = kBmDefaultBall}) => BmConfig(
     mode: 'local',
-    teams: const <String>['club0', 'club1'],
+    teams: const <String>['bmw', 'nike'],
     form: const <int>[0, 0],
     names: const <String>['A', 'B'],
     field: field,
@@ -256,32 +256,41 @@ void main() {
     });
   });
 
-  group('v9 teams: the 48 badge-sheet teams (v10 keeps the car and sport sets)', () {
+  group('NX pucks: the owner\'s 77 pucks are the only teams', () {
     test('catalog, categories, art and shop ids', () {
-      // v10 (owner art 2026-11-22) grew the catalogue; the v9 car/sport half is unchanged.
-      // v14 added 16 car crests (discs/v11) on top of the 24 v9 car badges.
-      expect(kBmTeamDefs.where((BmTeamDef t) => t.cat == 'cars').length, 40);
-      expect(kBmTeamDefs.where((BmTeamDef t) => t.cat == 'cars' && t.art.startsWith('discs/v11/')).length, 16);
-      expect(kBmTeamDefs.where((BmTeamDef t) => t.cat == 'sport').length, 12);
+      final Map<String, int> counts = <String, int>{};
+      for (final BmTeamDef t in kBmTeamDefs.where((BmTeamDef t) => t.cat != 'custom')) {
+        counts[t.cat] = (counts[t.cat] ?? 0) + 1;
+      }
+      expect(counts, <String, int>{'clubs': 22, 'nations': 21, 'brands': 13, 'cars': 9, 'fantasy': 12});
+      expect(kBmCats.map((List<Object> c) => c[0]).toList(), <String>['clubs', 'nations', 'brands', 'cars', 'fantasy', 'custom']);
       expect(kBmTeams.map((BmTeam t) => t.id).toSet().length, kBmTeamDefs.length);
-      // every car / sport badge is still the v9 art, byte for byte the same folder
-      for (final BmTeam t in kBmTeams.where((BmTeam t) => (t.cat == 'cars' || t.cat == 'sport') && !t.id.startsWith('nxcar_'))) {
-        expect(File(t.asset).existsSync(), isTrue, reason: t.asset);
-        expect(t.asset.startsWith('assets/games/bermuda/discs/v9/'), isTrue, reason: t.asset);
+      for (final BmTeam t in kBmTeams.where((BmTeam t) => t.cat != 'custom')) {
+        expect(t.asset, 'assets/games/finger_soccer/pucks/iso/${t.id}.webp');
+        for (final String d in <String>['iso', 'top', 'thumb']) {
+          expect(File('assets/games/finger_soccer/pucks/$d/${t.id}.webp').existsSync(), isTrue, reason: '$d ${t.id}');
+        }
+        expect(bmTeamThumb(t), 'assets/games/finger_soccer/pucks/thumb/${t.id}.webp');
         expect(t.faName.isNotEmpty, isTrue, reason: t.id);
         expect(t.power, inInclusiveRange(1, 10));
         expect(t.accuracy, inInclusiveRange(1, 10));
       }
-      expect(Directory('assets/games/bermuda/discs/v9').listSync().length, 48);
-      expect(Directory('assets/games/bermuda/discs').listSync().whereType<File>(), isEmpty);
-      // the shop's free teams are the starter NX coins and exist
+      // only the NX pucks ship: no other file in the puck folders, and the old disc folders are gone
+      for (final String d in <String>['iso', 'top', 'thumb']) {
+        expect(Directory('assets/games/finger_soccer/pucks/$d').listSync().length, 77, reason: d);
+      }
+      expect(Directory('assets/games/bermuda/discs').existsSync(), isFalse);
+      expect(Directory('assets/games/finger_soccer/nx_pucks').existsSync(), isFalse);
+      // the free teams are wolf, shark and eagle
+      expect(kFreeTeams, <String>{'fx_wolf', 'fx_shark', 'fx_eagle'});
       for (final String id in kFreeTeams) {
         expect(bmTeam(id).id, id);
-        expect(bmTeam(id).cat, 'nx');
+        expect(bmTeam(id).cat, 'fantasy');
       }
-      expect(bmTeam(kDefaultTeam).name, 'NX Core');
-      // an unknown (removed) team id falls back to the first team
-      expect(bmTeam('spt4').id, kBmTeams.first.id);
+      expect(bmTeam(kDefaultTeam).name, 'Wolf');
+      // an unknown (removed) team id falls back to the default free team
+      expect(bmTeam('spt4').id, kDefaultTeam);
+      expect(bmTeam('club0').id, kDefaultTeam);
     });
   });
 
@@ -320,7 +329,7 @@ void main() {
                 body: BermudaView(
                     launch: launch(),
                     autoStart: true,
-                    pick: const FsMatchPick(teams: <String>['nx_core', 'realmadrid'], forms: <int>[0, 0])))));
+                    pick: const FsMatchPick(teams: <String>['cuba', 'realmadrid'], forms: <int>[0, 0])))));
 
     Future<BmEngine> start(WidgetTester tester, Map<String, Object> prefs) async {
       // ignore: invalid_use_of_visible_for_testing_member

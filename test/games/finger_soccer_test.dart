@@ -30,7 +30,7 @@ class _Hooks implements BmHooks {
 
 BmConfig _cfg({bool mirror = false, String mode = 'bot'}) => BmConfig(
       mode: mode,
-      teams: const <String>['club0', 'club1'],
+      teams: const <String>['bmw', 'nike'],
       form: const <int>[0, 3],
       names: const <String>['A', 'B'],
       field: 6,
@@ -130,10 +130,8 @@ void main() {
     expect(pitchWidth, inInclusiveRange(360 * 0.75, 360 * 0.96));
   });
 
-  test('teams: v10 categories, plausible varied stats, art present', () {
-    const List<String> builtInCategories = <String>[
-      'clubs', 'nations', 'nx', 'cars', 'sport', 'elite', 'legends',
-    ];
+  test('teams: NX puck categories, plausible varied stats, art present', () {
+    const List<String> builtInCategories = <String>['clubs', 'nations', 'brands', 'cars', 'fantasy'];
     const List<String> categories = <String>[
       ...builtInCategories,
       'custom',
@@ -150,12 +148,12 @@ void main() {
       final Iterable<BmTeam> teams = kBmTeams.where((BmTeam t) => t.cat == c);
       expect(teams, isNotEmpty, reason: c);
     }
-    for (final String c in <String>['clubs', 'nations', 'nx', 'cars', 'sport']) {
+    for (final String c in builtInCategories) {
       final Iterable<BmTeam> teams = kBmTeams.where((BmTeam t) => t.cat == c);
-      expect(teams.length, greaterThanOrEqualTo(12), reason: c);
+      expect(teams.length, greaterThanOrEqualTo(9), reason: c);
       expect(teams.map((BmTeam t) => t.power).toSet().length, greaterThanOrEqualTo(3), reason: c);
     }
-    expect(bmTeam('club0').name, 'BMW');
+    expect(bmTeam('bmw').name, 'BMW');
     for (final BmFieldS f in kBmFields) {
       expect(f.gs, 'white', reason: f.id);
       expect(File(f.asset).existsSync(), isTrue, reason: f.asset);
@@ -178,7 +176,7 @@ void main() {
   test('power changes shot speed; accuracy bounds the aim error; same seed => same shot', () {
     double shotAngleErr(String team, int seed) {
       final BmEngine e = BmEngine(_Hooks(), rng: math.Random(seed))
-        ..startMatch(BmConfig(mode: 'local', teams: <String>[team, 'club1'], form: const <int>[0, 0], names: const <String>['A', 'B'], field: 0, ball: 0));
+        ..startMatch(BmConfig(mode: 'local', teams: <String>[team, 'nike'], form: const <int>[0, 0], names: const <String>['A', 'B'], field: 0, ball: 0));
       final BmBody b = e.bodies.firstWhere((BmBody x) => x.team == 0 && x != e.ball);
       e.fire(b, 0, -200, 200);
       return math.atan2(b.vx, -b.vy);
@@ -186,26 +184,26 @@ void main() {
 
     double shotSpeed(String team) {
       final BmEngine e = BmEngine(_Hooks(), rng: math.Random(5))
-        ..startMatch(BmConfig(mode: 'local', teams: <String>[team, 'club1'], form: const <int>[0, 0], names: const <String>['A', 'B'], field: 0, ball: 0));
+        ..startMatch(BmConfig(mode: 'local', teams: <String>[team, 'nike'], form: const <int>[0, 0], names: const <String>['A', 'B'], field: 0, ball: 0));
       final BmBody b = e.bodies.firstWhere((BmBody x) => x.team == 0 && x != e.ball);
       e.fire(b, 0, -320, 320);
       return math.sqrt(b.vx * b.vx + b.vy * b.vy);
     }
 
-    // v10 teams: NX Frost (nx_frost) 10 / 10, Real Madrid (realmadrid) 10 / 10, NX Core (nx_core) 6 / 6
-    expect(shotSpeed('nx_frost'), closeTo(shotSpeed('realmadrid'), 1e-9));
-    expect(shotSpeed('realmadrid'), greaterThan(shotSpeed('nx_core')));
-    expect(shotSpeed('nx_frost') / shotSpeed('nx_core'), closeTo(BmEngine.strikeOf(10) / BmEngine.strikeOf(6), 1e-9));
+    // NX pucks: Argentina 10 / 10, Real Madrid 10 / 10, Cuba 6 / 7
+    expect(shotSpeed('argentina'), closeTo(shotSpeed('realmadrid'), 1e-9));
+    expect(shotSpeed('realmadrid'), greaterThan(shotSpeed('cuba')));
+    expect(shotSpeed('argentina') / shotSpeed('cuba'), closeTo(BmEngine.strikeOf(10) / BmEngine.strikeOf(bmTeam('cuba').power), 1e-9));
     // accuracy 10: exact aim, every seed
     for (int s = 0; s < 20; s++) {
-      expect(shotAngleErr('nx_frost', s).abs(), lessThan(1e-9));
+      expect(shotAngleErr('argentina', s).abs(), lessThan(1e-9));
     }
     // a weaker side misses by up to its accuracy bound, and not always by zero
-    final List<double> errs = <double>[for (int s = 0; s < 40; s++) shotAngleErr('nx_core', s)];
-    final double bound = BmEngine.aimErrorOf(6, 1);
+    final List<double> errs = <double>[for (int s = 0; s < 40; s++) shotAngleErr('cuba', s)];
+    final double bound = BmEngine.aimErrorOf(bmTeam('cuba').accuracy, 1);
     expect(errs.every((double x) => x.abs() <= bound + 1e-9), isTrue);
     expect(errs.where((double x) => x.abs() > bound * .2).length, greaterThan(5));
-    expect(shotAngleErr('nx_core', 11), shotAngleErr('nx_core', 11));
+    expect(shotAngleErr('cuba', 11), shotAngleErr('cuba', 11));
   });
 
   test('bot vs bot plays a long match without escaping the pitch', () {
@@ -275,7 +273,7 @@ void main() {
     final BmEngine e = BmEngine(_Hooks(), rng: math.Random(3))
       ..startMatch(const BmConfig(
         mode: 'online',
-        teams: <String>['club0', 'club1'],
+        teams: <String>['bmw', 'nike'],
         form: <int>[0, 3],
         names: <String>['A · C · E', 'B · D · F'],
         field: 0,
@@ -295,7 +293,7 @@ void main() {
     final Map<String, dynamic> snap = e.snapshot();
     final BmEngine r = BmEngine(_Hooks(), rng: math.Random(3))
       ..startMatch(const BmConfig(
-          mode: 'online', teams: <String>['club0', 'club1'], form: <int>[0, 3], names: <String>['a', 'b'],
+          mode: 'online', teams: <String>['bmw', 'nike'], form: <int>[0, 3], names: <String>['a', 'b'],
           field: 0, ball: 0, perSide: 3));
     r.applyRotation(snap);
     expect(r.shooterSeat(0), e.shooterSeat(0));
@@ -320,7 +318,7 @@ void main() {
         for (int b = 0; b < kBmForms.length; b++) {
           final BmEngine e = BmEngine(_Hooks(), rng: math.Random(1))
             ..startMatch(BmConfig(
-                mode: 'local', teams: const <String>['club0', 'club1'], form: <int>[a, b], names: const <String>['A', 'B'],
+                mode: 'local', teams: const <String>['bmw', 'nike'], form: <int>[a, b], names: const <String>['A', 'B'],
                 field: fld, ball: 0));
           final List<BmBody> d = e.bodies.where((BmBody x) => x != e.ball).toList();
           expect(d.length, 10);
@@ -345,7 +343,7 @@ void main() {
     for (int fi = 0; fi < kBmForms.length; fi++) {
       final BmEngine e = BmEngine(_Hooks(), rng: math.Random(1))
         ..startMatch(BmConfig(
-            mode: 'local', teams: const <String>['club0', 'club1'], form: <int>[fi, fi], names: const <String>['A', 'B'],
+            mode: 'local', teams: const <String>['bmw', 'nike'], form: <int>[fi, fi], names: const <String>['A', 'B'],
             field: 0, ball: 0));
       final List<BmBody> bot = e.bodies.where((BmBody x) => x.team == 0).toList();
       final List<BmBody> top = e.bodies.where((BmBody x) => x.team == 1).toList();
@@ -366,7 +364,7 @@ void main() {
   test('formations online: both phones put every global side in the same place (mirror)', () {
     BmEngine mk(bool mirror) => BmEngine(_Hooks(), rng: math.Random(1))
       ..startMatch(BmConfig(
-          mode: 'online', teams: const <String>['club0', 'club1'], form: const <int>[7, 4], names: const <String>['A', 'B'],
+          mode: 'online', teams: const <String>['bmw', 'nike'], form: const <int>[7, 4], names: const <String>['A', 'B'],
           field: 0, ball: 0, mirror: mirror));
     final BmEngine h = mk(false), g = mk(true);
     // snapshots are global and keyed by piece id: identical at kickoff means both phones agree on every disc
@@ -391,7 +389,7 @@ void main() {
       expect(base, lessThan(full10 * 1.15), reason: '${s.$1} ${s.$2}');
     }
     // ANIX keeps its own team stats (the reference numbers are only used to normalise measurements)
-    expect(bmTeam('nat18').power, isNot(2));
+    expect(bmTeam('iran').power, isNot(2));
   });
 
   test('calibration v2: a disc slides the same law whether shot or struck, and the shot still stops short', () {
@@ -447,7 +445,7 @@ void main() {
   test('in-match formation change: now on the own kickoff, else at the next kickoff', () {
     BmEngine fresh(int f0, int f1) => BmEngine(_Hooks(), rng: math.Random(1))
       ..startMatch(BmConfig(
-          mode: 'local', teams: const <String>['club0', 'club1'], form: <int>[f0, f1], names: const <String>['A', 'B'],
+          mode: 'local', teams: const <String>['bmw', 'nike'], form: <int>[f0, f1], names: const <String>['A', 'B'],
           field: 0, ball: 0));
     final BmEngine e = fresh(0, 0);
     expect(e.turn, 0);
@@ -475,7 +473,7 @@ void main() {
   test('in-match formation change online: both phones apply the logged move identically (mirror)', () {
     BmEngine mk(bool mirror) => BmEngine(_Hooks(), rng: math.Random(1))
       ..startMatch(BmConfig(
-          mode: 'online', teams: const <String>['club0', 'club1'], form: const <int>[0, 0], names: const <String>['A', 'B'],
+          mode: 'online', teams: const <String>['bmw', 'nike'], form: const <int>[0, 0], names: const <String>['A', 'B'],
           field: 0, ball: 0, mirror: mirror));
     final BmEngine h = mk(false), g = mk(true);
     // the move as sent over the net: global side + formation index, applied by both phones in log order

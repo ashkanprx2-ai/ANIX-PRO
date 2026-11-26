@@ -26,10 +26,10 @@ void main() {
       await _settle(200);
       // the same instant on both phones: both race for seq 1, then 2
       final List<bool> ok = await Future.wait(<Future<bool>>[
-        a.send(<String, dynamic>{'a': 'tpick', 'team': 'club0', kNetFloat: true}),
-        b.send(<String, dynamic>{'a': 'tpick', 'team': 'club1', kNetFloat: true}),
-        a.send(<String, dynamic>{'a': 'setup', 'team': 'club0', 'form': 2, kNetFloat: true}),
-        b.send(<String, dynamic>{'a': 'setup', 'team': 'club1', 'form': 4, kNetFloat: true}),
+        a.send(<String, dynamic>{'a': 'tpick', 'team': 'bmw', kNetFloat: true}),
+        b.send(<String, dynamic>{'a': 'tpick', 'team': 'nike', kNetFloat: true}),
+        a.send(<String, dynamic>{'a': 'setup', 'team': 'bmw', 'form': 2, kNetFloat: true}),
+        b.send(<String, dynamic>{'a': 'setup', 'team': 'nike', 'form': 4, kNetFloat: true}),
       ]);
       await _settle();
       expect(ok, everyElement(isTrue));
@@ -37,8 +37,8 @@ void main() {
       expect(s.rows.length, 4);
       expect(s.refused, 0);
       // each phone got exactly the other's two moves, in log order, with the real kind restored
-      expect(ga.map((NetMove m) => m.data['team']).toList(), <String>['club1', 'club1']);
-      expect(gb.map((NetMove m) => m.data['team']).toList(), <String>['club0', 'club0']);
+      expect(ga.map((NetMove m) => m.data['team']).toList(), <String>['nike', 'nike']);
+      expect(gb.map((NetMove m) => m.data['team']).toList(), <String>['bmw', 'bmw']);
       expect(<String>{...ga.map((NetMove m) => m.kind), ...gb.map((NetMove m) => m.kind)}, <String>{'move'});
       a.dispose();
       b.dispose();
@@ -72,7 +72,7 @@ void main() {
     final FakeMatchServer s = FakeMatchServer(players: <String>['u0', 'u1'], legacyTurnGate: true);
     final SupabaseMatchLink a = fakeLink(s, 0);
     a.listen((_) {});
-    await a.send(<String, dynamic>{'a': 'setup', 'team': 'club0', kNetFloat: true});
+    await a.send(<String, dynamic>{'a': 'setup', 'team': 'bmw', kNetFloat: true});
     await a.send(<String, dynamic>{'a': 'shot', 'cid': 1});
     final SupabaseMatchLink b = fakeLink(s, 1);
     final List<NetMove> gb = <NetMove>[];

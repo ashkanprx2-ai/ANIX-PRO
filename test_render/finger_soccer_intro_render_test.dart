@@ -30,7 +30,7 @@ Widget _app(Widget child) => ProviderScope(
 
 FsTeamSelect _team() => FsTeamSelect(
       fa: true,
-      teams: <String>['nat18', 'club9'],
+      teams: <String>['iran', 'liverpool'],
       players: _players,
       onReady: (_) {},
       onShop: () {},
@@ -71,13 +71,13 @@ void main() {
     await shot(
         tester,
         FsFormationSelect(
-            discAsset: 'assets/games/bermuda/discs/v9/nx_core.webp', initial: 0, onDone: (_) {}, onBar: () {}, freezeAt: .76),
+            discAsset: 'assets/games/finger_soccer/pucks/iso/fx_wolf.webp', initial: 0, onDone: (_) {}, onBar: () {}, freezeAt: .76),
         'formation_select');
     expect(tester.takeException(), isNull);
   });
 
   testWidgets('shop', (WidgetTester tester) async {
-    await shot(tester, FsShop(fa: true, team: 'club32', onTeam: (_) {}, onBack: () {}), 'shop');
+    await shot(tester, FsShop(fa: true, team: 'fx_wolf', onTeam: (_) {}, onBack: () {}), 'shop');
     expect(find.text('انتخاب محصول ها'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -119,8 +119,8 @@ void main() {
     await shot(
         tester,
         const FsScoreTable(seconds: 16, topLane: 50, rows: <FsScoreRow>[
-          FsScoreRow(name: 'HIIS', score: 3, crest: 'assets/games/bermuda/discs/v9/nx_core.webp', winner: true, avatar: '07-star-fox'),
-          FsScoreRow(name: 'ربات', score: 1, crest: 'assets/games/bermuda/discs/v9/nx_core.webp', avatar: '04-iron-warden'),
+          FsScoreRow(name: 'HIIS', score: 3, crest: 'assets/games/finger_soccer/pucks/iso/fx_wolf.webp', winner: true, avatar: '07-star-fox'),
+          FsScoreRow(name: 'ربات', score: 1, crest: 'assets/games/finger_soccer/pucks/iso/fx_wolf.webp', avatar: '04-iron-warden'),
         ]),
         'score_table');
     expect(find.text('جدول امتیازات'), findsOneWidget);

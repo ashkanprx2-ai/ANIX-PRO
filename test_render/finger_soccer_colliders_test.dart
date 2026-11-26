@@ -49,7 +49,7 @@ void main() {
       final BmEngine e = BmEngine(_Hooks(), rng: math.Random(1));
       e.startMatch(BmConfig(
           mode: 'local',
-          teams: const <String>['club0', 'club1'],
+          teams: const <String>['bmw', 'nike'],
           form: const <int>[0, 3],
           names: const <String>['A', 'B'],
           field: fi,
@@ -78,8 +78,8 @@ void main() {
       await tester.runAsync(() async {
         im.field = await _load(f.asset);
         if (!f.builtInGoals) im.goal = await _load('assets/games/bermuda/goals/${f.gs}.webp');
-        im.team[0] = await _load(bmTeam('club0').asset, w: 192);
-        im.team[1] = await _load(bmTeam('club1').asset, w: 192);
+        im.team[0] = await _load(bmTeam('bmw').asset, w: 192);
+        im.team[1] = await _load(bmTeam('nike').asset, w: 192);
         // v9: every ball is one still art rolled by the painter (no sprite sheets any more)
         im.ball = await _load(bmBallArt(fi % kBmBallN.length));
       });

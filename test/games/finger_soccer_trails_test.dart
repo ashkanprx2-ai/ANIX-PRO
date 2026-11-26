@@ -23,7 +23,7 @@ class _H implements BmHooks {
 
 BmConfig _cfg() => const BmConfig(
     mode: 'bot',
-    teams: <String>['nx_frost', 'realmadrid'],
+    teams: <String>['argentina', 'realmadrid'],
     form: <int>[0, 1],
     names: <String>['A', 'B'],
     field: 0,

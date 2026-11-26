@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nexora/core/storage/local_store.dart';
 import 'package:nexora/games/finger_soccer/intro/fs_formation_select.dart';
 import 'package:nexora/games/finger_soccer/intro/fs_intro_data.dart';
-import 'package:nexora/games/finger_soccer/intro/fs_intro_ui.dart';
 import 'package:nexora/games/finger_soccer/intro/fs_team_select.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -30,9 +29,9 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
   }
 
-  testWidgets('team select: the arrows pick the team shown (free team / opponent side)', (WidgetTester tester) async {
+  testWidgets('team select: category tabs + puck grid pick the team (free team / opponent side)', (WidgetTester tester) async {
     phone(tester);
-    final List<String> teams = <String>['nx_core', 'club9'];
+    final List<String> teams = <String>['fx_wolf', 'liverpool'];
     List<String>? ready;
     await tester.pumpWidget(_app(FsTeamSelect(
       fa: true,
@@ -44,29 +43,40 @@ void main() {
       freeze: true,
     )));
     await tester.pump(const Duration(milliseconds: 300));
-    // side one: nx_core (NX Core) -> next is nx_cyan, also a free team
-    await tester.tap(find.byWidgetPredicate((Widget w) => w is FsArrow && !w.left));
+    // side one opens on its team's category (fantasy): every tile is an NX puck with its name
+    expect(find.byKey(const ValueKey<String>('fs_team_fx_wolf')), findsOneWidget);
+    expect(find.text('گرگ'), findsWidgets);
+    // tapping another free puck picks it
+    await tester.tap(find.byKey(const ValueKey<String>('fs_team_fx_shark')));
     await tester.pump(const Duration(milliseconds: 300));
-    expect(teams[0], 'nx_cyan');
-    // side two (opponent, no ownership needed): club9 -> club10
+    expect(teams[0], 'fx_shark');
+    // a locked puck is only browsed (buy button), the picked team stays
+    await tester.tap(find.byKey(const ValueKey<String>('fs_team_fx_dragon')));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(teams[0], 'fx_shark');
+    expect(find.textContaining('خرید'), findsOneWidget);
+    // side two (opponent, no ownership needed): clubs tab -> Arsenal
     await tester.tap(find.text('تیم دو'));
     await tester.pump(const Duration(milliseconds: 300));
-    await tester.tap(find.byWidgetPredicate((Widget w) => w is FsArrow && !w.left));
+    await tester.tap(find.byKey(const ValueKey<String>('fs_tab_clubs')));
     await tester.pump(const Duration(milliseconds: 300));
-    expect(teams[1], 'club10');
+    await tester.tap(find.byKey(const ValueKey<String>('fs_team_arsenal')));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(teams[1], 'arsenal');
     await tester.tap(find.text('آماده'));
     await tester.pump(const Duration(milliseconds: 300));
-    expect(ready, <String>['nx_cyan', 'club10']);
+    expect(ready, <String>['fx_shark', 'arsenal']);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 1));
   });
 
-  test('team category labels cover clubs, nations and NX in Persian and English', () {
-    expect(fsTeamCategoryName('clubs', true), 'باشگاهی');
+  test('team category labels cover the NX puck categories in Persian and English', () {
+    expect(fsTeamCategoryName('clubs', true), 'باشگاه‌ها');
     expect(fsTeamCategoryName('clubs', false), 'Clubs');
     expect(fsTeamCategoryName('nations', true), 'ملی');
-    expect(fsTeamCategoryName('nations', false), 'Nations');
-    expect(fsTeamCategoryName('nx', true), 'نیکسورا');
+    expect(fsTeamCategoryName('brands', true), 'برندها');
+    expect(fsTeamCategoryName('cars', true), 'ماشین‌ها');
+    expect(fsTeamCategoryName('fantasy', true), 'فانتزی');
     expect(fsTeamCategoryName('unknown', false), 'unknown');
   });
 
@@ -74,7 +84,7 @@ void main() {
     phone(tester);
     int? done;
     await tester.pumpWidget(_app(FsFormationSelect(
-      discAsset: 'assets/games/bermuda/discs/v10/nx_core_green.webp',
+      discAsset: 'assets/games/finger_soccer/pucks/iso/fx_wolf.webp',
       initial: 0,
       onDone: (int f) => done = f,
       onBar: () {},

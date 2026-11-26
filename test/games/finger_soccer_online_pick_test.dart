@@ -142,7 +142,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.byKey(const ValueKey<String>('setup-ready')), findsOneWidget);
     // the opponent's pick arrives while this phone is still choosing: no match yet
-    net.deliver(1, <String, dynamic>{'a': 'setup', 'team': 'club9', 'form': 4, 'field': 0, 'ball': 0});
+    net.deliver(1, <String, dynamic>{'a': 'setup', 'team': 'liverpool', 'form': 4, 'field': 0, 'ball': 0});
     await tester.pump(const Duration(milliseconds: 300));
     expect(engineOf(tester), isNull);
     expect(find.text('حریف آماده است ✓'), findsOneWidget);
@@ -151,7 +151,7 @@ void main() {
     final Map<String, dynamic> mine = net.sent.firstWhere((Map<String, dynamic> d) => d['a'] == 'setup');
     expect(mine['for'], isNull);
     final BmEngine e = engineOf(tester)!;
-    expect(e.sel, <String>[mine['team'] as String, 'club9']);
+    expect(e.sel, <String>[mine['team'] as String, 'liverpool']);
     expect(e.form[1], 4);
     expect(e.form[0], mine['form']);
     await close(tester);
@@ -167,14 +167,14 @@ void main() {
     // log confirms it (send -> ok) it counts on this phone too, so the match starts instead of hanging.
     await pumpFor(tester, 15);
     final Map<String, dynamic> fill = net.sent.firstWhere((Map<String, dynamic> d) => d['for'] == 0);
-    expect(fill['team'], 'club0');
+    expect(fill['team'], 'bmw');
     expect(fill[kNetFloat], isTrue);
     await tester.pump(const Duration(milliseconds: 300));
-    expect(engineOf(tester)!.sel[0], 'club0');
+    expect(engineOf(tester)!.sel[0], 'bmw');
     // a late real setup of that side changes nothing (first per side in the log wins on both phones)
     net.deliver(0, <String, dynamic>{'a': 'setup', 'team': 'club5', 'form': 2, 'field': 0, 'ball': 0});
     await tester.pump(const Duration(milliseconds: 300));
-    expect(engineOf(tester)!.sel[0], 'club0');
+    expect(engineOf(tester)!.sel[0], 'bmw');
     await close(tester);
   });
 
@@ -184,12 +184,12 @@ void main() {
     await tester.pumpWidget(ProviderScope(
         child: MaterialApp(home: Scaffold(body: BermudaView(launch: _launch(net))))));
     await tester.pump(const Duration(milliseconds: 100));
-    net.deliver(0, <String, dynamic>{'a': 'setup', 'team': 'club3', 'form': 1, 'field': 0, 'ball': 0}, replay: true);
-    net.deliver(1, <String, dynamic>{'a': 'setup', 'team': 'club4', 'form': 2, 'field': 0, 'ball': 0}, replay: true);
+    net.deliver(0, <String, dynamic>{'a': 'setup', 'team': 'porsche', 'form': 1, 'field': 0, 'ball': 0}, replay: true);
+    net.deliver(1, <String, dynamic>{'a': 'setup', 'team': 'mercedes', 'form': 2, 'field': 0, 'ball': 0}, replay: true);
     net.onDone!();
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.byKey(const ValueKey<String>('setup-ready')), findsNothing);
-    expect(engineOf(tester)!.sel, <String>['club3', 'club4']);
+    expect(engineOf(tester)!.sel, <String>['porsche', 'mercedes']);
     await close(tester);
   });
 
@@ -215,7 +215,7 @@ void main() {
   testWidgets('room match (v4): the room pick is the starting pick in the lobby', (WidgetTester tester) async {
     final _FakeNet net = await open(tester, settings: <String, dynamic>{
       'room_prefs': <String, dynamic>{
-        '0': <String, dynamic>{'team': 'nx_core', 'form': 3},
+        '0': <String, dynamic>{'team': 'cuba', 'form': 3},
         '1': <String, dynamic>{'team': 'club7', 'form': 5},
       },
     });
@@ -224,7 +224,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey<String>('setup-ready')));
     await pumpFor(tester, 1);
     final Map<String, dynamic> mine = net.sent.firstWhere((Map<String, dynamic> d) => d['a'] == 'setup');
-    expect(mine['team'], 'nx_core');
+    expect(mine['team'], 'cuba');
     expect(mine['form'], 3);
     await close(tester);
   });

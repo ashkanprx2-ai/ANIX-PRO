@@ -207,8 +207,8 @@ void main() {
       net.liveCtl.add(const NetLiveMessage(0, 'fs_av', <String, dynamic>{'av': '07-star-fox'}));
       await tester.pump(const Duration(milliseconds: 50));
       expect(net.liveSent.length, before + 1); // no ping-pong
-      net.deliver(0, _setup('club3', 1));
-      net.deliver(1, _setup('club4', 2));
+      net.deliver(0, _setup('porsche', 1));
+      net.deliver(1, _setup('mercedes', 2));
       await tester.pump(const Duration(milliseconds: 300));
       final BmEngine e = stateOf(tester).matchEngine as BmEngine;
       e.score = <int>[e.ct(0) == 0 ? 3 : 1, e.ct(1) == 0 ? 3 : 1]; // global side 0 scored 3, side 1 scored 1

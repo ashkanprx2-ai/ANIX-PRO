@@ -75,8 +75,8 @@ void main() {
     testWidgets('room match: both phones leave the picks and start the same match ($srv)', (WidgetTester tester) async {
       final FakeMatchServer s = FakeMatchServer(players: <String>['u0', 'u1'], legacyTurnGate: legacy, settings: <String, dynamic>{
         'room_prefs': <String, dynamic>{
-          '0': <String, dynamic>{'team': 'club0', 'form': 1},
-          '1': <String, dynamic>{'team': 'club1', 'form': 2},
+          '0': <String, dynamic>{'team': 'bmw', 'form': 1},
+          '1': <String, dynamic>{'team': 'nike', 'form': 2},
         },
       });
       final List<SupabaseMatchLink> links = await openBoth(tester, s);

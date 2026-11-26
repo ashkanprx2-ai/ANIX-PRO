@@ -16,14 +16,20 @@ void main() {
       }
     }
     expect(defaultTeamPrice('lux0'), 500);
-    expect(defaultTeamPrice('realmadrid'), greaterThan(defaultTeamPrice('everton')));
-    expect(teamItemId('club0'), 'fs_team:club0');
+    expect(defaultTeamPrice('realmadrid'), greaterThan(defaultTeamPrice('cuba')));
+    expect(teamItemId('bmw'), 'fs_team:bmw');
+    expect(kFreeTeams, <String>{'fx_wolf', 'fx_shark', 'fx_eagle'});
+    expect(kDefaultTeam, 'fx_wolf');
   });
 
   test('locked teams fall back to the default free team when signed out', () {
-    expect(GemShop.instance.ownsTeam('nx_core'), isTrue);
-    // a retired v9 starter (its art no longer ships) is never fielded, even if the server still lists it
-    expect(GemShop.instance.usableTeam('club32'), kDefaultTeam);
+    expect(GemShop.instance.ownsTeam('fx_shark'), isTrue);
+    expect(GemShop.instance.ownsTeam('cuba'), isFalse);
+    expect(GemShop.instance.usableTeam('cuba'), kDefaultTeam);
+    // a retired id (old crest teams; its art no longer ships) is never fielded, even if the server still lists it
+    for (final String old in <String>['club32', 'nx_core', 'club0', 'elite_realmadrid', 'nxcar_bmw']) {
+      expect(GemShop.instance.usableTeam(old), kDefaultTeam, reason: old);
+    }
     expect(GemShop.instance.ownsTeam('lux0'), isFalse);
     expect(GemShop.instance.usableTeam('lux0'), kDefaultTeam);
   });

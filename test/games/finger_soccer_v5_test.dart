@@ -152,16 +152,16 @@ void main() {
       expect(sentOf(net, 'setup').length, 1);
       expect(engineOf(tester), isNull);
       expect(find.byKey(const ValueKey<String>('online-wait')), findsOneWidget);
-      net.deliver(1, _setup('club9', 4));
+      net.deliver(1, _setup('liverpool', 4));
       await tester.pump(const Duration(milliseconds: 300));
-      expect(engineOf(tester)!.sel, <String>[sentOf(net, 'setup').first['team'] as String, 'club9']);
+      expect(engineOf(tester)!.sel, <String>[sentOf(net, 'setup').first['team'] as String, 'liverpool']);
       await close(tester);
     });
 
     testWidgets('team pick replayed from the log (older app) is not a play move (no legacy room start)',
         (WidgetTester tester) async {
       final _FakeNet net = await open(tester, seat: 1);
-      net.deliver(0, <String, dynamic>{'a': 'tpick', 'team': 'club3'}, replay: true);
+      net.deliver(0, <String, dynamic>{'a': 'tpick', 'team': 'porsche'}, replay: true);
       await tester.pump(const Duration(milliseconds: 300));
       expect(engineOf(tester), isNull);
       expect(find.byKey(const ValueKey<String>('setup-ready')), findsOneWidget);
@@ -205,8 +205,8 @@ void main() {
       GameResult? got;
       final _FakeNet net = await open(tester, seat: seat, seats: seats, onFinish: (GameResult r) => got = r);
       net.forfeited.addAll(left);
-      net.deliver(0, _setup('club3', 1));
-      net.deliver(1, _setup('club4', 2));
+      net.deliver(0, _setup('porsche', 1));
+      net.deliver(1, _setup('mercedes', 2));
       await tester.pump(const Duration(milliseconds: 300));
       final BmEngine e = engineOf(tester)!;
       expect(e.perSide, seats ~/ 2);
