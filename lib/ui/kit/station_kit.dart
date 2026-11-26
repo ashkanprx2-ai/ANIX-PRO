@@ -1020,11 +1020,16 @@ class StationLetter extends StatelessWidget {
 
 /// `.av` gold ring avatar (HUD / profile).
 class StationRingAvatar extends StatelessWidget {
-  const StationRingAvatar({super.key, required this.name, this.size = 42, this.imageUrl, this.level});
+  const StationRingAvatar({super.key, required this.name, this.size = 42, this.imageUrl, this.level, this.portrait});
   final String name;
   final double size;
+
+  /// Uploaded profile photo (https); falls back to the painted [portrait].
   final String? imageUrl;
   final int? level;
+
+  /// Painted portrait id (assets/avatar/portraits/<id>.webp); `01-vanguard` when unset.
+  final String? portrait;
 
   @override
   Widget build(BuildContext context) {
@@ -1032,6 +1037,9 @@ class StationRingAvatar extends StatelessWidget {
     final String initials = name.trim().isEmpty
         ? 'NX'
         : name.trim().split(RegExp(r'\s+')).take(2).map((String w) => String.fromCharCode(w.runes.first)).join().toUpperCase();
+    final int cache = (size * MediaQuery.devicePixelRatioOf(context)).round();
+    final Widget painted = Image.asset('assets/avatar/portraits/${portrait ?? '01-vanguard'}.webp',
+        fit: BoxFit.cover, width: size, height: size, cacheWidth: cache, errorBuilder: (_, __, ___) => _initials(initials, p));
     return SizedBox(
       width: size,
       height: size,
@@ -1049,11 +1057,9 @@ class StationRingAvatar extends StatelessWidget {
               color: p.isLight ? const Color(0xFF0A1A5A) : const Color(0xFF14102E),
               alignment: Alignment.center,
               child: imageUrl != null && imageUrl!.isNotEmpty
-                  ? Image.network(imageUrl!, fit: BoxFit.cover, width: size, height: size,
-                      errorBuilder: (_, __, ___) => _initials(initials, p))
-                  : p.isLight
-                      ? Image.asset('assets/station/white/lion.webp', fit: BoxFit.cover, width: size, height: size)
-                      : _initials(initials, p),
+                  ? Image.network(imageUrl!,
+                      fit: BoxFit.cover, width: size, height: size, cacheWidth: cache, errorBuilder: (_, __, ___) => painted)
+                  : painted,
             ),
           ),
         ),

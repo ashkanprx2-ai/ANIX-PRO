@@ -174,7 +174,7 @@ class _StationBoardScreenState extends ConsumerState<StationBoardScreen> {
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: StationRow(
-                  leading: StationRingAvatar(name: prof.username, size: 38, imageUrl: prof.avatarUrl),
+                  leading: StationRingAvatar(name: prof.username, size: 38, imageUrl: prof.avatarUrl, portrait: prof.portrait),
                   title: stx(context, 'شما', 'You'),
                   trailing: Text(_game == null ? 'XP ${nxNum(context, prof.xp)}' : '—', style: const TextStyle(fontWeight: FontWeight.w500)),
                 ),

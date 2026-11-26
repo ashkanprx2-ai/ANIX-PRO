@@ -673,14 +673,20 @@ class _StationEventScreenState extends ConsumerState<StationEventScreen> {
     _tournaments(ref).then((List<Tournament> l) {
       if (mounted) setState(() => _list = l);
     });
+    // Only the big countdown ticks every second (ValueListenableBuilder); the rest of the screen rebuilds once a minute.
     _tick = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() {});
+      final DateTime n = DateTime.now().toUtc();
+      _now.value = n;
+      if (n.second == 0 && mounted) setState(() {});
     });
   }
+
+  final ValueNotifier<DateTime> _now = ValueNotifier<DateTime>(DateTime.now().toUtc());
 
   @override
   void dispose() {
     _tick?.cancel();
+    _now.dispose();
     super.dispose();
   }
 
@@ -703,10 +709,10 @@ class _StationEventScreenState extends ConsumerState<StationEventScreen> {
         _ => stx(context, 'جام', 'Cup'),
       };
 
-  String _clock(Duration d) {
+  String _clock(Duration d, {bool seconds = true}) {
     if (d.isNegative) d = Duration.zero;
     String two(int v) => v.toString().padLeft(2, '0');
-    final String s = '${two(d.inHours)}:${two(d.inMinutes % 60)}:${two(d.inSeconds % 60)}';
+    final String s = seconds ? '${two(d.inHours)}:${two(d.inMinutes % 60)}:${two(d.inSeconds % 60)}' : '${two(d.inHours)}:${two(d.inMinutes % 60)}';
     return stationFa(context) ? s.replaceAllMapped(RegExp(r'\d'), (Match m) => '۰۱۲۳۴۵۶۷۸۹'[int.parse(m[0]!)]) : s;
   }
 
@@ -739,8 +745,11 @@ class _StationEventScreenState extends ConsumerState<StationEventScreen> {
             title: t.title,
             subtitle: t.canRegister ? stx(context, 'شروع تا', 'Starts in') : stx(context, 'وضعیت', 'Status'),
             children: <Widget>[
-              Text(_clock(t.startAt.difference(DateTime.now().toUtc())),
-                  style: TextStyle(fontSize: 26, color: p.isLight ? const Color(0xFFFFD77A) : p.gold2, letterSpacing: 1.2)),
+              ValueListenableBuilder<DateTime>(
+                valueListenable: _now,
+                builder: (_, DateTime now, __) => Text(_clock(t.startAt.difference(now)),
+                    style: TextStyle(fontSize: 26, color: p.isLight ? const Color(0xFFFFD77A) : p.gold2, letterSpacing: 1.2)),
+              ),
             ],
           ),
           StationStats(<(String, String)>[
@@ -770,7 +779,7 @@ class _StationEventScreenState extends ConsumerState<StationEventScreen> {
                   first: o == list[1],
                   leading: StationIcon(stationGameIcon(o.game), size: 38, radius: 12),
                   title: o.title,
-                  subtitle: _clock(o.startAt.difference(DateTime.now().toUtc())),
+                  subtitle: _clock(o.startAt.difference(DateTime.now().toUtc()), seconds: false),
                   onTap: () => context.push('/tournaments/${o.id}'),
                 ),
             ]),

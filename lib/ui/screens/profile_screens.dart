@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../core/companion/companion.dart';
 import '../../core/online/cloud_profile_sync.dart';
@@ -180,7 +181,7 @@ class _StationProfileScreenState extends ConsumerState<StationProfileScreen> {
         Transform.translate(
           offset: const Offset(0, -46),
           child: Column(children: <Widget>[
-            Center(child: StationRingAvatar(name: name, size: 96, imageUrl: prof.avatarUrl, level: prof.level)),
+            Center(child: StationAvatarPicker(name: name, size: 96)),
             const SizedBox(height: 8),
             Text(name, style: StationText.title(context, size: 19)),
             Text(
@@ -274,7 +275,7 @@ class _StationAccountScreenState extends ConsumerState<StationAccountScreen> {
         StationCard(
           hero: true,
           child: Column(children: <Widget>[
-            StationRingAvatar(name: prof.username, size: 84, imageUrl: prof.avatarUrl),
+            StationRingAvatar(name: prof.username, size: 84, imageUrl: prof.avatarUrl, portrait: prof.portrait),
             const SizedBox(height: 8),
             Text(prof.username.isEmpty ? stx(context, 'کاوشگر', 'Explorer') : prof.username, style: StationText.title(context, size: 20)),
             Text(fa ? 'سطح ${nxNum(context, prof.level)} · ${prof.rankTitleFa}' : 'Level ${prof.level} · ${prof.rankTitleEn}', style: StationText.mute(context)),
@@ -608,6 +609,91 @@ class StationControllerScreen extends ConsumerWidget {
           ),
         ]),
       ],
+    );
+  }
+}
+
+/// The profile photo: ringed avatar with a camera badge. Tap → gallery / camera; the photo is resized to ≤512 px,
+/// uploaded to `nx-media/<uid>/avatar.*` (CloudProfileSync.uploadAvatar) and saved on the profile, so every avatar
+/// in the app shows it. Without a photo the painted portrait is shown.
+class StationAvatarPicker extends ConsumerStatefulWidget {
+  const StationAvatarPicker({super.key, required this.name, this.size = 96});
+  final String name;
+  final double size;
+
+  @override
+  ConsumerState<StationAvatarPicker> createState() => _StationAvatarPickerState();
+}
+
+class _StationAvatarPickerState extends ConsumerState<StationAvatarPicker> {
+  bool _busy = false;
+
+  Future<void> _choose() async {
+    final OnlineService o = ref.read(onlineProvider);
+    if (!o.isOnline || o.isGuest) {
+      stationToast(context, stx(context, 'برای عکس پروفایل وارد حساب شو.', 'Sign in to set a profile photo.'));
+      return;
+    }
+    ImageSource? src;
+    await showStationSheet<void>(
+      context,
+      title: stx(context, 'عکس پروفایل', 'Profile photo'),
+      options: <StationSheetOption>[
+        StationSheetOption(label: stx(context, '🖼  انتخاب از گالری', '🖼  From gallery'), onTap: () => src = ImageSource.gallery),
+        StationSheetOption(label: stx(context, '📷  گرفتن عکس با دوربین', '📷  Take a photo'), onTap: () => src = ImageSource.camera),
+      ],
+    );
+    if (src == null || !mounted) return;
+    final XFile? file;
+    try {
+      file = await ImagePicker().pickImage(source: src!, maxWidth: 512, maxHeight: 512, imageQuality: 85);
+    } catch (_) {
+      if (mounted) stationToast(context, stx(context, 'دسترسی به عکس ممکن نشد.', 'Could not open photos.'), error: true);
+      return;
+    }
+    if (file == null || !mounted) return;
+    setState(() => _busy = true);
+    try {
+      final String n = file.name.toLowerCase();
+      final String ext = n.contains('.') ? n.split('.').last : 'jpg';
+      await ref.read(cloudSyncProvider).uploadAvatar(await file.readAsBytes(), extension: ext);
+      if (mounted) stationToast(context, stx(context, 'عکس پروفایل ذخیره شد.', 'Profile photo saved.'));
+    } catch (_) {
+      if (mounted) stationToast(context, stx(context, 'آپلود عکس ناموفق بود.', 'Profile photo upload failed.'), error: true);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ProfileService prof = ref.watch(profileProvider);
+    final StationPalette p = StationPalette.of(context);
+    return GestureDetector(
+      onTap: _busy ? null : _choose,
+      child: Stack(clipBehavior: Clip.none, children: <Widget>[
+        StationRingAvatar(name: widget.name, size: widget.size, imageUrl: prof.avatarUrl, portrait: prof.portrait, level: prof.level),
+        PositionedDirectional(
+          bottom: 0,
+          start: -2,
+          child: Tooltip(
+            message: stx(context, 'عکس پروفایل', 'Profile photo'),
+            child: Container(
+              width: 34,
+              height: 34,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: p.primary,
+                border: Border.all(color: p.bg, width: 2),
+              ),
+              child: _busy
+                  ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: p.primaryInk))
+                  : Icon(Icons.photo_camera_rounded, size: 18, color: p.primaryInk),
+            ),
+          ),
+        ),
+      ]),
     );
   }
 }

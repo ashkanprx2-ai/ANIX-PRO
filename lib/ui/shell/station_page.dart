@@ -285,7 +285,7 @@ class _StationPageState extends ConsumerState<StationPage> with TickerProviderSt
                     if (p.isLight)
                       DecoratedBox(decoration: BoxDecoration(gradient: p.plate))
                     else
-                      Image.asset('assets/station/neon/card.webp', fit: BoxFit.fill),
+                      Image.asset('assets/station/neon/card.webp', fit: BoxFit.fill, cacheWidth: (cw * MediaQuery.devicePixelRatioOf(context)).round()),
                     DecoratedBox(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
@@ -337,7 +337,7 @@ class _StationPageState extends ConsumerState<StationPage> with TickerProviderSt
           border: Border.all(color: p.isLight ? const Color(0xFFE0B04A) : p.line, width: p.isLight ? 2 : 1),
           boxShadow: const <BoxShadow>[BoxShadow(color: Color(0x80000000), blurRadius: 30, offset: Offset(0, 14), spreadRadius: -14)],
         ),
-        child: StationRingAvatar(name: prof.username, size: 44, imageUrl: prof.avatarUrl, level: prof.level),
+        child: StationRingAvatar(name: prof.username, size: 44, imageUrl: prof.avatarUrl, portrait: prof.portrait, level: prof.level),
       ),
     );
   }
@@ -382,7 +382,7 @@ class _ProfilePop extends ConsumerWidget {
             ),
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
               Row(children: <Widget>[
-                StationRingAvatar(name: prof.username, size: 46, imageUrl: prof.avatarUrl),
+                StationRingAvatar(name: prof.username, size: 46, imageUrl: prof.avatarUrl, portrait: prof.portrait),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
