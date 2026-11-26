@@ -73,7 +73,7 @@ const kAchievements = <AchievementDef>[
   AchievementDef(id: 'daily', asset: 'badge_daily', nameFa: 'وفادار', nameEn: 'Loyal',
       descFa: '۳ روز پیاپی جایزه‌ی روزانه', descEn: '3-day daily streak', check: _daily),
   AchievementDef(id: 'idea', asset: 'badge_idea', nameFa: 'کنجکاو', nameEn: 'Curious Mind',
-      descFa: '۱۰ سؤال از ORACLE', descEn: 'Ask ORACLE 10 things', check: _idea),
+      descFa: '۱۰ سؤال از اوراکل یا لونا', descEn: 'Ask ORACLE or LUNA 10 things', check: _idea),
   AchievementDef(id: 'team', asset: 'badge_team', nameFa: 'هم‌تیمی', nameEn: 'Team Player',
       descFa: 'یک اجتماع بساز یا عضو شو', descEn: 'Create or join a community', check: _team),
   AchievementDef(id: 'decorator', asset: 'trophy_orb', nameFa: 'معمار مدار', nameEn: 'Orbit Architect',

@@ -94,7 +94,7 @@ class OracleLines {
       OracleLine('باختی؟ منم دیروز به ماشین‌حساب باختم 🧮', 'Lost? I lost to a calculator yesterday 🧮'),
       OracleLine('شکست مقدمه‌ی… یه شکست دیگه‌ست. شوخی کردم! دوباره برو 💪', 'Failure leads to… more failure. Kidding! Go again 💪'),
       OracleLine('حریفت شانس آورد. من دیدم. واقعاً دیدم! 👁️', 'Your opponent got lucky. I saw it. Really! 👁️'),
-      OracleLine('بیا یه راهنمایی بهت بدم؟ تو بازی دکمه‌ی ORACLE رو بزن 🤖', 'Want a hint? Tap the ORACLE button inside a game 🤖'),
+      OracleLine('بیا یه راهنمایی بهت بدم؟ تو بازی دکمه‌ی دستیار رو بزن 🤖', 'Want a hint? Tap the companion button inside a game 🤖'),
     ],
     OracleTopic.draw: <OracleLine>[
       OracleLine('مساوی؟ یعنی هردوتون به یه اندازه خوب… یا بد 🤝', 'A draw? Equally good… or equally bad 🤝'),

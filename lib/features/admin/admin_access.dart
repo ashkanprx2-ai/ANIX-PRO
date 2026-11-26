@@ -27,7 +27,7 @@ class AdminPerm {
         moderation => fa ? 'نظارت محتوا' : 'Moderation',
         rooms => fa ? 'اتاق‌ها' : 'Rooms',
         announcements => fa ? 'اطلاعیه‌ها' : 'Announcements',
-        oracle => fa ? 'تنظیمات اوراکل' : 'ORACLE config',
+        oracle => fa ? 'تنظیمات اوراکل و لونا' : 'ORACLE & LUNA config',
         admins => fa ? 'مدیریت ادمین‌ها' : 'Admin management',
         shop => fa ? 'فروشگاه و قیمت‌ها' : 'Shop & prices',
         _ => p,

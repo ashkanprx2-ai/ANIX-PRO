@@ -21,7 +21,7 @@ const List<LegalSection> privacyFa = <LegalSection>[
           '• صدا و تصویر: تماس و اتاق صوتی به‌صورت زنده از سرور انتقال صدا عبور می‌کند و ما آن را ضبط یا ذخیره نمی‌کنیم.\n'
           '• خرید: شناسه‌ی سفارش و محصول خریداری‌شده از کافه‌بازار برای تحویل سکه/جم. اطلاعات کارت بانکی را هرگز دریافت نمی‌کنیم.\n'
           '• فنی: نسخه‌ی برنامه، سیستم‌عامل و گزارش خطا/کرش برای رفع اشکال؛ زمان آخرین حضور آنلاین.\n'
-          '• دستیار اوراکل: پیام‌هایی که به دستیار هوش مصنوعی می‌دهی برای ساخت پاسخ به ارائه‌دهنده‌ی هوش مصنوعی فرستاده می‌شود.'),
+          '• دستیار هوش مصنوعی (اوراکل / لونا): پیام‌هایی که به دستیار هوش مصنوعی می‌دهی برای ساخت پاسخ به ارائه‌دهنده‌ی هوش مصنوعی فرستاده می‌شود.'),
   LegalSection('چرا استفاده می‌کنیم',
       'برای ورود و نگه‌داری حساب، اجرای مسابقه‌ها و رتبه‌بندی، نمایش پروفایل و چت به کسانی که اجازه داده‌ای، تحویل خریدها، جلوگیری از تقلب و سوءاستفاده، رسیدگی به گزارش‌ها و رفع خطاها.'),
   LegalSection('چه کسانی می‌بینند',
@@ -48,7 +48,7 @@ const List<LegalSection> privacyEn = <LegalSection>[
           '• Voice and video: calls and voice rooms are relayed live through a media server; we do not record or store them.\n'
           '• Purchases: the Cafe Bazaar order token and product, to deliver coins/gems. We never receive your card details.\n'
           '• Technical: app version, operating system and error/crash reports to fix bugs; your last-online time.\n'
-          '• ORACLE assistant: messages you send to the AI assistant are sent to an AI provider to generate replies.'),
+          '• AI companion (ORACLE / LUNA): messages you send to the AI assistant are sent to an AI provider to generate replies.'),
   LegalSection('Why we use it',
       'To sign you in and keep your account, run matches and rankings, show your profile and chats to the people you allow, deliver purchases, prevent cheating and abuse, handle reports and fix errors.'),
   LegalSection('Who can see it',
