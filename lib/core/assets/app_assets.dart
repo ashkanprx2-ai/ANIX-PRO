@@ -35,47 +35,47 @@ class AppAssets {
   static const avatarGearVisorPanel = 'assets/avatar/gear/visor_panel.webp';
   static const avatarGearWatch = 'assets/avatar/gear/watch.webp';
   static const charactersOracleHeroOrbit =
-      'assets/characters/oracle/hero_orbit.webp';
+      'assets/characters/oracle/hero.webp';
   static const charactersOracleAvatarUser =
-      'assets/characters/oracle/avatar_user.webp';
+      'assets/characters/oracle/avatar.webp';
   static const charactersOracleEmotesEmoteAlert =
-      'assets/characters/oracle/emotes/emote_alert.webp';
+      'assets/characters/oracle/confused.webp';
   static const charactersOracleEmotesEmoteCheer =
-      'assets/characters/oracle/emotes/emote_cheer.webp';
+      'assets/characters/oracle/cheer.webp';
   static const charactersOracleEmotesEmoteIdle =
-      'assets/characters/oracle/emotes/emote_idle.webp';
+      'assets/characters/oracle/happy.webp';
   static const charactersOracleEmotesEmotePoint =
-      'assets/characters/oracle/emotes/emote_point.webp';
+      'assets/characters/oracle/smart.webp';
   static const charactersOracleEmotesEmoteSmile =
-      'assets/characters/oracle/emotes/emote_smile.webp';
+      'assets/characters/oracle/happy.webp';
   static const charactersOracleEmotesEmoteWave =
-      'assets/characters/oracle/emotes/emote_wave.webp';
+      'assets/characters/oracle/salute.webp';
   static const charactersOracleEmotesHeroFront =
-      'assets/characters/oracle/emotes/hero_front.webp';
+      'assets/characters/oracle/hero.webp';
   static const charactersOraclePosesAlert =
-      'assets/characters/oracle/poses/alert.webp';
+      'assets/characters/oracle/confused.webp';
   static const charactersOraclePosesCalm =
-      'assets/characters/oracle/poses/calm.webp';
+      'assets/characters/oracle/happy.webp';
   static const charactersOraclePosesCheer =
-      'assets/characters/oracle/poses/cheer.webp';
+      'assets/characters/oracle/cheer.webp';
   static const charactersOraclePosesConfused =
-      'assets/characters/oracle/poses/confused.webp';
+      'assets/characters/oracle/confused.webp';
   static const charactersOraclePosesCraft =
-      'assets/characters/oracle/poses/craft.webp';
+      'assets/characters/oracle/smart.webp';
   static const charactersOraclePosesHappy =
-      'assets/characters/oracle/poses/happy.webp';
+      'assets/characters/oracle/happy.webp';
   static const charactersOraclePosesHeroWave =
-      'assets/characters/oracle/poses/hero_wave.webp';
+      'assets/characters/oracle/salute.webp';
   static const charactersOraclePosesIdle =
-      'assets/characters/oracle/poses/idle.webp';
+      'assets/characters/oracle/happy.webp';
   static const charactersOraclePosesPower =
-      'assets/characters/oracle/poses/power.webp';
+      'assets/characters/oracle/cool.webp';
   static const charactersOraclePosesPresent =
-      'assets/characters/oracle/poses/present.webp';
+      'assets/characters/oracle/sign.webp';
   static const charactersOraclePosesSleep =
-      'assets/characters/oracle/poses/sleep.webp';
+      'assets/characters/oracle/sleep.webp';
   static const charactersOraclePosesSpin =
-      'assets/characters/oracle/poses/spin.webp';
+      'assets/characters/oracle/gamer.webp';
   static const gamesBackgammonBoardNxGold =
       'assets/games/backgammon/board_nx_gold.webp';
   static const gamesBackgammonCheckerDark =
@@ -404,7 +404,11 @@ class AppAssets {
     if (pose == 'idle' || pose == 'hero_wave') {
       return charactersOracleAvatarUser;
     }
-    return 'assets/characters/oracle/poses/$pose.webp';
+    const Map<String, String> moods = <String, String>{
+      'alert': 'confused', 'calm': 'happy', 'cheer': 'cheer', 'confused': 'confused', 'craft': 'smart', 'happy': 'happy',
+      'power': 'cool', 'present': 'sign', 'sleep': 'sleep', 'spin': 'gamer',
+    };
+    return 'assets/characters/oracle/${moods[pose] ?? 'happy'}.webp';
   }
 
   static String disc(String id) => 'assets/games/shared/discs/$id.webp';

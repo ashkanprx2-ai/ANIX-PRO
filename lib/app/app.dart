@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 
 import '../core/audio/music_service.dart';
 import '../core/backend/backend_gateway.dart';
+import '../core/companion/companion.dart';
+import '../worlds/oracle_core/persona/oracle_persona.dart';
 import '../core/online/call_watcher.dart';
 import '../core/online/cloud_profile_sync.dart';
 import '../core/online/invite_watcher.dart';
@@ -48,6 +50,9 @@ class _NexoraAppState extends ConsumerState<NexoraApp> {
   @override
   void initState() {
     super.initState();
+    // The active companion (ORACLE / LUNA) decides which persona every ORACLE-engine caller talks to.
+    CompanionController.onSwitch.add((CompanionId c) => OraclePersona.activate(c.name));
+    OraclePersona.activate(ref.read(companionProvider).active.name);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref.read(onlineProvider).addListener(_syncAuthMode);

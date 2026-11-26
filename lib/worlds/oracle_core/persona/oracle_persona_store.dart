@@ -17,17 +17,23 @@ class OraclePersonaStore {
   static bool _loadedCache = false;
   static DateTime? _fetchedAt;
 
-  /// Applies the locally cached admin config (instant, offline).
+  /// Supabase row per companion (`nx_oracle_persona.id`): 1 = ORACLE, 2 = LUNA.
+  static int rowOf(String companion) => companion == 'luna' ? 2 : 1;
+  static String _cacheKey(String companion) => companion == 'luna' ? '$_kCfg.luna' : _kCfg;
+
+  /// Applies the locally cached admin configs of both companions (instant, offline).
   static void loadCached() {
     if (_loadedCache) return;
     _loadedCache = true;
-    try {
-      final String? raw = LocalStore.instance.getString(_kCfg);
-      if (raw != null && raw.isNotEmpty) {
-        final Object? j = jsonDecode(raw);
-        if (j is Map) OraclePersona.instance.applyConfig(Map<String, dynamic>.from(j));
-      }
-    } catch (_) {/* keep defaults */}
+    for (final String c in const <String>['oracle', 'luna']) {
+      try {
+        final String? raw = LocalStore.instance.getString(_cacheKey(c));
+        if (raw != null && raw.isNotEmpty) {
+          final Object? j = jsonDecode(raw);
+          if (j is Map) OraclePersona.forCompanion(c).applyConfig(Map<String, dynamic>.from(j));
+        }
+      } catch (_) {/* keep defaults */}
+    }
   }
 
   /// Fetches the admin config from Supabase (at most every 10 minutes) and caches it.
@@ -37,23 +43,33 @@ class OraclePersonaStore {
     if (!force && _fetchedAt != null && DateTime.now().difference(_fetchedAt!) < const Duration(minutes: 10)) return;
     _fetchedAt = DateTime.now();
     try {
-      final Map<String, dynamic>? row =
-          await c.from('nx_oracle_persona').select('data').eq('id', 1).maybeSingle().timeout(const Duration(seconds: 12));
-      final Object? d = row?['data'];
-      if (d is Map && d.isNotEmpty) {
-        final Map<String, dynamic> m = Map<String, dynamic>.from(d);
-        OraclePersona.instance.applyConfig(m);
-        await LocalStore.instance.setString(_kCfg, jsonEncode(m));
+      final List<dynamic> rows = await c
+          .from('nx_oracle_persona')
+          .select('id, data')
+          .inFilter('id', <int>[1, 2])
+          .timeout(const Duration(seconds: 12));
+      for (final dynamic r in rows) {
+        final Object? d = (r as Map)['data'];
+        final String companion = (r['id'] as num?)?.toInt() == 2 ? 'luna' : 'oracle';
+        if (d is Map && d.isNotEmpty) {
+          final Map<String, dynamic> m = Map<String, dynamic>.from(d);
+          OraclePersona.forCompanion(companion).applyConfig(m);
+          await LocalStore.instance.setString(_cacheKey(companion), jsonEncode(m));
+        }
       }
     } catch (_) {/* offline or table missing → cached/defaults */}
   }
 
-  /// Saves a new config (admins only; enforced server-side by `nx_oracle_persona_save`).
-  static Future<String?> save(SupabaseClient c, Map<String, dynamic> data) async {
+  /// Saves a new config for [companion] (admins only; enforced server-side by `nx_oracle_persona_save`).
+  static Future<String?> save(SupabaseClient c, Map<String, dynamic> data, {String companion = 'oracle'}) async {
     try {
-      await c.rpc('nx_oracle_persona_save', params: <String, dynamic>{'p_data': data});
-      OraclePersona.instance.applyConfig(data);
-      await LocalStore.instance.setString(_kCfg, jsonEncode(data));
+      await c.rpc('nx_oracle_persona_save', params: <String, dynamic>{
+        'p_data': data,
+        // ORACLE keeps the original one-argument RPC (works before the LUNA migration is applied).
+        if (companion == 'luna') 'p_persona': companion,
+      });
+      OraclePersona.forCompanion(companion).applyConfig(data);
+      await LocalStore.instance.setString(_cacheKey(companion), jsonEncode(data));
       return null;
     } catch (e) {
       return '$e';

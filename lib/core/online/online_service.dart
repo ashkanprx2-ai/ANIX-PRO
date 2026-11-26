@@ -178,6 +178,20 @@ class OnlineService extends ChangeNotifier {
     return ok ?? false;
   }
 
+  /// "Sign in with Google": Supabase OAuth (Google provider) in the system browser; Google returns to
+  /// [emailRedirect] (`nexora://login-callback`, the Android intent filter CI adds), supabase_flutter exchanges the
+  /// code and the session listener + router redirect take the user on. Returns true when the browser was opened.
+  Future<bool> signInWithGoogle() async {
+    final bool? ok = await _run<bool>((SupabaseClient c) async {
+      return c.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: emailRedirect,
+        authScreenLaunchMode: LaunchMode.externalApplication,
+      );
+    });
+    return ok ?? false;
+  }
+
   Future<bool> verifyEmailOtp(String email, String token) async {
     final bool? ok = await _run<bool>((SupabaseClient c) async {
       await c.auth.verifyOTP(email: email.trim(), token: token.trim(), type: OtpType.email);

@@ -593,6 +593,14 @@ class ProfileService extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// A free preference slot that is not a shop item (e.g. `companion` = oracle | luna). Synced like [equipped].
+  void setPreference(String slot, String value) {
+    if (equipped[slot] == value) return;
+    equipped[slot] = value;
+    _save();
+    notifyListeners();
+  }
+
   void unequip(String slot) {
     equipped.remove(slot);
     _save();

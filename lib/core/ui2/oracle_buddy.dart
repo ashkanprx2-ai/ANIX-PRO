@@ -16,7 +16,8 @@ import '../../worlds/oracle_core/persona/oracle_persona_store.dart';
 import '../../worlds/oracle_core/persona/oracle_tour.dart';
 import '../online/online_service.dart';
 import '../profile/profile_service.dart';
-import 'oracle_lines.dart';
+import '../../worlds/oracle_core/persona/companion_lines.dart';
+import '../companion/companion.dart';
 
 /// App-wide events the corner ORACLE reacts to (wins, losses, purchases…).
 /// v13: ORACLE guided tours (home / dock / ...) are switched off for good (owner request 2026-11-24).
@@ -37,18 +38,18 @@ class OracleBus {
 
 enum BuddyMood { idle, wave, talk, sulk, sleep, wink, laugh, confused, shocked, excited }
 
-String _sprite(BuddyMood m) => switch (m) {
-      BuddyMood.idle => 'assets/characters/oracle/moods/sheetB_01.webp',
-      BuddyMood.wave => 'assets/characters/oracle/moods/wave.webp',
-      BuddyMood.talk => 'assets/characters/oracle/moods/sheetB_06.webp',
-      BuddyMood.sulk => 'assets/characters/oracle/moods/sulk.webp',
-      BuddyMood.sleep => 'assets/characters/oracle/moods/sleepy.webp',
-      BuddyMood.wink => 'assets/characters/oracle/moods/wink.webp',
-      BuddyMood.laugh => 'assets/characters/oracle/moods/laugh.webp',
-      BuddyMood.confused => 'assets/characters/oracle/moods/confused.webp',
-      BuddyMood.shocked => 'assets/characters/oracle/moods/shocked.webp',
-      BuddyMood.excited => 'assets/characters/oracle/moods/excited.webp',
-    };
+String _sprite(BuddyMood m) => CompanionInfo.of(CompanionController.activeId).mood(switch (m) {
+      BuddyMood.idle => CompanionMood.happy,
+      BuddyMood.wave => CompanionMood.salute,
+      BuddyMood.talk => CompanionMood.wink,
+      BuddyMood.sulk => CompanionMood.angry,
+      BuddyMood.sleep => CompanionMood.sleep,
+      BuddyMood.wink => CompanionMood.wink,
+      BuddyMood.laugh => CompanionMood.cheer,
+      BuddyMood.confused => CompanionMood.confused,
+      BuddyMood.shocked => CompanionMood.cry,
+      BuddyMood.excited => CompanionMood.hearteyes,
+    });
 
 /// The mischievous corner ORACLE: lives above every page except games, teases, sulks until apologised to, falls
 /// asleep and snores until poked, winks, laughs, gets confused, reacts to wins/losses/purchases/idle time.
