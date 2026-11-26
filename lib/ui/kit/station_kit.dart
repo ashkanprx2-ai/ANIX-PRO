@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/profile/profile_service.dart';
+import '../../core/storage/local_store.dart';
 import '../../core/settings/app_settings.dart';
 import '../theme/station_theme.dart';
 
@@ -212,8 +213,9 @@ class _StationPressState extends ConsumerState<StationPress> with SingleTickerPr
   @override
   Widget build(BuildContext context) {
     final StationPalette p = StationPalette.of(context);
-    final AppSettings s = ref.watch(settingsProvider);
-    final bool fancy = !p.isLight && s.quality != GraphicsQuality.low && !s.reducedMotion;
+    // Station chrome is also drawn inside bare game widgets (tests, embedded boards) where no store exists yet.
+    final AppSettings? s = LocalStore.ready ? ref.watch(settingsProvider) : null;
+    final bool fancy = s != null && !p.isLight && s.quality != GraphicsQuality.low && !s.reducedMotion;
     final bool enabled = widget.onTap != null || widget.onLongPress != null;
     Matrix4 m = Matrix4.identity();
     if (_local != null && _size != Size.zero) {
@@ -247,7 +249,7 @@ class _StationPressState extends ConsumerState<StationPress> with SingleTickerPr
           onTap: widget.onTap == null
               ? null
               : () {
-                  if (s.haptics) HapticFeedback.selectionClick();
+                  if ((s?.haptics ?? false)) HapticFeedback.selectionClick();
                   widget.onTap!();
                 },
           onLongPress: widget.onLongPress,
@@ -538,7 +540,7 @@ class _StationButtonState extends ConsumerState<StationButton> {
           onTapUp: (_) => setState(() => _down = false),
           onTap: enabled
               ? () {
-                  if (ref.read(settingsProvider).haptics) HapticFeedback.lightImpact();
+                  if (LocalStore.ready && ref.read(settingsProvider).haptics) HapticFeedback.lightImpact();
                   widget.onTap!();
                 }
               : null,

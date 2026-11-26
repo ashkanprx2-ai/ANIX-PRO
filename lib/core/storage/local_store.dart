@@ -9,6 +9,9 @@ class LocalStore {
   final SharedPreferences _prefs;
 
   static LocalStore? _instance;
+
+  /// True once [init] (or [setForTest]) ran — UI chrome that is also drawn inside bare game widgets checks this.
+  static bool get ready => _instance != null;
   static LocalStore get instance {
     final i = _instance;
     if (i == null) throw StateError('LocalStore.init() not called');
