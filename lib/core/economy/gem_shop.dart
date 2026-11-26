@@ -17,7 +17,7 @@ const Set<String> kFreeTeams = kBmFreeTeamIds;
 /// Default team for a new player / when a saved team is not owned or no longer exists.
 const String kDefaultTeam = kBmDefaultTeamId;
 
-/// Inventory / catalog id of a finger-soccer team (`fs_team:club0`).
+/// Inventory / catalog id of a finger-soccer team (`fs_team:realmadrid`).
 String teamItemId(String teamId) => 'fs_team:$teamId';
 
 /// The lobby's "create your custom team" tile (not a fieldable team; see bm_data.dart). A saved setup naming it

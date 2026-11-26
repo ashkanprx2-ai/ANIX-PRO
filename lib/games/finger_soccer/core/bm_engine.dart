@@ -434,7 +434,7 @@ class BmEngine {
   double get goalVisualDepth => GGw > 0 ? GGh * GGleg : DEPTH;
   BmFieldS get field => kBmFields[setFld];
 
-  List<String> sel = <String>['club0', 'club1'];
+  List<String> sel = <String>[kBmDefaultTeamId, kBmBotTeamId];
   List<int> form = <int>[0, 0];
 
   List<BmBody> bodies = <BmBody>[];

@@ -529,7 +529,7 @@ class _BermudaViewState extends State<BermudaView>
     final Map<String, dynamic> m = mine is Map ? Map<String, dynamic>.from(mine) : <String, dynamic>{};
     final String t = '${m['team'] ?? ''}';
     final String team =
-        kBmTeams.any((BmTeam x) => x.id == t) || bmIsCustomTeamId(t) ? t : (seat == 0 ? 'club0' : 'club1');
+        kBmTeams.any((BmTeam x) => x.id == t) || bmIsCustomTeamId(t) ? t : (seat == 0 ? kBmDefaultTeamId : kBmBotTeamId);
     int i(dynamic v, int max) => ((v as num?)?.toInt() ?? 0).clamp(0, max - 1).toInt();
     return _Setup(team, i(m['form'], kBmForms.length), bmFieldIndex((st['field'] as num?)?.toInt()),
         bmBallIndex((st['ball'] as num?)?.toInt()));
@@ -1000,7 +1000,7 @@ class _BermudaViewState extends State<BermudaView>
       // our own side: our real pick is in flight (or about to be); only fill the OTHER sides
       if (side == mySeat) continue;
       final _Setup d = (_roomPrefs != null ? _prefSetup(side) : null) ??
-          _Setup(side == 0 ? 'club0' : 'club1', 0, my.field, my.ball);
+          _Setup(side == 0 ? kBmDefaultTeamId : kBmBotTeamId, 0, my.field, my.ball);
       unawaited(net.send(<String, dynamic>{...d.toJson(), 'for': side, kNetFloat: true}).then((bool ok) {
         if (ok && !_disposed) {
           _inbox?.add(NetMove(seq: -2, seat: side, kind: 'ownSetup', data: d.toJson()));

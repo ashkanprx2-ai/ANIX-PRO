@@ -90,7 +90,7 @@ Rooms are built around conversation:
 
 The flagship game: flick discs, bend shots, score.
 
-- **138 teams in seven categories** — **Clubs** (47), **Nations** (19), **NX** (12), **Cars** (40), **Sport** (12), **Elite** (6) and **Legends** (2), every crest a clean **round disc**. Each team carries real **power** and **accuracy** stats.
+- **77 teams in five categories** — the owner's own NX pucks: **Clubs** (22), **Nations** (21), **Brands** (13), **Cars** (9) and **Fantasy** (12; Wolf, Shark and Eagle are free), each puck shown exactly as designed. Each team carries real **power** and **accuracy** stats.
 - **🛡️ Your own team** *(new)* — buy the custom-team slot (1000 💎), upload a photo, it is cropped into a round crest and joins the shared **Custom Teams** list with every stat at **10**. You play it free forever; anyone else unlocks it for **250 💎**. Ownership and prices are enforced on the server.
 - **🖤 Black-gold lobby** *(new)* — one luxury pre-match screen for online and pass-and-play: shared 30 s pick timer, opponent status, locked teams bought in place.
 - **📐 Fair pitches** *(new)* — every pitch scaled to one standard, so discs, ball and goals are the same size everywhere; heavier discs and ball for smoother, weightier motion.
@@ -103,7 +103,7 @@ The flagship game: flick discs, bend shots, score.
 
 | | Game | Online | Highlights |
 |---|---|---|---|
-| ⚽ | **Finger Soccer** | 2–6 | 138 teams + custom teams, 3v3 rotation, trails, rematch |
+| ⚽ | **Finger Soccer** | 2–6 | 77 NX puck teams + custom teams, 3v3 rotation, trails, rematch |
 | 🎯 | **Carrom** | 2 | Queen + cover rule, fouls, deterministic replay |
 | 🎱 | **Billiards** | 2 | Groups, ball-in-hand, cue skins |
 | 🎲 | **Backgammon (تخته‌نرد)** | 2 | Bar, bearing off, gammons & backgammons |
@@ -211,7 +211,7 @@ test/         unit + widget tests (games, rooms, auth rules, assets, ORACLE, tou
 ### ✨ امکانات
 
 - **🎙️ اتاق‌ها:** صحنه‌ی صدا، گفتگوی متنی با پیام‌های زنده و کادر نوشتن پایین صفحه، فهرست اعضا با آواتار گرد. سخنران و شنونده **بی‌محدودیت**. مدیر اتاق بازی را انتخاب می‌کند، بازیکن‌ها را تیک می‌زند؛ هر بازیکن تیم و چیدمانش را می‌چیند و مدیر زمین و توپ را؛ بعد از بازی همه به اتاق برمی‌گردند. ظرفیت دست مدیر است و از قواعد واقعی هر بازی بیرون نمی‌زند: مافیا تا **۱۲ نفر**، جاسوس و مافیا تا **۸ نفر**، بازی‌های تیمی مثل فوتبال انگشتی تا **۶ نفر** (دو طرف برابر)، بازی‌های گروهی تا **۴ نفر** و دوئل‌ها **۲ نفر**.
-- **⚽ فوتبال انگشتی (گل‌کوچیک):** ۱۳۸ تیم در هفت دسته‌ی **باشگاهی** (۴۷)، **ملی** (۱۹)، **نیکسورا** (۱۲)، **خودرو** (۴۰)، **ورزشی** (۱۲)، **ویژه** (۶) و **افسانه‌ای** (۲) با آمار قدرت و دقت شوت؛ لوگوی گرد برای همه‌ی تیم‌ها؛ **تیم اختصاصی خودت** (خرید با ۱۰۰۰ الماس، عکس خودت روی مهره، همه‌ی آمار ۱۰، برای بقیه ۲۵۰ الماس)؛ لابی مشکی‌طلایی؛ اندازه‌ی یکسان زمین و مهره در همه‌ی زمین‌ها؛ رد رنگی پشت مهره‌ها و **بازی مجدد** آنلاین؛ ۱۱ زمین، ۲۲ توپ و ۹ چیدمان؛ بازی **۱ به ۱، ۲ به ۲ و ۳ به ۳** با چرخش نوبت بین هم‌تیمی‌ها.
+- **⚽ فوتبال انگشتی (گل‌کوچیک):** ۷۷ تیم (مهره‌های NX خودِ سازنده) در پنج دسته‌ی **باشگاه‌ها** (۲۲)، **ملی** (۲۱)، **برندها** (۱۳)، **ماشین‌ها** (۹) و **فانتزی** (۱۲؛ گرگ، کوسه و عقاب رایگان) با آمار قدرت و دقت شوت؛ **تیم اختصاصی خودت** (خرید با ۱۰۰۰ الماس، عکس خودت روی مهره، همه‌ی آمار ۱۰، برای بقیه ۲۵۰ الماس)؛ لابی مشکی‌طلایی؛ اندازه‌ی یکسان زمین و مهره در همه‌ی زمین‌ها؛ رد رنگی پشت مهره‌ها و **بازی مجدد** آنلاین؛ ۱۱ زمین، ۲۲ توپ و ۹ چیدمان؛ بازی **۱ به ۱، ۲ به ۲ و ۳ به ۳** با چرخش نوبت بین هم‌تیمی‌ها.
 - **🎮 ۲۶ بازی:** ۹ بازی اصلی (فوتبال انگشتی، کارم، بیلیارد، تخته‌نرد، لودو، مار و پله، NX Cards، کوییز و مافیا)، ۷ بازی چندنفره‌ی آرکید (مسابقه‌ی کارت، مسابقه‌ی موانع، میدان بمب، بیلیارد ۸ توپ، مینی گلف، نبرد بسکتبال و جاسوس و مافیا) و ۱۰ بازی تک‌نفره‌ی آرکید (دونده‌ی بی‌پایان، جئو دش، مسابقه‌ی ترافیک، میوه‌بُر، چاقو زدن، پرش مارپیچ، حباب‌زن، برج بلوک، تتریس راش و ۲۰۴۸) — آفلاین با ربات یا آنلاین با آدم‌های واقعی.
 - **⚡ بازی سریع:** پیدا کردن حریف با یک لمس؛ جفت‌شدن منصفانه، بدون صندلی‌های «روح»، اتصال دوباره‌ی امن.
 - **🏆 رده‌بندی و تورنمنت:** امتیاز ELO برای هر بازی، رتبه‌ی کلی، جام‌ها، تورنمنت تا ۶۴ نفر با جایزه‌ی سمت سرور.

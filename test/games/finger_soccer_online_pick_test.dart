@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nexora/games/finger_soccer/core/bm_data.dart';
 import 'package:nexora/core/storage/local_store.dart';
 import 'package:nexora/games/core/game_contract.dart';
 import 'package:nexora/games/finger_soccer/core/bm_engine.dart';
@@ -167,14 +168,14 @@ void main() {
     // log confirms it (send -> ok) it counts on this phone too, so the match starts instead of hanging.
     await pumpFor(tester, 15);
     final Map<String, dynamic> fill = net.sent.firstWhere((Map<String, dynamic> d) => d['for'] == 0);
-    expect(fill['team'], 'bmw');
+    expect(fill['team'], kBmDefaultTeamId);
     expect(fill[kNetFloat], isTrue);
     await tester.pump(const Duration(milliseconds: 300));
-    expect(engineOf(tester)!.sel[0], 'bmw');
+    expect(engineOf(tester)!.sel[0], kBmDefaultTeamId);
     // a late real setup of that side changes nothing (first per side in the log wins on both phones)
-    net.deliver(0, <String, dynamic>{'a': 'setup', 'team': 'club5', 'form': 2, 'field': 0, 'ball': 0});
+    net.deliver(0, <String, dynamic>{'a': 'setup', 'team': 'porsche', 'form': 2, 'field': 0, 'ball': 0});
     await tester.pump(const Duration(milliseconds: 300));
-    expect(engineOf(tester)!.sel[0], 'bmw');
+    expect(engineOf(tester)!.sel[0], kBmDefaultTeamId);
     await close(tester);
   });
 
@@ -198,8 +199,8 @@ void main() {
     phone(tester);
     final _FakeNet net = _FakeNet(settings: <String, dynamic>{
       'room_prefs': <String, dynamic>{
-        '0': <String, dynamic>{'team': 'club6', 'form': 3},
-        '1': <String, dynamic>{'team': 'club7', 'form': 5},
+        '0': <String, dynamic>{'team': 'chelsea', 'form': 3},
+        '1': <String, dynamic>{'team': 'juventus', 'form': 5},
       },
     });
     await tester.pumpWidget(ProviderScope(
@@ -208,15 +209,15 @@ void main() {
     net.deliver(0, <String, dynamic>{'a': 'form', 'side': 0, 'form': 3}, replay: true);
     net.onDone!();
     await tester.pump(const Duration(milliseconds: 300));
-    expect(engineOf(tester)!.sel, <String>['club6', 'club7']);
+    expect(engineOf(tester)!.sel, <String>['chelsea', 'juventus']);
     await close(tester);
   });
 
   testWidgets('room match (v4): the room pick is the starting pick in the lobby', (WidgetTester tester) async {
     final _FakeNet net = await open(tester, settings: <String, dynamic>{
       'room_prefs': <String, dynamic>{
-        '0': <String, dynamic>{'team': 'cuba', 'form': 3},
-        '1': <String, dynamic>{'team': 'club7', 'form': 5},
+        '0': <String, dynamic>{'team': 'fx_shark', 'form': 3},
+        '1': <String, dynamic>{'team': 'juventus', 'form': 5},
       },
     });
     expect(find.byKey(const ValueKey<String>('setup-ready')), findsOneWidget);
@@ -224,7 +225,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey<String>('setup-ready')));
     await pumpFor(tester, 1);
     final Map<String, dynamic> mine = net.sent.firstWhere((Map<String, dynamic> d) => d['a'] == 'setup');
-    expect(mine['team'], 'cuba');
+    expect(mine['team'], 'fx_shark');
     expect(mine['form'], 3);
     await close(tester);
   });

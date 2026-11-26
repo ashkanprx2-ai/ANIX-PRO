@@ -100,22 +100,20 @@ void main() {
     });
 
     test('the catalogue the README advertises is the one that ships', () {
-      // 138 playable teams (+1 custom_team creation tile = 139 defs); v14 added 16 car crests, 11 pitches, 22 balls.
-      expect(kBmTeamDefs.where((BmTeamDef t) => t.cat != 'custom').length, 138);
-      expect(kBmTeamDefs.where((BmTeamDef t) => t.cat == 'clubs').length, 47);
-      expect(kBmTeamDefs.where((BmTeamDef t) => t.cat == 'nations').length, 19);
-      expect(kBmTeamDefs.where((BmTeamDef t) => t.cat == 'nx').length, 12);
-      expect(kBmTeamDefs.where((BmTeamDef t) => t.cat == 'cars').length, 40);
-      expect(kBmTeamDefs.where((BmTeamDef t) => t.cat == 'sport').length, 12);
-      expect(kBmTeamDefs.where((BmTeamDef t) => t.cat == 'elite').length, 6);
-      expect(kBmTeamDefs.where((BmTeamDef t) => t.cat == 'legends').length, 2);
+      // 77 playable NX pucks (+1 custom_team creation tile = 78 defs), 11 pitches, 22 balls.
+      expect(kBmTeamDefs.where((BmTeamDef t) => t.cat != 'custom').length, 77);
+      expect(kBmTeamDefs.where((BmTeamDef t) => t.cat == 'clubs').length, 22);
+      expect(kBmTeamDefs.where((BmTeamDef t) => t.cat == 'nations').length, 21);
+      expect(kBmTeamDefs.where((BmTeamDef t) => t.cat == 'brands').length, 13);
+      expect(kBmTeamDefs.where((BmTeamDef t) => t.cat == 'cars').length, 9);
+      expect(kBmTeamDefs.where((BmTeamDef t) => t.cat == 'fantasy').length, 12);
       expect(kBmFieldsRaw.length, 11);
       expect(kBmBallN.length, 22);
       final String readme = File('README.md').readAsStringSync();
-      expect(readme, contains('138 teams'));
+      expect(readme, contains('77 teams'));
       expect(readme, contains('11 pitches'));
       expect(readme, contains('22 balls'));
-      expect(readme, contains('۱۳۸ تیم'));
+      expect(readme, contains('۷۷ تیم'));
     });
   });
 }

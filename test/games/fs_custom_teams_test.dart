@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nexora/games/finger_soccer/core/bm_data.dart';
 import 'package:nexora/core/economy/gem_shop.dart';
 import 'package:nexora/games/finger_soccer/core/bm_engine.dart';
 import 'package:nexora/games/finger_soccer/core/fs_custom_teams.dart';
@@ -68,7 +69,7 @@ void main() {
     expect(t.power, kBmCustomTeamStat);
     expect(t.accuracy, kBmCustomTeamStat);
     expect(t.asset, kBmCustomTeamFallbackAsset);
-    expect(bmTeam('no_such_team').id, kBmTeams.first.id);
+    expect(bmTeam('no_such_team').id, kBmDefaultTeamId);
   });
 
   test('without a signed-in profile someone else\'s custom team costs 250 and is not usable', () {
