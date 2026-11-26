@@ -9,7 +9,6 @@ import 'package:nexora/core/settings/app_settings.dart';
 import 'package:nexora/core/storage/local_store.dart';
 import 'package:nexora/ui/kit/station_kit.dart';
 import 'package:nexora/ui/screens/auth_screens.dart';
-import 'package:nexora/ui/theme/station_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<ProviderContainer> _pump(WidgetTester tester, String lang) async {
