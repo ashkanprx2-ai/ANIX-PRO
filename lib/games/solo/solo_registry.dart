@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/game_contract.dart';
 import '../piano_tiles/piano_tiles.dart';
+import '../gate_shooter/gate_shooter.dart';
 import 'solo_kit.dart';
 import 'ui/action_boards.dart';
 import 'ui/puzzle_boards.dart';
@@ -114,6 +115,7 @@ final List<SoloDef> kSoloDefs = <SoloDef>[
     board: (BuildContext c, SoloRun r) => World2048Board(run: r),
   ),
   kPianoTilesDef,
+  kGateShooterDef,
 ];
 
 SoloDef? soloDef(String id) {

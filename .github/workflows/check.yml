@@ -70,6 +70,9 @@ jobs:
           grep -E "Error|error:|Expected:|Actual:|FAILED|failed|passed|EXCEPTION|overflowed" intro.txt | head -120
           tail -15 intro.txt
           echo "=====INTRO-END====="
+          flutter test test_render/gate_shooter_render_test.dart --dart-define=SHOTS=$PWD/shots > gs.txt 2>&1
+          echo "=====GS-BEGIN====="; grep -E "Error|error:|Expected:|Actual:|EXCEPTION|overflowed|passed|failed|\.dart:[0-9]+" gs.txt | head -60; tail -15 gs.txt; echo "=====GS-END====="
+          grep -E "EXCEPTION|Expected:|Actual:|Some tests failed|All tests passed|overflowed" gs.txt | head -8 | while IFS= read -r line; do echo "::warning title=gs-render::$line"; done
           ls -la shots
           exit 0
       - uses: actions/upload-artifact@v4

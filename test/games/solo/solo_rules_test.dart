@@ -24,6 +24,7 @@ void main() {
         'knife_hit',
         'game_2048',
         'piano_tiles',
+        'gate_shooter',
       ];
       expect(kSoloDefs.length, ids.length);
       for (final String id in ids) {

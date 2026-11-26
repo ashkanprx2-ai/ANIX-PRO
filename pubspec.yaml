@@ -122,6 +122,8 @@ flutter:
     - assets/games/game_2048/
     - assets/games/piano_tiles/
     - assets/games/piano_tiles/notes/
+    - assets/games/gate_shooter/
+    - assets/games/gate_shooter/sfx/
     - assets/progression/achievements/
     - assets/progression/club_badges/
     - assets/ui/holo_frames/

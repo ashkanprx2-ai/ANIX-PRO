@@ -32,6 +32,7 @@ void main() {
       'bubble_shooter': (1, 1),
       'knife_hit': (1, 1),
       'game_2048': (1, 1),
+      'gate_shooter': (1, 1),
     };
 
     test('bounds match the server table', () {
